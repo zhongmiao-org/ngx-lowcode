@@ -1,0 +1,24 @@
+<div
+  class="ngx-lowcode-node-shell"
+  [class.ngx-lowcode-node-shell--design]="isDesignMode()"
+  [class.ngx-lowcode-node-shell--selected]="isSelected()"
+  [class.ngx-lowcode-node-shell--drop-target]="isDropTarget()"
+  [class.ngx-lowcode-node-shell--can-drop]="canAcceptDrop()"
+  (mousemove)="handlePointerMove($event)"
+  (mouseleave)="handleMouseLeave()"
+  (click)="selectNode($event)">
+  @if (definition(); as material) {
+    <ng-container *ngComponentOutlet="material.component; inputs: { node: node(), runtime: runtime() }">
+    </ng-container>
+  } @else {
+    <div class="ngx-lowcode-node-missing">
+      Unknown material: {{ node().componentType }}
+    </div>
+  }
+  @if (isSelected()) {
+    <div class="ngx-lowcode-node-shell__badge">{{ node().componentType }}</div>
+  }
+  @if (isDropTarget()) {
+    <div class="ngx-lowcode-node-shell__drop-hint">{{ dropHintLabel() }}</div>
+  }
+</div>

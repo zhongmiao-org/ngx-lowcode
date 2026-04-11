@@ -1,0 +1,342 @@
+<div class="ngx-lowcode-designer" [style.grid-template-columns]="layoutColumns()">
+  <aside class="ngx-lowcode-designer__sidebar">
+    <button
+      type="button"
+      class="ngx-lowcode-panel-toggle"
+      [attr.aria-label]="leftSidebarCollapsed() ? t().expandLeft : t().collapseLeft"
+      (click)="toggleLeftSidebar()">
+      {{ leftSidebarCollapsed() ? '›' : '‹' }}
+    </button>
+    @if (!leftSidebarCollapsed()) {
+      <div class="ngx-lowcode-panel">
+        <div class="ngx-lowcode-panel__title">{{ t().materials }}</div>
+        <div
+          class="ngx-lowcode-materials"
+          cdkDropList
+          [id]="paletteDropListId"
+          [cdkDropListData]="availableMaterials()"
+          [cdkDropListConnectedTo]="[stageDropListId]"
+          [cdkDropListSortingDisabled]="true">
+          @for (material of availableMaterials(); track material.type) {
+            <button
+              [thyButton]="buttonKinds.default"
+              class="ngx-lowcode-materials__item"
+              cdkDrag
+              [cdkDragData]="material.type"
+              (cdkDragStarted)="handlePaletteDragStarted($event)"
+              (cdkDragEnded)="handlePaletteDragEnded($event)"
+              (click)="handleMaterialClick(material.type)">
+              {{ material.title }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="ngx-lowcode-panel">
+        <div class="ngx-lowcode-panel__title">{{ t().outline }}</div>
+        <div class="ngx-lowcode-outline">
+          @for (node of editorSchema().layoutTree; track node.id) {
+            <ng-container [ngTemplateOutlet]="outlineNode" [ngTemplateOutletContext]="{ $implicit: node, depth: 0 }"></ng-container>
+          }
+        </div>
+      </div>
+    }
+  </aside>
+
+  <div class="ngx-lowcode-designer__resizer" (pointerdown)="startResize($event, 'left')"></div>
+
+  <main class="ngx-lowcode-designer__canvas">
+    <header class="ngx-lowcode-toolbar">
+      <div>
+        <strong>{{ effectiveConfig().title || editorSchema().pageMeta.title }}</strong>
+      </div>
+      <div class="ngx-lowcode-toolbar__actions">
+        <button [thyButton]="buttonKinds.default" (click)="undo()">{{ t().undo }}</button>
+        <button [thyButton]="buttonKinds.default" (click)="redo()">{{ t().redo }}</button>
+        <button [thyButton]="buttonKinds.primaryOutline" (click)="emitPreview()">{{ t().preview }}</button>
+        <button [thyButton]="buttonKinds.primaryOutline" (click)="emitSave()">{{ t().save }}</button>
+        <button [thyButton]="buttonKinds.primary" (click)="emitPublish()">{{ t().publish }}</button>
+      </div>
+    </header>
+
+    <section
+      class="ngx-lowcode-stage"
+      [class.ngx-lowcode-stage--root-drop-target]="isPaletteDragging && !activeDropTarget()"
+      cdkDropList
+      [id]="stageDropListId"
+      [cdkDropListData]="editorSchema().layoutTree"
+      [cdkDropListConnectedTo]="[paletteDropListId]"
+      [cdkDropListSortingDisabled]="true"
+      (cdkDropListDropped)="handleMaterialDrop($event)">
+      <ngx-lowcode-renderer
+        [schema]="editorSchema()"
+        [mode]="'design'"
+        [selectedNodeId]="selectedNodeId()"
+        [paletteDragging]="isPaletteDragging"
+        [hoveredDropTarget]="activeDropTarget()"
+        [context]="{}"
+        (selectionChange)="handleRendererSelectionChange($event)"
+        (dropTargetChange)="handleRendererDropTargetChange($event)">
+      </ngx-lowcode-renderer>
+    </section>
+  </main>
+
+  <div class="ngx-lowcode-designer__resizer" (pointerdown)="startResize($event, 'right')"></div>
+
+  <aside class="ngx-lowcode-designer__props">
+    <button
+      type="button"
+      class="ngx-lowcode-panel-toggle ngx-lowcode-panel-toggle--right"
+      [attr.aria-label]="rightSidebarCollapsed() ? t().expandRight : t().collapseRight"
+      (click)="toggleRightSidebar()">
+      {{ rightSidebarCollapsed() ? '‹' : '›' }}
+    </button>
+    @if (!rightSidebarCollapsed()) {
+      <div class="ngx-lowcode-panel">
+        <div class="ngx-lowcode-panel__title">{{ t().page }}</div>
+
+        <label class="ngx-lowcode-prop-row">
+          <span>{{ t().pageTitle }}</span>
+          <input
+            thyInput
+            [ngModel]="editorSchema().pageMeta.title"
+            (ngModelChange)="updatePageMeta('title', $event)" />
+        </label>
+
+        <label class="ngx-lowcode-prop-row">
+          <span>{{ t().pageDescription }}</span>
+          <textarea
+            [ngModel]="editorSchema().pageMeta.description ?? ''"
+            (ngModelChange)="updatePageMeta('description', $event)"
+            rows="3"></textarea>
+        </label>
+
+        <div class="ngx-lowcode-page-meta">
+          <span>{{ t().pageId }}: {{ editorSchema().pageMeta.id }}</span>
+          <span>{{ t().nodeCount }}: {{ countNodes(editorSchema().layoutTree) }}</span>
+        </div>
+      </div>
+
+      <div class="ngx-lowcode-panel">
+        <div class="ngx-lowcode-panel__title">{{ t().properties }}</div>
+        @if (selectedNode(); as node) {
+          <div class="ngx-lowcode-props__meta">
+            <strong>{{ node.componentType }}</strong>
+            <span>{{ node.id }}</span>
+          </div>
+
+          <label class="ngx-lowcode-prop-row">
+            <span>{{ t().nodeName }}</span>
+            <input
+              thyInput
+              [ngModel]="node.name ?? ''"
+              [placeholder]="t().nodeNamePlaceholder"
+              (ngModelChange)="updateNodeName(node.id, $event)" />
+          </label>
+
+          <div class="ngx-lowcode-props-grid">
+            @for (setter of selectedDefinition()?.setterSchema ?? []; track setter.key) {
+              <label class="ngx-lowcode-prop-row" [class.ngx-lowcode-prop-row--half]="setter.type === 'number'">
+                <span>{{ setter.label }}</span>
+
+                @switch (setter.type) {
+                  @case ('textarea') {
+                    <textarea
+                      [ngModel]="stringProp(node, setter.key)"
+                      (ngModelChange)="updateNodeProp(node.id, setter.key, $event)"
+                      rows="4"></textarea>
+                  }
+                  @case ('number') {
+                    <input
+                      thyInput
+                      type="number"
+                      [ngModel]="numberProp(node, setter.key)"
+                      (ngModelChange)="updateNodeProp(node.id, setter.key, toNumber($event))" />
+                  }
+                  @case ('switch') {
+                    <thy-switch
+                      [ngModel]="booleanProp(node, setter.key)"
+                      (ngModelChange)="updateNodeProp(node.id, setter.key, $event)">
+                    </thy-switch>
+                  }
+                  @case ('select') {
+                    <thy-select
+                      [ngModel]="node.props[setter.key]"
+                      (ngModelChange)="updateNodeProp(node.id, setter.key, $event)">
+                      @for (option of setter.options ?? []; track option.value) {
+                        <thy-option [thyValue]="option.value" [thyLabelText]="option.label"></thy-option>
+                      }
+                    </thy-select>
+                  }
+                  @default {
+                    <input
+                      thyInput
+                      [ngModel]="stringProp(node, setter.key)"
+                      (ngModelChange)="updateNodeProp(node.id, setter.key, $event)" />
+                  }
+                }
+              </label>
+            }
+          </div>
+
+          <div class="ngx-lowcode-props__sub-title">{{ t().style }}</div>
+
+          <div class="ngx-lowcode-props-grid">
+            <label class="ngx-lowcode-prop-row">
+              <span>{{ t().textColor }}</span>
+              <input
+                thyInput
+                thyColorPicker
+                [ngModel]="styleProp(node, 'color')"
+                (ngModelChange)="updateNodeStyle(node.id, 'color', $event)" />
+            </label>
+
+            <label class="ngx-lowcode-prop-row">
+              <span>{{ t().background }}</span>
+              <input
+                thyInput
+                thyColorPicker
+                [ngModel]="styleProp(node, 'background')"
+                (ngModelChange)="updateNodeStyle(node.id, 'background', $event)" />
+            </label>
+
+            @for (dimension of styleDimensions(); track dimension.key) {
+              <label class="ngx-lowcode-prop-row ngx-lowcode-prop-row--half">
+                <span>{{ dimension.label }}</span>
+                <div class="ngx-lowcode-size-editor">
+                  <input
+                    thyInput
+                    type="number"
+                    [ngModel]="styleDimension(node, dimension.key).value"
+                    (ngModelChange)="updateStyleDimensionValue(node.id, dimension.key, $event)" />
+                  <thy-select
+                    [ngModel]="styleDimension(node, dimension.key).unit"
+                    (ngModelChange)="updateStyleDimensionUnit(node.id, dimension.key, $event)">
+                    @for (unit of styleUnits; track unit) {
+                      <thy-option [thyValue]="unit" [thyLabelText]="unit"></thy-option>
+                    }
+                  </thy-select>
+                </div>
+              </label>
+            }
+
+            <label class="ngx-lowcode-prop-row ngx-lowcode-prop-row--half">
+              <span>{{ t().padding }}</span>
+              <input
+                thyInput
+                [ngModel]="styleProp(node, 'padding')"
+                (ngModelChange)="updateNodeStyle(node.id, 'padding', $event)" />
+            </label>
+
+            <label class="ngx-lowcode-prop-row ngx-lowcode-prop-row--half">
+              <span>{{ t().marginBottom }}</span>
+              <input
+                thyInput
+                [ngModel]="styleProp(node, 'marginBottom')"
+                (ngModelChange)="updateNodeStyle(node.id, 'marginBottom', $event)" />
+            </label>
+          </div>
+
+          <div class="ngx-lowcode-props__actions">
+            <button [thyButton]="buttonKinds.default" (click)="duplicateSelected()">{{ t().duplicate }}</button>
+            <button [thyButton]="buttonKinds.dangerOutline" (click)="deleteSelected()">{{ t().delete }}</button>
+          </div>
+        } @else {
+          <p class="ngx-lowcode-empty">{{ t().selectNodeHint }}</p>
+        }
+      </div>
+
+      <div class="ngx-lowcode-panel">
+        <div class="ngx-lowcode-panel__title">{{ t().runtimeModel }}</div>
+
+        <div class="ngx-lowcode-tabset">
+          <button
+            type="button"
+            class="ngx-lowcode-tabset__item"
+            [class.is-active]="activeModelTab() === 'state'"
+            (click)="activeModelTab.set('state')">
+            {{ t().state }}
+          </button>
+          <button
+            type="button"
+            class="ngx-lowcode-tabset__item"
+            [class.is-active]="activeModelTab() === 'datasources'"
+            (click)="activeModelTab.set('datasources')">
+            {{ t().datasources }}
+          </button>
+          <button
+            type="button"
+            class="ngx-lowcode-tabset__item"
+            [class.is-active]="activeModelTab() === 'actions'"
+            (click)="activeModelTab.set('actions')">
+            {{ t().actions }}
+          </button>
+        </div>
+
+        @if (activeModelTab() === 'state') {
+          <textarea
+            class="ngx-lowcode-code-editor"
+            [ngModel]="stateDraft()"
+            (ngModelChange)="stateDraft.set($event)"
+            rows="12"></textarea>
+          @if (stateDraftError(); as error) {
+            <p class="ngx-lowcode-error">{{ error }}</p>
+          }
+          <button [thyButton]="buttonKinds.primaryOutline" (click)="applyStateDraft()">{{ t().applyState }}</button>
+        }
+
+        @if (activeModelTab() === 'datasources') {
+          <textarea
+            class="ngx-lowcode-code-editor"
+            [ngModel]="datasourcesDraft()"
+            (ngModelChange)="datasourcesDraft.set($event)"
+            rows="12"></textarea>
+          @if (datasourcesDraftError(); as error) {
+            <p class="ngx-lowcode-error">{{ error }}</p>
+          }
+          <button [thyButton]="buttonKinds.primaryOutline" (click)="applyDatasourcesDraft()">{{ t().applyDatasources }}</button>
+        }
+
+        @if (activeModelTab() === 'actions') {
+          <textarea
+            class="ngx-lowcode-code-editor"
+            [ngModel]="actionsDraft()"
+            (ngModelChange)="actionsDraft.set($event)"
+            rows="12"></textarea>
+          @if (actionsDraftError(); as error) {
+            <p class="ngx-lowcode-error">{{ error }}</p>
+          }
+          <button [thyButton]="buttonKinds.primaryOutline" (click)="applyActionsDraft()">{{ t().applyActions }}</button>
+        }
+      </div>
+    }
+  </aside>
+</div>
+
+<ng-template #outlineNode let-node let-depth="depth">
+  <div class="ngx-lowcode-outline__row" [style.padding-left.px]="12 + depth * 16">
+    @if (editingOutlineNodeId() === node.id) {
+      <input
+        thyInput
+        class="ngx-lowcode-outline__editor"
+        [ngModel]="outlineNameDraft()"
+        [placeholder]="t().nodeNamePlaceholder"
+        (ngModelChange)="outlineNameDraft.set($event)"
+        (blur)="commitOutlineRename(node.id)"
+        (keydown.enter)="commitOutlineRename(node.id)"
+        (keydown.escape)="cancelOutlineRename()" />
+    } @else {
+      <button
+        type="button"
+        class="ngx-lowcode-outline__item"
+        [class.is-selected]="selectedNodeId() === node.id"
+        (click)="selectNode(node.id)"
+        (dblclick)="startOutlineRename(node)">
+        {{ nodeDisplayName(node) }}
+      </button>
+    }
+  </div>
+  @for (child of node.children ?? []; track child.id) {
+    <ng-container [ngTemplateOutlet]="outlineNode" [ngTemplateOutletContext]="{ $implicit: child, depth: depth + 1 }"></ng-container>
+  }
+</ng-template>

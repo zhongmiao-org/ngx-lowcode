@@ -1,0 +1,9 @@
+@if (schema(); as currentSchema) {
+  <ngx-lowcode-render-children
+    [nodes]="currentSchema.layoutTree"
+    [runtime]="runtime()"
+    [paletteDragging]="paletteDragging()"
+    [hoveredDropTarget]="hoveredDropTarget()"
+    (dropTargetChange)="dropTargetChange.emit($event)">
+  </ngx-lowcode-render-children>
+}
