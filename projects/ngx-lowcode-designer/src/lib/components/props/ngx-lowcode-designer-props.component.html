@@ -1,0 +1,227 @@
+<button
+  type="button"
+  class="ngx-lowcode-panel-toggle ngx-lowcode-panel-toggle--right"
+  [attr.aria-label]="collapsed() ? t().expandRight : t().collapseRight"
+  (click)="toggleCollapse.emit()">
+  {{ collapsed() ? '‹' : '›' }}
+</button>
+
+@if (!collapsed()) {
+  <div class="ngx-lowcode-panel">
+    <div class="ngx-lowcode-panel__title">{{ t().page }}</div>
+
+    <label class="ngx-lowcode-prop-row">
+      <span>{{ t().pageTitle }}</span>
+      <input
+        thyInput
+        [ngModel]="editorSchema().pageMeta.title"
+        (ngModelChange)="pageMetaChange.emit({ key: 'title', value: $event })" />
+    </label>
+
+    <label class="ngx-lowcode-prop-row">
+      <span>{{ t().pageDescription }}</span>
+      <textarea
+        [ngModel]="editorSchema().pageMeta.description ?? ''"
+        (ngModelChange)="pageMetaChange.emit({ key: 'description', value: $event })"
+        rows="3"></textarea>
+    </label>
+
+    <div class="ngx-lowcode-page-meta">
+      <span>{{ t().pageId }}: {{ editorSchema().pageMeta.id }}</span>
+      <span>{{ t().nodeCount }}: {{ countNodes(editorSchema().layoutTree) }}</span>
+    </div>
+  </div>
+
+  <div class="ngx-lowcode-panel">
+    <div class="ngx-lowcode-panel__title">{{ t().properties }}</div>
+    @if (selectedNode(); as node) {
+      <div class="ngx-lowcode-props__meta">
+        <strong>{{ node.componentType }}</strong>
+        <span>{{ node.id }}</span>
+      </div>
+
+      <label class="ngx-lowcode-prop-row">
+        <span>{{ t().nodeName }}</span>
+        <input
+          thyInput
+          [ngModel]="node.name ?? ''"
+          [placeholder]="t().nodeNamePlaceholder"
+          (ngModelChange)="nodeNameChange.emit({ nodeId: node.id, value: $event })" />
+      </label>
+
+      <div class="ngx-lowcode-props-grid">
+        @for (setter of selectedDefinition()?.setterSchema ?? []; track setter.key) {
+          <label class="ngx-lowcode-prop-row" [class.ngx-lowcode-prop-row--half]="setter.type === 'number'">
+            <span>{{ setter.label }}</span>
+
+            @switch (setter.type) {
+              @case ('textarea') {
+                <textarea
+                  [ngModel]="stringProp(node, setter.key)"
+                  (ngModelChange)="nodePropChange.emit({ nodeId: node.id, key: setter.key, value: $event })"
+                  rows="4"></textarea>
+              }
+              @case ('number') {
+                <input
+                  thyInput
+                  type="number"
+                  [ngModel]="numberProp(node, setter.key)"
+                  (ngModelChange)="nodePropChange.emit({ nodeId: node.id, key: setter.key, value: toNumber($event) })" />
+              }
+              @case ('switch') {
+                <thy-switch
+                  [ngModel]="booleanProp(node, setter.key)"
+                  (ngModelChange)="nodePropChange.emit({ nodeId: node.id, key: setter.key, value: $event })">
+                </thy-switch>
+              }
+              @case ('select') {
+                <thy-select
+                  [ngModel]="node.props[setter.key]"
+                  (ngModelChange)="nodePropChange.emit({ nodeId: node.id, key: setter.key, value: $event })">
+                  @for (option of setter.options ?? []; track option.value) {
+                    <thy-option [thyValue]="option.value" [thyLabelText]="option.label"></thy-option>
+                  }
+                </thy-select>
+              }
+              @default {
+                <input
+                  thyInput
+                  [ngModel]="stringProp(node, setter.key)"
+                  (ngModelChange)="nodePropChange.emit({ nodeId: node.id, key: setter.key, value: $event })" />
+              }
+            }
+          </label>
+        }
+      </div>
+
+      <div class="ngx-lowcode-props__sub-title">{{ t().style }}</div>
+
+      <div class="ngx-lowcode-props-grid">
+        <label class="ngx-lowcode-prop-row">
+          <span>{{ t().textColor }}</span>
+          <input
+            thyInput
+            thyColorPicker
+            [ngModel]="styleProp(node, 'color')"
+            (ngModelChange)="nodeStyleChange.emit({ nodeId: node.id, key: 'color', value: $event })" />
+        </label>
+
+        <label class="ngx-lowcode-prop-row">
+          <span>{{ t().background }}</span>
+          <input
+            thyInput
+            thyColorPicker
+            [ngModel]="styleProp(node, 'background')"
+            (ngModelChange)="nodeStyleChange.emit({ nodeId: node.id, key: 'background', value: $event })" />
+        </label>
+
+        @for (dimension of styleDimensions(); track dimension.key) {
+          <label class="ngx-lowcode-prop-row ngx-lowcode-prop-row--half">
+            <span>{{ dimension.label }}</span>
+            <div class="ngx-lowcode-size-editor">
+              <input
+                thyInput
+                type="number"
+                [ngModel]="styleDimension(node, dimension.key).value"
+                (ngModelChange)="updateStyleDimensionValue(node.id, dimension.key, $event)" />
+              <thy-select
+                [ngModel]="styleDimension(node, dimension.key).unit"
+                (ngModelChange)="updateStyleDimensionUnit(node.id, dimension.key, $event)">
+                @for (unit of styleUnits(); track unit) {
+                  <thy-option [thyValue]="unit" [thyLabelText]="unit"></thy-option>
+                }
+              </thy-select>
+            </div>
+          </label>
+        }
+
+        <label class="ngx-lowcode-prop-row ngx-lowcode-prop-row--half">
+          <span>{{ t().padding }}</span>
+          <input
+            thyInput
+            [ngModel]="styleProp(node, 'padding')"
+            (ngModelChange)="nodeStyleChange.emit({ nodeId: node.id, key: 'padding', value: $event })" />
+        </label>
+
+        <label class="ngx-lowcode-prop-row ngx-lowcode-prop-row--half">
+          <span>{{ t().marginBottom }}</span>
+          <input
+            thyInput
+            [ngModel]="styleProp(node, 'marginBottom')"
+            (ngModelChange)="nodeStyleChange.emit({ nodeId: node.id, key: 'marginBottom', value: $event })" />
+        </label>
+      </div>
+
+      <div class="ngx-lowcode-props__actions">
+        <button [thyButton]="buttonKinds.default" (click)="duplicate.emit()">{{ t().duplicate }}</button>
+        <button [thyButton]="buttonKinds.dangerOutline" (click)="delete.emit()">{{ t().delete }}</button>
+      </div>
+    } @else {
+      <p class="ngx-lowcode-empty">{{ t().selectNodeHint }}</p>
+    }
+  </div>
+
+  <div class="ngx-lowcode-panel">
+    <div class="ngx-lowcode-panel__title">{{ t().runtimeModel }}</div>
+
+    <div class="ngx-lowcode-tabset">
+      <button
+        type="button"
+        class="ngx-lowcode-tabset__item"
+        [class.is-active]="activeModelTab() === 'state'"
+        (click)="activeModelTab.set('state')">
+        {{ t().state }}
+      </button>
+      <button
+        type="button"
+        class="ngx-lowcode-tabset__item"
+        [class.is-active]="activeModelTab() === 'datasources'"
+        (click)="activeModelTab.set('datasources')">
+        {{ t().datasources }}
+      </button>
+      <button
+        type="button"
+        class="ngx-lowcode-tabset__item"
+        [class.is-active]="activeModelTab() === 'actions'"
+        (click)="activeModelTab.set('actions')">
+        {{ t().actions }}
+      </button>
+    </div>
+
+    @if (activeModelTab() === 'state') {
+      <textarea
+        class="ngx-lowcode-code-editor"
+        [ngModel]="stateDraft()"
+        (ngModelChange)="stateDraft.set($event)"
+        rows="12"></textarea>
+      @if (stateDraftError(); as error) {
+        <p class="ngx-lowcode-error">{{ error }}</p>
+      }
+      <button [thyButton]="buttonKinds.primaryOutline" (click)="applyStateDraft()">{{ t().applyState }}</button>
+    }
+
+    @if (activeModelTab() === 'datasources') {
+      <textarea
+        class="ngx-lowcode-code-editor"
+        [ngModel]="datasourcesDraft()"
+        (ngModelChange)="datasourcesDraft.set($event)"
+        rows="12"></textarea>
+      @if (datasourcesDraftError(); as error) {
+        <p class="ngx-lowcode-error">{{ error }}</p>
+      }
+      <button [thyButton]="buttonKinds.primaryOutline" (click)="applyDatasourcesDraft()">{{ t().applyDatasources }}</button>
+    }
+
+    @if (activeModelTab() === 'actions') {
+      <textarea
+        class="ngx-lowcode-code-editor"
+        [ngModel]="actionsDraft()"
+        (ngModelChange)="actionsDraft.set($event)"
+        rows="12"></textarea>
+      @if (actionsDraftError(); as error) {
+        <p class="ngx-lowcode-error">{{ error }}</p>
+      }
+      <button [thyButton]="buttonKinds.primaryOutline" (click)="applyActionsDraft()">{{ t().applyActions }}</button>
+    }
+  </div>
+}

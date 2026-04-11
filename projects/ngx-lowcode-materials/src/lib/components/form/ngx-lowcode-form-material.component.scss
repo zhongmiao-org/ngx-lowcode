@@ -1,0 +1,27 @@
+.ngx-lowcode-form {
+  padding: 16px;
+  border: 1px solid #d0d5dd;
+  border-radius: 12px;
+  background: #fcfcfd;
+}
+
+.ngx-lowcode-form__title {
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.ngx-lowcode-form__grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.ngx-lowcode-form__drop-placeholder {
+  grid-column: 1 / -1;
+  border: 2px dashed #14b8a6;
+  border-radius: 12px;
+  padding: 18px 12px;
+  color: #0f766e;
+  background: rgba(204, 251, 241, 0.35);
+  text-align: center;
+}

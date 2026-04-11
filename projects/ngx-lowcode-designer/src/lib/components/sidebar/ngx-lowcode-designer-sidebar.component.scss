@@ -1,0 +1,70 @@
+:host {
+  display: block;
+  position: relative;
+  padding: 16px;
+  border-right: 1px solid #e4e7ec;
+  background: rgba(255, 255, 255, 0.9);
+  overflow: auto;
+  min-width: 0;
+}
+
+.ngx-lowcode-panel-toggle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #d0d5dd;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #344054;
+}
+
+.ngx-lowcode-panel {
+  background: #ffffff;
+  border: 1px solid #eaecf0;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 16px;
+  min-width: 0;
+}
+
+.ngx-lowcode-panel__title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.ngx-lowcode-materials {
+  display: grid;
+  gap: 8px;
+}
+
+.ngx-lowcode-materials__item {
+  justify-content: flex-start;
+}
+
+.ngx-lowcode-outline__item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #344054;
+}
+
+.ngx-lowcode-outline__item.is-selected {
+  background: #eef4ff;
+  color: #1d4ed8;
+}
+
+.ngx-lowcode-outline__row {
+  margin-bottom: 2px;
+}
+
+.ngx-lowcode-outline__editor {
+  width: 100%;
+}

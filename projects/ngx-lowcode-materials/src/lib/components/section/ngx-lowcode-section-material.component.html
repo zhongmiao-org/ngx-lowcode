@@ -1,0 +1,16 @@
+<section class="ngx-lowcode-section" [ngStyle]="sectionStyle()">
+  <header class="ngx-lowcode-section__header">{{ title() }}</header>
+  <div class="ngx-lowcode-section__body" [ngStyle]="bodyStyle()">
+    @for (column of distributedChildren(); track $index) {
+      <div
+        class="ngx-lowcode-section__column"
+        [class.ngx-lowcode-section__column--active-drop]="activeDropSlot() === columnSlotName($index)"
+        [class.ngx-lowcode-section__column--empty]="!column.length">
+        <ngx-lowcode-render-children [nodes]="column" [runtime]="runtime()"></ngx-lowcode-render-children>
+        @if (showColumnDropPlaceholder(column, $index)) {
+          <div class="ngx-lowcode-section__drop-placeholder">{{ columnPlaceholderLabel($index) }}</div>
+        }
+      </div>
+    }
+  </div>
+</section>

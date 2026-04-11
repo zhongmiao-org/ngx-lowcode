@@ -1,7 +1,6 @@
-import { CdkDragDrop, CdkDragEnd, CdkDragStart, DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { Component, OnChanges, OnDestroy, SimpleChanges, computed, inject, input, output, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { NgxLowcodeEditorStore, NgxLowcodeMaterialRegistry } from 'ngx-lowcode-core';
 import { cloneSchema, createDefaultPageSchema, createNodeId, findNodeById } from 'ngx-lowcode-core-utils';
 import {
@@ -16,12 +15,9 @@ import {
 } from 'ngx-lowcode-core-types';
 import { getDesignerI18n, NgxLowcodeDesignerLocale } from 'ngx-lowcode-i18n';
 import { NgxLowcodeRendererComponent } from 'ngx-lowcode-renderer';
+import { NgxLowcodeDesignerPropsComponent } from '../props/ngx-lowcode-designer-props.component';
+import { NgxLowcodeDesignerSidebarComponent } from '../sidebar/ngx-lowcode-designer-sidebar.component';
 import { ThyButtonModule } from 'ngx-tethys/button';
-import { ThyColorPickerModule } from 'ngx-tethys/color-picker';
-import { ThyInputModule } from 'ngx-tethys/input';
-import { ThyOption } from 'ngx-tethys/shared';
-import { ThySelectModule } from 'ngx-tethys/select';
-import { ThySwitchModule } from 'ngx-tethys/switch';
 
 @Component({
   selector: 'ngx-lowcode-designer',
@@ -29,14 +25,10 @@ import { ThySwitchModule } from 'ngx-tethys/switch';
   imports: [
     CommonModule,
     DragDropModule,
-    FormsModule,
     NgxLowcodeRendererComponent,
+    NgxLowcodeDesignerSidebarComponent,
+    NgxLowcodeDesignerPropsComponent,
     ThyButtonModule,
-    ThyColorPickerModule,
-    ThyInputModule,
-    ThySelectModule,
-    ThyOption,
-    ThySwitchModule
   ],
   providers: [NgxLowcodeEditorStore],
   templateUrl: './ngx-lowcode-designer.component.html',
@@ -46,19 +38,9 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
   private readonly registry = inject(NgxLowcodeMaterialRegistry);
   private readonly editorStore = inject(NgxLowcodeEditorStore);
   protected isPaletteDragging = false;
-  private suppressNextPaletteClick = false;
   private resizeCleanup: (() => void) | null = null;
 
   readonly activeDropTarget = signal<NgxLowcodeDropTarget | null>(null);
-  readonly activeModelTab = signal<'state' | 'datasources' | 'actions'>('state');
-  readonly editingOutlineNodeId = signal<string | null>(null);
-  readonly outlineNameDraft = signal('');
-  readonly stateDraft = signal('{}');
-  readonly datasourcesDraft = signal('[]');
-  readonly actionsDraft = signal('[]');
-  readonly stateDraftError = signal('');
-  readonly datasourcesDraftError = signal('');
-  readonly actionsDraftError = signal('');
   readonly leftSidebarWidth = signal(280);
   readonly rightSidebarWidth = signal(320);
   readonly leftSidebarCollapsed = signal(false);
@@ -121,7 +103,6 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
         resetHistory: true,
         preserveSelection: true
       });
-      this.syncRuntimeDrafts(nextSchema);
     }
   }
 
@@ -141,14 +122,6 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
     this.emitSelectionChange();
   }
 
-  handleMaterialClick(materialType: string): void {
-    if (this.isPaletteDragging || this.suppressNextPaletteClick) {
-      this.suppressNextPaletteClick = false;
-      return;
-    }
-    this.addMaterial(materialType);
-  }
-
   handleMaterialDrop(event: CdkDragDrop<NgxLowcodeNodeSchema[], NgxLowcodeComponentDefinition[], string>): void {
     if (event.previousContainer.id === event.container.id) {
       return;
@@ -160,18 +133,9 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
     this.addMaterial(materialType);
   }
 
-  handlePaletteDragStarted(_event: CdkDragStart<string>): void {
-    this.isPaletteDragging = true;
+  handlePaletteDragStateChange(isDragging: boolean): void {
+    this.isPaletteDragging = isDragging;
     this.activeDropTarget.set(null);
-  }
-
-  handlePaletteDragEnded(_event: CdkDragEnd<string>): void {
-    this.isPaletteDragging = false;
-    this.activeDropTarget.set(null);
-    this.suppressNextPaletteClick = true;
-    queueMicrotask(() => {
-      this.suppressNextPaletteClick = false;
-    });
   }
 
   handleRendererSelectionChange(nodeId: string | null): void {
@@ -189,9 +153,6 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
   }
 
   selectNode(nodeId: string): void {
-    if (this.editingOutlineNodeId() && this.editingOutlineNodeId() !== nodeId) {
-      this.cancelOutlineRename();
-    }
     this.editorStore.dispatch({ type: 'select-node', nodeId });
     this.emitSelectionChange();
   }
@@ -220,33 +181,6 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
     this.emitSchemaChange();
   }
 
-  styleDimension(node: NgxLowcodeNodeSchema, key: string): { value: number | null; unit: string } {
-    const raw = this.styleProp(node, key).trim();
-    if (!raw) {
-      return { value: null, unit: 'px' };
-    }
-
-    const match = raw.match(/^(-?\d+(?:\.\d+)?)([a-z%]+)$/i);
-    if (!match) {
-      return { value: Number(raw) || null, unit: 'px' };
-    }
-
-    return { value: Number(match[1]), unit: match[2] };
-  }
-
-  updateStyleDimensionValue(nodeId: string, key: string, value: string | number | null): void {
-    const nextValue = value === null || value === '' ? null : Number(value);
-    const currentNode = this.selectedNode();
-    const currentDimension = currentNode ? this.styleDimension(currentNode, key) : { value: null, unit: 'px' };
-    this.commitStyleDimension(nodeId, key, nextValue, currentDimension.unit);
-  }
-
-  updateStyleDimensionUnit(nodeId: string, key: string, unit: string): void {
-    const currentNode = this.selectedNode();
-    const currentDimension = currentNode ? this.styleDimension(currentNode, key) : { value: null, unit: 'px' };
-    this.commitStyleDimension(nodeId, key, currentDimension.value, unit);
-  }
-
   duplicateSelected(): void {
     const nodeId = this.selectedNodeId();
     if (!nodeId) {
@@ -264,7 +198,7 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
     }
 
     const isRoot = this.editorSchema().layoutTree.some((node) => node.id === nodeId);
-    if (isRoot && this.effectiveConfig().allowDeleteRoot === false) {
+    if (isRoot && !this.effectiveConfig().allowDeleteRoot) {
       return;
     }
 
@@ -280,7 +214,6 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
     this.editorStore.dispatch({ type: 'undo' });
     this.emitSchemaChange();
     this.emitSelectionChange();
-    this.syncRuntimeDrafts(this.editorSchema());
   }
 
   redo(): void {
@@ -290,7 +223,6 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
     this.editorStore.dispatch({ type: 'redo' });
     this.emitSchemaChange();
     this.emitSelectionChange();
-    this.syncRuntimeDrafts(this.editorSchema());
   }
 
   toggleLeftSidebar(): void {
@@ -349,97 +281,19 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
     this.command.emit({ type: 'publish', schema });
   }
 
-  applyStateDraft(): void {
-    const parsed = this.parseJsonDraft<Record<string, unknown>>(this.stateDraft());
-    if (!parsed) {
-      this.stateDraftError.set(this.t().stateJsonError);
-      return;
-    }
-    this.stateDraftError.set('');
-    this.editorStore.dispatch({ type: 'replace-state', state: parsed });
+  replaceState(state: Record<string, unknown>): void {
+    this.editorStore.dispatch({ type: 'replace-state', state });
     this.emitSchemaChange();
-    this.syncRuntimeDrafts(this.editorSchema());
   }
 
-  applyDatasourcesDraft(): void {
-    const parsed = this.parseJsonDraft<NgxLowcodeDatasourceDefinition[]>(this.datasourcesDraft());
-    if (!Array.isArray(parsed)) {
-      this.datasourcesDraftError.set(this.t().datasourcesJsonError);
-      return;
-    }
-    this.datasourcesDraftError.set('');
-    this.editorStore.dispatch({ type: 'replace-datasources', datasources: parsed });
+  replaceDatasources(datasources: NgxLowcodeDatasourceDefinition[]): void {
+    this.editorStore.dispatch({ type: 'replace-datasources', datasources });
     this.emitSchemaChange();
-    this.syncRuntimeDrafts(this.editorSchema());
   }
 
-  applyActionsDraft(): void {
-    const parsed = this.parseJsonDraft<NgxLowcodeActionDefinition[]>(this.actionsDraft());
-    if (!Array.isArray(parsed)) {
-      this.actionsDraftError.set(this.t().actionsJsonError);
-      return;
-    }
-    this.actionsDraftError.set('');
-    this.editorStore.dispatch({ type: 'replace-actions', actions: parsed });
+  replaceActions(actions: NgxLowcodeActionDefinition[]): void {
+    this.editorStore.dispatch({ type: 'replace-actions', actions });
     this.emitSchemaChange();
-    this.syncRuntimeDrafts(this.editorSchema());
-  }
-
-  stringProp(node: NgxLowcodeNodeSchema, key: string): string {
-    return String(node.props[key] ?? '');
-  }
-
-  numberProp(node: NgxLowcodeNodeSchema, key: string): number {
-    return Number(node.props[key] ?? 0);
-  }
-
-  booleanProp(node: NgxLowcodeNodeSchema, key: string): boolean {
-    return Boolean(node.props[key]);
-  }
-
-  styleProp(node: NgxLowcodeNodeSchema, key: string): string {
-    const value = node.style?.[key];
-    return value === undefined || value === null ? '' : String(value);
-  }
-
-  countNodes(nodes: NgxLowcodeNodeSchema[]): number {
-    return nodes.reduce((total, node) => total + 1 + this.countNodes(node.children ?? []), 0);
-  }
-
-  nodeDisplayName(node: NgxLowcodeNodeSchema): string {
-    if (typeof node.name === 'string' && node.name.trim()) {
-      return node.name.trim();
-    }
-
-    const titleKeys = ['title', 'label', 'text', 'placeholder', 'stateKey'];
-    for (const key of titleKeys) {
-      const value = node.props[key];
-      if (typeof value === 'string' && value.trim()) {
-        return `${node.componentType} · ${value.trim()}`;
-      }
-    }
-    return `${node.componentType} · ${node.id}`;
-  }
-
-  toNumber(value: string | number): number {
-    return Number(value);
-  }
-
-  startOutlineRename(node: NgxLowcodeNodeSchema): void {
-    this.selectNode(node.id);
-    this.editingOutlineNodeId.set(node.id);
-    this.outlineNameDraft.set(node.name ?? '');
-  }
-
-  commitOutlineRename(nodeId: string): void {
-    this.updateNodeName(nodeId, this.outlineNameDraft());
-    this.editingOutlineNodeId.set(null);
-    this.outlineNameDraft.set('');
-  }
-
-  cancelOutlineRename(): void {
-    this.editingOutlineNodeId.set(null);
-    this.outlineNameDraft.set('');
   }
 
   private resolveInsertionTarget(): NgxLowcodeDropTarget {
@@ -491,35 +345,5 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
 
     nextSchema.layoutTree = [rootPage];
     return nextSchema;
-  }
-
-  private syncRuntimeDrafts(schema: NgxLowcodePageSchema): void {
-    this.stateDraft.set(this.stringifyJson(schema.state));
-    this.datasourcesDraft.set(this.stringifyJson(schema.datasources));
-    this.actionsDraft.set(this.stringifyJson(schema.actions));
-    this.stateDraftError.set('');
-    this.datasourcesDraftError.set('');
-    this.actionsDraftError.set('');
-  }
-
-  private stringifyJson(value: unknown): string {
-    return JSON.stringify(value, null, 2);
-  }
-
-  private commitStyleDimension(nodeId: string, key: string, value: number | null, unit: string): void {
-    this.editorStore.dispatch({
-      type: 'update-node-style',
-      nodeId,
-      patch: { [key]: value === null || Number.isNaN(value) ? undefined : `${value}${unit}` }
-    });
-    this.emitSchemaChange();
-  }
-
-  private parseJsonDraft<T>(value: string): T | null {
-    try {
-      return JSON.parse(value) as T;
-    } catch {
-      return null;
-    }
   }
 }

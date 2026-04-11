@@ -1,0 +1,9 @@
+<form class="ngx-lowcode-form">
+  <div class="ngx-lowcode-form__title">{{ title() }}</div>
+  <div class="ngx-lowcode-form__grid">
+    <ngx-lowcode-render-children [nodes]="node().children ?? []" [runtime]="runtime()"></ngx-lowcode-render-children>
+    @if (showEmptyDropzone()) {
+      <div class="ngx-lowcode-form__drop-placeholder">Drop form fields here</div>
+    }
+  </div>
+</form>

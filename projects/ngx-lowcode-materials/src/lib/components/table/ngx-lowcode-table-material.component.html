@@ -1,0 +1,27 @@
+<section class="ngx-lowcode-table">
+  <header class="ngx-lowcode-table__header">{{ title() }}</header>
+  @if (rows().length) {
+    <div class="ngx-lowcode-table__wrap">
+      <table>
+        <thead>
+          <tr>
+            @for (column of columns(); track column) {
+              <th>{{ column }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track $index) {
+            <tr>
+              @for (column of columns(); track column) {
+                <td>{{ row[column] }}</td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="ngx-lowcode-table__empty">No data</div>
+  }
+</section>
