@@ -15,4 +15,9 @@ export class NgxLowcodeTextMaterialComponent {
   readonly runtime = input.required<NgxLowcodeRuntimeContext>();
 
   readonly content = computed(() => interpolateTemplate(String(this.node().props['text'] ?? ''), this.runtime()));
+  readonly href = computed(() => String(this.node().props['href'] ?? '').trim());
+  readonly target = computed(() => {
+    const value = String(this.node().props['target'] ?? '').trim();
+    return value || null;
+  });
 }

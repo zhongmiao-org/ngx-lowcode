@@ -1,3 +1,9 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
 .ngx-lowcode-form {
   padding: 16px;
   border: 1px solid #d0d5dd;
@@ -11,17 +17,58 @@
 }
 
 .ngx-lowcode-form__grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  min-width: 0;
 }
 
-.ngx-lowcode-form__drop-placeholder {
-  grid-column: 1 / -1;
+.ngx-lowcode-form__item {
+  min-width: 0;
+  width: 100%;
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+
+.ngx-lowcode-form__item--section,
+.ngx-lowcode-form__drag-shell {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.ngx-lowcode-form__item.cdk-drag-animating {
+  transition: transform 180ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.ngx-lowcode-form__drag-preview {
+  min-width: 140px;
+  max-width: 240px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.28);
+}
+
+.cdk-drop-list-dragging .ngx-lowcode-form__item:not(.cdk-drag-placeholder) {
+  transition: transform 180ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.ngx-lowcode-form__item.cdk-drag-placeholder {
+  position: relative;
+  opacity: 1;
+}
+
+.ngx-lowcode-form__item.cdk-drag-placeholder > * {
+  visibility: hidden;
+}
+
+.ngx-lowcode-form__item.cdk-drag-placeholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
   border: 2px dashed #14b8a6;
   border-radius: 12px;
-  padding: 18px 12px;
-  color: #0f766e;
   background: rgba(204, 251, 241, 0.35);
-  text-align: center;
+  visibility: visible;
 }

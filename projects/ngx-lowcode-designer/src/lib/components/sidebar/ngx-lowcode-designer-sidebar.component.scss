@@ -1,10 +1,14 @@
+@import '@tabler/icons-webfont/dist/tabler-icons.css';
+
 :host {
   display: block;
   position: relative;
   padding: 16px;
   border-right: 1px solid #e4e7ec;
   background: rgba(255, 255, 255, 0.9);
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
   min-width: 0;
 }
 
@@ -30,6 +34,11 @@
   min-width: 0;
 }
 
+.ngx-lowcode-panel:first-of-type {
+  container-type: inline-size;
+  container-name: materials-panel;
+}
+
 .ngx-lowcode-panel__title {
   font-size: 14px;
   font-weight: 700;
@@ -38,33 +47,170 @@
 
 .ngx-lowcode-materials {
   display: grid;
+  gap: 14px;
+}
+
+.ngx-lowcode-materials__group {
+  display: grid;
   gap: 8px;
 }
 
-.ngx-lowcode-materials__item {
-  justify-content: flex-start;
+.ngx-lowcode-materials__group-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #667085;
+  text-transform: uppercase;
 }
 
-.ngx-lowcode-outline__item {
-  display: block;
+.ngx-lowcode-materials__item {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  align-items: stretch;
+}
+
+.ngx-lowcode-materials__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+@container materials-panel (min-width: 200px) {
+  .ngx-lowcode-materials__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container materials-panel (min-width: 342px) {
+  .ngx-lowcode-materials__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.ngx-lowcode-materials__card {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 6px;
+  padding: 0 8px;
+  border: 1px solid #e4e7ec;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ngx-lowcode-materials__handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  text-align: left;
+  min-height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  cursor: grab;
+  box-shadow: none;
+  justify-self: center;
+}
+
+.ngx-lowcode-materials__handle :where(.ti) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  font-size: 28px;
+  line-height: 1;
+  opacity: 1;
+  visibility: visible;
+}
+
+.ngx-lowcode-materials__handle:hover,
+.ngx-lowcode-materials__handle:focus,
+.ngx-lowcode-materials__handle:focus-visible {
   border: none;
   background: transparent;
-  border-radius: 8px;
-  padding: 8px 12px;
-  color: #344054;
+  color: inherit;
+  box-shadow: none;
+  outline: none;
 }
 
-.ngx-lowcode-outline__item.is-selected {
-  background: #eef4ff;
-  color: #1d4ed8;
+.ngx-lowcode-materials__handle:active {
+  cursor: grabbing;
 }
 
-.ngx-lowcode-outline__row {
-  margin-bottom: 2px;
+.ngx-lowcode-materials__content {
+  display: block;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: center;
+}
+
+.ngx-lowcode-materials__name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #101828;
+  line-height: 1.35;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: calc(1.35em * 2);
+  word-break: break-word;
+}
+
+.ngx-lowcode-outline {
+  min-width: 0;
+}
+
+.ngx-lowcode-outline__node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ngx-lowcode-outline__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: inherit;
+  font-size: 14px;
+}
+
+.ngx-lowcode-outline__label {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ngx-lowcode-outline__editor {
   width: 100%;
+}
+
+:host ::ng-deep .ngx-lowcode-outline .thy-tree-node-wrapper {
+  border-radius: 8px;
+}
+
+:host ::ng-deep .ngx-lowcode-outline .thy-tree-node-wrapper.active {
+  background: #eef4ff;
+  color: #1d4ed8;
+}
+
+:host ::ng-deep .ngx-lowcode-outline .thy-tree-node-content {
+  min-width: 0;
+}
+
+:host ::ng-deep .ngx-lowcode-outline .thy-tree-node-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

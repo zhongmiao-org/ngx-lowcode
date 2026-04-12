@@ -168,7 +168,7 @@ thy-collapse-item + thy-collapse-item {
   border: 1px solid #eaecf0;
   border-radius: 12px;
   background: #f8fafc;
-  overflow: hidden;
+  overflow: visible;
 }
 
 :host ::ng-deep .thy-collapse-header {
@@ -180,6 +180,15 @@ thy-collapse-item + thy-collapse-item {
 :host ::ng-deep .thy-collapse-content-box {
   padding: 14px;
   background: #ffffff;
+  overflow: visible;
+}
+
+:host ::ng-deep .thy-select-custom {
+  width: 100%;
+}
+
+:host ::ng-deep .thy-select-control {
+  width: 100%;
 }
 
 @media (max-width: 1200px) {

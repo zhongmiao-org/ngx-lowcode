@@ -5,15 +5,109 @@
       <p>{{ value }}</p>
     }
   </section>
-  <section class="ngx-lowcode-page__body">
-    <ngx-lowcode-render-children
-      [nodes]="node().children ?? []"
-      [parentId]="node().id"
-      [slot]="null"
-      [runtime]="runtime()">
-    </ngx-lowcode-render-children>
-    @if (showEmptyDropzone()) {
-      <div class="ngx-lowcode-empty-dropzone">Drop components into this page</div>
+
+  <section
+    class="ngx-lowcode-page__body"
+    [ngStyle]="pageBodyStyle()">
+    @if (isDesignMode()) {
+      <div
+        class="ngx-lowcode-page__design-surface"
+        thyFlex
+        [thyDirection]="thyDirection()"
+        [thyWrap]="thyWrap()"
+        [thyJustifyContent]="thyJustifyContent()"
+        [thyAlignItems]="thyAlignItems()"
+        [thyGap]="0"
+        [ngStyle]="designContainerStyle()"
+        cdkDropList
+        [cdkDropListData]="dropListData()"
+        [cdkDropListDisabled]="false"
+        [cdkDropListOrientation]="designDropListOrientation()"
+        (cdkDropListEntered)="logDropListEntered($any($event))"
+        (cdkDropListExited)="logDropListExited($any($event))"
+        (cdkDropListDropped)="handleDrop($any($event))">
+        @for (child of node().children ?? []; track child.id; let index = $index) {
+          @if (canDragChild(child)) {
+            <div
+              class="ngx-lowcode-page__item"
+              thyFlexItem
+              [thyGrow]="resolveFlexItem(child).grow"
+              [thyShrink]="resolveFlexItem(child).shrink"
+              [thyBasis]="resolveFlexItem(child).basis"
+              [ngStyle]="designItemStyle(child)"
+              cdkDrag
+              [cdkDragData]="child"
+              [cdkDragDisabled]="isDragSuppressed(child.id)"
+              (pointerdown)="prepareDrag($event, child.id)"
+              (pointerup)="clearPreparedDrag(child.id)"
+              (pointercancel)="clearPreparedDrag(child.id)"
+              (cdkDragStarted)="handleDragStart(child.id)"
+              (cdkDragEnded)="handleDragEnd()">
+              <div *cdkDragPreview class="ngx-lowcode-page__drag-preview">
+                {{ dragPreviewLabel(child) }}
+              </div>
+              <div class="ngx-lowcode-page__drag-shell">
+                <ngx-lowcode-node-renderer
+                  [node]="child"
+                  [parentId]="node().id"
+                  [slot]="null"
+                  [siblingIndex]="index"
+                  [parentOrientation]="childFlowOrientation()"
+                  [disableSiblingHotspots]="true"
+                  [runtime]="runtime()">
+                </ngx-lowcode-node-renderer>
+              </div>
+            </div>
+          } @else {
+            <div
+              class="ngx-lowcode-page__item"
+              thyFlexItem
+              [thyGrow]="resolveFlexItem(child).grow"
+              [thyShrink]="resolveFlexItem(child).shrink"
+              [thyBasis]="resolveFlexItem(child).basis"
+              [ngStyle]="designItemStyle(child)">
+              <div class="ngx-lowcode-page__drag-shell">
+                <ngx-lowcode-node-renderer
+                  [node]="child"
+                  [parentId]="node().id"
+                  [slot]="null"
+                  [siblingIndex]="index"
+                  [parentOrientation]="childFlowOrientation()"
+                  [disableSiblingHotspots]="true"
+                  [runtime]="runtime()">
+                </ngx-lowcode-node-renderer>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    } @else {
+      <thy-flex
+        class="ngx-lowcode-page__flex"
+        [thyDirection]="thyDirection()"
+        [thyWrap]="thyWrap()"
+        [thyJustifyContent]="thyJustifyContent()"
+        [thyAlignItems]="thyAlignItems()"
+        [thyGap]="+(thyGap() || 0)">
+        @for (child of node().children ?? []; track child.id) {
+          <thy-flex-item
+            class="ngx-lowcode-page__item ngx-lowcode-page__item--flex"
+            [thyGrow]="resolveFlexItem(child).grow"
+            [thyShrink]="resolveFlexItem(child).shrink"
+            [thyBasis]="resolveFlexItem(child).basis"
+            [style.order]="resolveFlexItem(child).order"
+            [style.align-self]="resolveFlexItem(child).alignSelf">
+            <ngx-lowcode-node-renderer
+              [node]="child"
+              [parentId]="node().id"
+              [slot]="null"
+              [siblingIndex]="$index"
+              [parentOrientation]="childFlowOrientation()"
+              [runtime]="runtime()">
+            </ngx-lowcode-node-renderer>
+          </thy-flex-item>
+        }
+      </thy-flex>
     }
   </section>
 </div>

@@ -13,6 +13,9 @@ export class NgxLowcodeTableMaterialComponent {
   readonly node = input.required<NgxLowcodeNodeSchema>();
   readonly runtime = input.required<NgxLowcodeRuntimeContext>();
 
+  readonly tableStyle = computed<Record<string, string | number>>(() => ({
+    ...(this.node().style ?? {})
+  }));
   readonly title = computed(() => String(this.node().props['title'] ?? 'Results'));
   readonly dataKey = computed(() => String(this.node().props['dataKey'] ?? ''));
   readonly rows = computed<Record<string, unknown>[]>(() => {

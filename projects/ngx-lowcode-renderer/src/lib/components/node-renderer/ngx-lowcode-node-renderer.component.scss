@@ -1,6 +1,15 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
 .ngx-lowcode-node-shell {
   position: relative;
   overflow: visible;
+  display: block;
+  width: 100%;
+  min-width: 0;
 }
 
 .ngx-lowcode-node-shell--design {
@@ -26,15 +35,37 @@
   opacity: 0.45;
 }
 
-.ngx-lowcode-node-shell--can-drop.ngx-lowcode-node-shell--design {
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+.ngx-lowcode-node-shell__edge {
+  position: absolute;
+  z-index: 2;
 }
 
-.ngx-lowcode-node-shell--drop-target {
-  box-shadow:
-    0 0 0 2px rgba(14, 116, 144, 0.9),
-    inset 0 0 0 2px rgba(125, 211, 252, 0.95);
-  background: linear-gradient(180deg, rgba(236, 254, 255, 0.85) 0%, rgba(240, 249, 255, 0.9) 100%);
+.ngx-lowcode-node-shell__edge--vertical {
+  left: 0;
+  right: 0;
+  height: 18px;
+}
+
+.ngx-lowcode-node-shell__edge--horizontal {
+  top: 0;
+  bottom: 0;
+  width: 18px;
+}
+
+.ngx-lowcode-node-shell__edge--before.ngx-lowcode-node-shell__edge--vertical {
+  top: -9px;
+}
+
+.ngx-lowcode-node-shell__edge--after.ngx-lowcode-node-shell__edge--vertical {
+  bottom: -9px;
+}
+
+.ngx-lowcode-node-shell__edge--before.ngx-lowcode-node-shell__edge--horizontal {
+  left: -9px;
+}
+
+.ngx-lowcode-node-shell__edge--after.ngx-lowcode-node-shell__edge--horizontal {
+  right: -9px;
 }
 
 .ngx-lowcode-node-shell__badge {
@@ -44,19 +75,6 @@
   padding: 2px 8px;
   border-radius: 999px;
   background: #2563eb;
-  color: #ffffff;
-  font-size: 12px;
-  line-height: 18px;
-  pointer-events: none;
-}
-
-.ngx-lowcode-node-shell__drop-hint {
-  position: absolute;
-  top: -10px;
-  right: 12px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: #0f766e;
   color: #ffffff;
   font-size: 12px;
   line-height: 18px;

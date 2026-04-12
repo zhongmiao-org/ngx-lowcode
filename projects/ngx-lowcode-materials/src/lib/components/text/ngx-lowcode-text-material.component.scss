@@ -2,3 +2,12 @@
   color: #1d2939;
   line-height: 1.6;
 }
+
+.ngx-lowcode-text--link {
+  color: #1677ff;
+  text-decoration: none;
+}
+
+.ngx-lowcode-text--link:hover {
+  text-decoration: underline;
+}

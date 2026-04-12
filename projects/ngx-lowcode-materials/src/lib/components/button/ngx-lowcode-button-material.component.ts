@@ -14,6 +14,9 @@ export class NgxLowcodeButtonMaterialComponent {
   readonly node = input.required<NgxLowcodeNodeSchema>();
   readonly runtime = input.required<NgxLowcodeRuntimeContext>();
 
+  readonly buttonStyle = computed<Record<string, string | number>>(() => ({
+    ...(this.node().style ?? {})
+  }));
   readonly label = computed(() => String(this.node().props['label'] ?? 'Button'));
   readonly buttonType = computed<any>(() => this.node().props['buttonType'] ?? 'primary');
 

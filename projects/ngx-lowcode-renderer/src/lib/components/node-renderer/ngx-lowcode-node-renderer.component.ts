@@ -18,6 +18,8 @@ export class NgxLowcodeNodeRendererComponent {
   readonly parentId = input<string | null>(null);
   readonly slot = input<string | null>(null);
   readonly siblingIndex = input(0);
+  readonly parentOrientation = input<'vertical' | 'horizontal'>('vertical');
+  readonly disableSiblingHotspots = input(false);
   readonly runtime = input.required<NgxLowcodeRuntimeContext>();
   readonly paletteDragging = input(false);
   readonly hoveredDropTarget = input<NgxLowcodeDropTarget | null>(null);
@@ -26,12 +28,8 @@ export class NgxLowcodeNodeRendererComponent {
   readonly definition = computed(() => this.registry.get(this.node().componentType));
   readonly isDesignMode = computed(() => this.runtime().mode === 'design');
   readonly isSelected = computed(() => this.runtime().selection() === this.node().id);
-  readonly canAcceptDrop = computed(() => Boolean(this.definition()?.canHaveChildren));
   readonly isDraggingNode = computed(() => this.runtime().draggingNode?.() === this.node().id);
-  readonly isDropTarget = computed(() => this.hoveredDropTarget()?.parentId === this.node().id);
-  readonly dropHintLabel = computed(() => {
-    return 'Drop Here';
-  });
+  readonly activeDropTarget = computed(() => this.runtime().dropTarget?.() ?? this.hoveredDropTarget());
 
   selectNode(event: MouseEvent): void {
     if (!this.isDesignMode()) {
@@ -41,28 +39,43 @@ export class NgxLowcodeNodeRendererComponent {
     this.runtime().setSelection(this.node().id);
   }
 
-  handlePointerMove(): void {
-    if (!this.paletteDragging() || !this.isDesignMode() || !this.canAcceptDrop()) {
+  handleBeforePointerMove(event: MouseEvent): void {
+    if (!this.isDraggingActive() || this.disableSiblingHotspots()) {
       return;
     }
-    this.dropTargetChange.emit({
-      parentId: this.node().id,
-      slot: null,
-      insertionIndex: null
+    event.stopPropagation();
+    this.emitDropTarget({
+      parentId: this.parentId(),
+      slot: this.slot(),
+      position: 'before',
+      targetNodeId: this.node().id
     });
   }
 
-  handleMouseLeave(): void {
-    if (!this.paletteDragging() || !this.isDesignMode() || !this.canAcceptDrop()) {
+  handleAfterPointerMove(event: MouseEvent): void {
+    if (!this.isDraggingActive() || this.disableSiblingHotspots()) {
       return;
     }
-    if (this.isDropTarget()) {
-      this.dropTargetChange.emit(null);
-    }
+    event.stopPropagation();
+    this.emitDropTarget({
+      parentId: this.parentId(),
+      slot: this.slot(),
+      position: 'after',
+      targetNodeId: this.node().id
+    });
   }
 
   requestDelete(event: MouseEvent): void {
     event.stopPropagation();
     this.runtime().requestNodeDelete?.(this.node().id);
+  }
+
+  private isDraggingActive(): boolean {
+    return this.isDesignMode() && (this.paletteDragging() || Boolean(this.runtime().paletteDragging?.()) || Boolean(this.runtime().draggingNode?.()));
+  }
+
+  private emitDropTarget(target: NgxLowcodeDropTarget): void {
+    this.runtime().setDropTarget?.(target);
+    this.dropTargetChange.emit(target);
   }
 }

@@ -7,3 +7,4 @@ export * from './lib/components/button/ngx-lowcode-button-material.component';
 export * from './lib/components/input/ngx-lowcode-input-material.component';
 export * from './lib/components/select/ngx-lowcode-select-material.component';
 export * from './lib/components/table/ngx-lowcode-table-material.component';
+export * from './lib/components/tethys/ngx-lowcode-tethys-material.component';

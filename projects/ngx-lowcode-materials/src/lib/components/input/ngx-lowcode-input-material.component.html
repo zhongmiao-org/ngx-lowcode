@@ -1,8 +1,7 @@
-<label class="ngx-lowcode-field">
-  <span>{{ label() }}</span>
+<thy-form-group class="ngx-lowcode-form-field" [thyLabelText]="label()">
   <input
     thyInput
     [placeholder]="placeholder()"
     [ngModel]="value()"
     (ngModelChange)="updateValue($event)" />
-</label>
+</thy-form-group>

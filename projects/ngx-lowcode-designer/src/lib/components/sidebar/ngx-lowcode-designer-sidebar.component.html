@@ -14,19 +14,36 @@
       cdkDropList
       [id]="paletteDropListId()"
       [cdkDropListData]="availableMaterials()"
-      [cdkDropListConnectedTo]="[stageDropListId()]"
       [cdkDropListSortingDisabled]="true">
-      @for (material of availableMaterials(); track material.type) {
-        <button
-          [thyButton]="buttonKind"
-          class="ngx-lowcode-materials__item"
-          cdkDrag
-          [cdkDragData]="material.type"
-          (cdkDragStarted)="handlePaletteDragStarted($event)"
-          (cdkDragEnded)="handlePaletteDragEnded($event)"
-          (click)="handleMaterialClick(material.type)">
-          {{ material.title }}
-        </button>
+      @for (group of groupedMaterials(); track group.category) {
+        <div class="ngx-lowcode-materials__group">
+          <div class="ngx-lowcode-materials__group-title">{{ group.category }}</div>
+          <div class="ngx-lowcode-materials__grid">
+            @for (material of group.items; track material.type) {
+              <div
+                class="ngx-lowcode-materials__card"
+                cdkDrag
+                [cdkDragData]="material.type"
+                (cdkDragStarted)="handlePaletteDragStarted($event)"
+                (cdkDragEnded)="handlePaletteDragEnded($event)">
+                <button
+                  type="button"
+                  class="ngx-lowcode-materials__handle"
+                  cdkDragHandle
+                  [attr.aria-label]="'拖拽 ' + material.title">
+                  <i [class]="materialIcon(material)" aria-hidden="true"></i>
+                </button>
+                <button
+                  type="button"
+                  class="ngx-lowcode-materials__content"
+                  [attr.title]="materialDescription(material)"
+                  (click)="handleMaterialClick(material.type)">
+                  <span class="ngx-lowcode-materials__name">{{ material.title }}</span>
+                </button>
+              </div>
+            }
+          </div>
+        </div>
       }
     </div>
   </div>
@@ -34,37 +51,37 @@
   <div class="ngx-lowcode-panel">
     <div class="ngx-lowcode-panel__title">{{ t().outline }}</div>
     <div class="ngx-lowcode-outline">
-      @for (node of editorSchema().layoutTree; track node.id) {
-        <ng-container [ngTemplateOutlet]="outlineNode" [ngTemplateOutletContext]="{ $implicit: node, depth: 0 }"></ng-container>
-      }
+      <thy-tree
+        thyType="default"
+        thySize="sm"
+        [thyNodes]="outlineTreeNodes()"
+        [thySelectedKeys]="selectedOutlineKeys()"
+        [thyExpandedKeys]="expandedOutlineNodeIds()"
+        [thyTitleTruncate]="true"
+        (thyOnClick)="handleOutlineClick($event)"
+        (thyDblClick)="handleOutlineDoubleClick($event)"
+        (thyOnExpandChange)="handleOutlineExpandChange($event)">
+        <ng-template #treeNodeTemplate let-origin="origin">
+          <div class="ngx-lowcode-outline__node">
+            <i class="ngx-lowcode-outline__icon" [class]="nodeTypeIcon(origin.origin)" aria-hidden="true"></i>
+            @if (editingOutlineNodeId() === origin.origin.id) {
+              <input
+                thyInput
+                class="ngx-lowcode-outline__editor"
+                [ngModel]="outlineNameDraft()"
+                [placeholder]="t().nodeNamePlaceholder"
+                (click)="$event.stopPropagation()"
+                (dblclick)="$event.stopPropagation()"
+                (ngModelChange)="outlineNameDraft.set($event)"
+                (blur)="commitOutlineRename(origin.origin.id)"
+                (keydown.enter)="commitOutlineRename(origin.origin.id)"
+                (keydown.escape)="cancelOutlineRename()" />
+            } @else {
+              <span class="ngx-lowcode-outline__label">{{ nodeDisplayName(origin.origin) }}</span>
+            }
+          </div>
+        </ng-template>
+      </thy-tree>
     </div>
   </div>
 }
-
-<ng-template #outlineNode let-node let-depth="depth">
-  <div class="ngx-lowcode-outline__row" [style.padding-left.px]="12 + depth * 16">
-    @if (editingOutlineNodeId() === node.id) {
-      <input
-        thyInput
-        class="ngx-lowcode-outline__editor"
-        [ngModel]="outlineNameDraft()"
-        [placeholder]="t().nodeNamePlaceholder"
-        (ngModelChange)="outlineNameDraft.set($event)"
-        (blur)="commitOutlineRename(node.id)"
-        (keydown.enter)="commitOutlineRename(node.id)"
-        (keydown.escape)="cancelOutlineRename()" />
-    } @else {
-      <button
-        type="button"
-        class="ngx-lowcode-outline__item"
-        [class.is-selected]="selectedNodeId() === node.id"
-        (click)="selectNode(node.id)"
-        (dblclick)="startOutlineRename(node)">
-        {{ nodeDisplayName(node) }}
-      </button>
-    }
-  </div>
-  @for (child of node.children ?? []; track child.id) {
-    <ng-container [ngTemplateOutlet]="outlineNode" [ngTemplateOutletContext]="{ $implicit: child, depth: depth + 1 }"></ng-container>
-  }
-</ng-template>

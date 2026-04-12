@@ -2,6 +2,7 @@ import {
   NgxLowcodeActionDefinition,
   NgxLowcodeComponentDefinition,
   NgxLowcodeDatasourceDefinition,
+  NgxLowcodeDropTarget,
   NgxLowcodeNodeSchema,
   NgxLowcodePageSchema
 } from 'ngx-lowcode-core-types';
@@ -60,6 +61,60 @@ export function findParentNode(nodes: NgxLowcodeNodeSchema[], nodeId: string): N
     }
   }
   return undefined;
+}
+
+export function findNodeLocation(
+  nodes: NgxLowcodeNodeSchema[],
+  nodeId: string,
+  parentId: string | null = null
+): { parentId: string | null; slot: string | null; index: number } | null {
+  for (let index = 0; index < nodes.length; index += 1) {
+    const node = nodes[index];
+    if (node.id === nodeId) {
+      return {
+        parentId,
+        slot: node.slot ?? null,
+        index
+      };
+    }
+
+    const nested = findNodeLocation(node.children ?? [], nodeId, node.id);
+    if (nested) {
+      return nested;
+    }
+  }
+
+  return null;
+}
+
+export function resolveDropTargetInsertion(
+  nodes: NgxLowcodeNodeSchema[],
+  target: NgxLowcodeDropTarget
+): { parentId: string | null; slot: string | null; insertionIndex: number | null } {
+  const position = target.position ?? 'inside';
+
+  if (position === 'inside' || !target.targetNodeId) {
+    return {
+      parentId: target.parentId,
+      slot: target.slot ?? null,
+      insertionIndex: target.insertionIndex ?? null
+    };
+  }
+
+  const location = findNodeLocation(nodes, target.targetNodeId);
+  if (!location) {
+    return {
+      parentId: target.parentId,
+      slot: target.slot ?? null,
+      insertionIndex: target.insertionIndex ?? null
+    };
+  }
+
+  return {
+    parentId: location.parentId,
+    slot: location.slot,
+    insertionIndex: location.index + (position === 'after' ? 1 : 0)
+  };
 }
 
 export function updateNodeById(
@@ -226,7 +281,7 @@ export function moveNode(
     slot: slot ?? undefined
   };
 
-  return insertNode(result.nodes, parentId, nextNode, slot, insertionIndex);
+  return insertNode(result.nodes, parentId, nextNode, slot, insertionIndex ?? null);
 }
 
 export function duplicateNode(nodes: NgxLowcodeNodeSchema[], nodeId: string): NgxLowcodeNodeSchema[] {

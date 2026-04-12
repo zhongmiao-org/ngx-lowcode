@@ -1,0 +1,103 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.ngx-lowcode-form-field {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group,
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group.row {
+  display: grid !important;
+  grid-template-columns: 120px minmax(0, 1fr) !important;
+  column-gap: 12px;
+  align-items: start;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group > .form-label {
+  display: block;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  flex: none;
+  margin: 0;
+  padding: 8px 0 0;
+  line-height: 1.5;
+  text-align: left;
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group > .col-sm-10,
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group > .col-form-control,
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group > .position-relative {
+  display: block;
+  width: auto;
+  max-width: none;
+  min-width: 0;
+  flex: none;
+  padding: 0;
+}
+
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group > .col-sm-2.col-form-label,
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group > .form-label.col-sm-2,
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group.row > .col-sm-2.col-form-label,
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group.row > .form-label.col-sm-2 {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  flex: 0 0 120px !important;
+  grid-column: 1 !important;
+  padding-top: 8px !important;
+}
+
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group > .col-sm-10.col-form-control,
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group.row > .col-sm-10.col-form-control {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  flex: 1 1 auto !important;
+  grid-column: 2 !important;
+}
+
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group.row > [class*='col-'] {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group > .form-label > span,
+:host-context(.thy-form-horizontal) ::ng-deep .ngx-lowcode-form-field.form-group.row > .form-label > span {
+  display: block;
+  text-align: left;
+  white-space: nowrap;
+  word-break: keep-all;
+  word-wrap: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:host-context(.thy-form-vertical) ::ng-deep .ngx-lowcode-form-field.form-group {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+:host-context(.thy-form-vertical) ::ng-deep .ngx-lowcode-form-field.form-group > .form-label,
+:host-context(.thy-form-vertical) ::ng-deep .ngx-lowcode-form-field.form-group > .position-relative,
+:host-context(.thy-form-vertical) ::ng-deep .ngx-lowcode-form-field.form-group > .col-sm-10,
+:host-context(.thy-form-vertical) ::ng-deep .ngx-lowcode-form-field.form-group > .col-form-control {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+:host-context(.thy-form-vertical) ::ng-deep .ngx-lowcode-form-field.form-group > .form-label,
+:host-context(.thy-form-vertical) ::ng-deep .ngx-lowcode-form-field.form-group > .form-label > span {
+  text-align: left;
+}

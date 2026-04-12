@@ -3,9 +3,9 @@ import {
   cloneSchema,
   createDefaultPageSchema,
   createNodeFromDefinition,
-  appendNode,
   duplicateNodeAndReturnId,
   findNodeById,
+  insertNode,
   moveNode,
   removeNodeById,
   updateNodeById
@@ -51,7 +51,7 @@ export class NgxLowcodeEditorStore {
         this.updateSelection(command.nodeId);
         return;
       case 'add-node':
-        this.addNode(command.componentType, command.parentId ?? null, command.slot ?? null);
+        this.addNode(command.componentType, command.parentId ?? null, command.slot ?? null, command.insertionIndex ?? null);
         return;
       case 'move-node':
         this.moveNode(command.nodeId, command.parentId ?? null, command.slot ?? null, command.insertionIndex ?? null);
@@ -119,7 +119,7 @@ export class NgxLowcodeEditorStore {
     });
   }
 
-  private addNode(componentType: string, parentId: string | null, slot: string | null): void {
+  private addNode(componentType: string, parentId: string | null, slot: string | null, insertionIndex: number | null): void {
     const definition = this.registry.get(componentType);
     if (!definition) {
       return;
@@ -131,7 +131,7 @@ export class NgxLowcodeEditorStore {
       nextNode.slot = slot;
     }
     const nextSchema = cloneSchema(currentState.schema);
-    nextSchema.layoutTree = appendNode(nextSchema.layoutTree, parentId, nextNode);
+    nextSchema.layoutTree = insertNode(nextSchema.layoutTree, parentId, nextNode, slot, insertionIndex);
 
     this.commitSchema(nextSchema, nextNode.id, true);
   }

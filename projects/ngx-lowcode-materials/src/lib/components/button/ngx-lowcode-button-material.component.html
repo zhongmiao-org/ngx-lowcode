@@ -1,3 +1,3 @@
-<button [thyButton]="buttonType()" thySize="md" (click)="handleClick()">
+<button [thyButton]="buttonType()" thySize="md" [ngStyle]="buttonStyle()" (click)="handleClick()">
   {{ label() }}
 </button>

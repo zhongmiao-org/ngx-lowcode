@@ -1,6 +1,9 @@
 import { InjectionToken, Signal, Type } from '@angular/core';
 
 export type NgxLowcodeSetterType = 'text' | 'textarea' | 'number' | 'switch' | 'select' | 'color';
+export type NgxLowcodeSetterGroup = 'properties' | 'layout' | 'style';
+export type NgxLowcodeLayoutMode = 'grid' | 'flex-grid' | 'flex';
+export type NgxLowcodeFormLayout = 'horizontal' | 'vertical';
 
 export interface NgxLowcodeSetterOption {
   label: string;
@@ -11,6 +14,8 @@ export interface NgxLowcodeSetterDefinition {
   key: string;
   label: string;
   type: NgxLowcodeSetterType;
+  group?: NgxLowcodeSetterGroup;
+  layoutModes?: NgxLowcodeLayoutMode[];
   placeholder?: string;
   options?: NgxLowcodeSetterOption[];
   suffix?: string;
@@ -43,6 +48,8 @@ export interface NgxLowcodeDropTarget {
   parentId: string | null;
   slot?: string | null;
   insertionIndex?: number | null;
+  position?: 'inside' | 'before' | 'after';
+  targetNodeId?: string | null;
 }
 
 export interface NgxLowcodeDatasourceDefinition {
@@ -100,6 +107,7 @@ export interface NgxLowcodeComponentDefinition {
   component: Type<unknown>;
   propsSchema?: Record<string, unknown>;
   setterSchema: NgxLowcodeSetterDefinition[];
+  itemSetterSchema?: NgxLowcodeSetterDefinition[];
   events?: NgxLowcodeEventDefinition[];
   slots?: NgxLowcodeSlotDefinition[];
   createNode: (options: NgxLowcodeMaterialCreateNodeOptions) => NgxLowcodeNodeSchema;
@@ -128,9 +136,12 @@ export interface NgxLowcodeRuntimeContext {
   selection: Signal<string | null>;
   dropTarget?: Signal<NgxLowcodeDropTarget | null>;
   draggingNode?: Signal<string | null>;
+  paletteDragging?: Signal<boolean>;
   setSelection: (nodeId: string | null) => void;
   setState: (patch: Record<string, unknown>) => void;
+  setDropTarget?: (target: NgxLowcodeDropTarget | null) => void;
   setDraggingNode?: (nodeId: string | null) => void;
+  requestNodeAdd?: (componentType: string, target: NgxLowcodeDropTarget) => void;
   requestNodeMove?: (nodeId: string, target: NgxLowcodeDropTarget) => void;
   requestNodeDelete?: (nodeId: string) => void;
   executeActionById: (actionId?: string, payload?: unknown) => Promise<void>;
@@ -170,6 +181,7 @@ export type NgxLowcodeEditorCommand =
       componentType: string;
       parentId?: string | null;
       slot?: string | null;
+      insertionIndex?: number | null;
     }
   | {
       type: 'move-node';

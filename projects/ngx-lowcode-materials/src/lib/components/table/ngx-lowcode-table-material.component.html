@@ -1,4 +1,4 @@
-<section class="ngx-lowcode-table">
+<section class="ngx-lowcode-table" [ngStyle]="tableStyle()">
   <header class="ngx-lowcode-table__header">{{ title() }}</header>
   @if (rows().length) {
     <div class="ngx-lowcode-table__wrap">

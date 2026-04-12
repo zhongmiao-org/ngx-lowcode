@@ -34,6 +34,52 @@ This repository is intentionally organized as a `monorepo with multiple publisha
 - Low-code document changes must converge on a single source of truth: `PageSchema` plus editor/document state.
 - The repo should stay ready for future aggregate publishing without collapsing internal boundaries.
 
+## Current Designer Status
+
+The current public baseline is centered on a usable page/form designer instead of broad component coverage.
+
+- Layout containers are `flex`-based in design mode.
+- Drag and drop is currently supported for `same-level sorting` within the same parent container.
+- Cross-container drag is intentionally not treated as stable yet.
+- The outline panel uses `ThyTree` and is expanded by default.
+- Material and outline icons are rendered with `Tabler Icons`.
+
+### Built-in Layout Model
+
+- `page`
+  Flex container for top-level page composition.
+- `section`
+  Generic flex layout container for arranging children.
+- `form`
+  Tethys form semantic container with `thyLayout: horizontal | vertical`.
+
+Recommended query form structure:
+
+```text
+page
+└── form
+    ├── section   // filter fields
+    └── section   // action buttons
+```
+
+### Built-in Material Coverage
+
+Stable built-in materials currently include:
+
+- Common: `text`, `button`, `icon`, `divider`, `image`
+- Layout: `page`, `section`, `form`, `space`, `anchor`
+- Navigation: `breadcrumb`, `tabs`, `menu`
+- Data entry: `input`, `select`, `input-number`, `checkbox`, `radio`, `switch`, `date-picker`, `upload`
+- Data display: `table`, `card`, `list`, `tag`, `avatar`, `progress`, `statistic`
+- Feedback: `alert`
+
+### Form Rendering Rules
+
+- Horizontal form items use a shared fixed label column for alignment.
+- Vertical form items keep labels above controls.
+- `text` supports optional `href` and `target` instead of using a separate link material.
+- `table`, `divider`, `form`, `tabs`, and `progress` default to full-width placement.
+
 ## Long-Term Docs
 
 - [Workspace Entry](../README.md)

@@ -1,14 +1,15 @@
-.ngx-lowcode-field {
-  display: grid;
-  gap: 8px;
-}
-
-.ngx-lowcode-field span {
-  font-size: 13px;
-  color: #344054;
-}
+@use '../../styles/form-field.shared';
 
 .ngx-lowcode-select {
   display: block;
   width: 100%;
+  min-width: 0;
+}
+
+
+:host ::ng-deep .thy-select-custom,
+:host ::ng-deep .thy-select-control,
+:host ::ng-deep .thy-select-selection {
+  width: 100%;
+  min-width: 0;
 }

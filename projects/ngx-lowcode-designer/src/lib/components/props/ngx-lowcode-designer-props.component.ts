@@ -3,7 +3,14 @@ import { Component, computed, effect, inject, input, output, signal } from '@ang
 import { FormsModule } from '@angular/forms';
 import { findNodeById, findParentNode } from 'ngx-lowcode-core-utils';
 import { NgxLowcodeMaterialRegistry } from 'ngx-lowcode-core';
-import { NgxLowcodeDatasourceDefinition, NgxLowcodeNodeSchema, NgxLowcodePageSchema } from 'ngx-lowcode-core-types';
+import {
+  NgxLowcodeComponentDefinition,
+  NgxLowcodeDatasourceDefinition,
+  NgxLowcodeLayoutMode,
+  NgxLowcodeNodeSchema,
+  NgxLowcodePageSchema,
+  NgxLowcodeSetterDefinition
+} from 'ngx-lowcode-core-types';
 import { NgxLowcodeDesignerI18n } from 'ngx-lowcode-i18n';
 import { ThyButtonModule } from 'ngx-tethys/button';
 import { ThyCollapseModule } from 'ngx-tethys/collapse';
@@ -52,6 +59,10 @@ export class NgxLowcodeDesignerPropsComponent {
     const node = this.selectedNode();
     return node ? this.registry.get(node.componentType) : undefined;
   });
+  readonly selectedParentDefinition = computed<NgxLowcodeComponentDefinition | undefined>(() => {
+    const node = this.selectedParentNode();
+    return node ? this.registry.get(node.componentType) : undefined;
+  });
   readonly selectedParentNode = computed<NgxLowcodeNodeSchema | null>(() => {
     const nodeId = this.selectedNodeId();
     if (!nodeId) {
@@ -59,9 +70,6 @@ export class NgxLowcodeDesignerPropsComponent {
     }
     return findParentNode(this.editorSchema().layoutTree, nodeId) ?? null;
   });
-  readonly selectedNodeIsSection = computed(() => this.selectedNode()?.componentType === 'section');
-  readonly selectedParentLayoutMode = computed(() => String(this.selectedParentNode()?.props['layoutMode'] ?? 'grid'));
-  readonly supportsItemLayout = computed(() => this.selectedParentNode()?.componentType === 'section');
   readonly styleUnits = input<readonly string[]>([]);
   readonly styleDimensions = input<Array<{ key: string; label: string }>>([]);
   readonly basicPanelExpanded = signal(true);
@@ -72,24 +80,36 @@ export class NgxLowcodeDesignerPropsComponent {
     return node ? [node] : [];
   });
   readonly fixedUnitStyles = computed(() => [
-    { key: 'padding', label: this.t().padding, unit: 'px' },
-    { key: 'marginBottom', label: this.t().marginBottom, unit: 'px' }
+    { key: 'paddingTop', label: 'Padding Top', unit: 'px' },
+    { key: 'paddingRight', label: 'Padding Right', unit: 'px' },
+    { key: 'paddingBottom', label: 'Padding Bottom', unit: 'px' },
+    { key: 'paddingLeft', label: 'Padding Left', unit: 'px' },
+    { key: 'marginTop', label: 'Margin Top', unit: 'px' },
+    { key: 'marginRight', label: 'Margin Right', unit: 'px' },
+    { key: 'marginBottom', label: 'Margin Bottom', unit: 'px' },
+    { key: 'marginLeft', label: 'Margin Left', unit: 'px' }
   ]);
-  readonly layoutSetterKeys = new Set([
-    'layoutMode',
-    'thyCols',
-    'thyXGap',
-    'thyYGap',
-    'thyGap',
-    'thyResponsive',
-    'thyDirection',
-    'thyWrap',
-    'thyJustifyContent',
-    'thyAlignItems',
-    'minHeight',
-    'height',
-    'padding'
-  ]);
+  readonly selectedNodeIsContainer = computed(() => (this.selectedDefinition()?.itemSetterSchema?.length ?? 0) > 0);
+  readonly selectedNodeLayoutMode = computed<NgxLowcodeLayoutMode | null>(() => {
+    if (!this.selectedNodeIsContainer()) {
+      return null;
+    }
+    return this.resolveEffectiveLayoutMode(this.selectedNode());
+  });
+  readonly selectedParentLayoutMode = computed<NgxLowcodeLayoutMode | null>(() => {
+    if ((this.selectedParentDefinition()?.itemSetterSchema?.length ?? 0) === 0) {
+      return null;
+    }
+    return this.resolveEffectiveLayoutMode(this.selectedParentNode());
+  });
+  readonly propertySetters = computed(() => this.filterSetters(this.selectedDefinition()?.setterSchema, 'properties'));
+  readonly layoutSetters = computed(() =>
+    this.filterSetters(this.selectedDefinition()?.setterSchema, 'layout', this.selectedNodeLayoutMode())
+  );
+  readonly itemLayoutSetters = computed(() =>
+    this.filterSetters(this.selectedParentDefinition()?.itemSetterSchema, 'layout', this.selectedParentLayoutMode())
+  );
+  readonly showLayoutPanel = computed(() => this.layoutSetters().length > 0 || this.itemLayoutSetters().length > 0);
 
   readonly toggleCollapse = output<void>();
   readonly pageMetaChange = output<{ key: 'title' | 'description'; value: string }>();
@@ -137,6 +157,15 @@ export class NgxLowcodeDesignerPropsComponent {
 
   numberProp(node: NgxLowcodeNodeSchema, key: string): number {
     return Number(node.props[key] ?? 0);
+  }
+
+  numberInputProp(node: NgxLowcodeNodeSchema, key: string): number | null {
+    const value = node.props[key];
+    if (value === undefined || value === null || value === '') {
+      return null;
+    }
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
   }
 
   booleanProp(node: NgxLowcodeNodeSchema, key: string): boolean {
@@ -206,12 +235,33 @@ export class NgxLowcodeDesignerPropsComponent {
     return value === undefined || value === null ? '' : String(value);
   }
 
-  isLayoutSetter(key: string): boolean {
-    return this.layoutSetterKeys.has(key);
-  }
-
   inputNumberSuffix(suffix?: string): string {
     return suffix ?? '';
+  }
+
+  renderSetterAsFullWidth(setter: NgxLowcodeSetterDefinition): boolean {
+    return setter.type === 'textarea';
+  }
+
+  setterModelValue(node: NgxLowcodeNodeSchema, setter: NgxLowcodeSetterDefinition): unknown {
+    if (setter.type === 'number') {
+      return this.numberInputProp(node, setter.key);
+    }
+    if (setter.type === 'switch') {
+      return this.booleanProp(node, setter.key);
+    }
+    if (setter.type === 'select') {
+      return node.props[setter.key] ?? null;
+    }
+    return this.stringProp(node, setter.key);
+  }
+
+  emitSetterChange(nodeId: string, setter: NgxLowcodeSetterDefinition, value: unknown): void {
+    this.nodePropChange.emit({
+      nodeId,
+      key: setter.key,
+      value: setter.type === 'number' && (value === '' || value === null) ? null : value
+    });
   }
 
   applyStateDraft(): void {
@@ -258,5 +308,36 @@ export class NgxLowcodeDesignerPropsComponent {
     } catch {
       return null;
     }
+  }
+
+  private filterSetters(
+    setters: NgxLowcodeSetterDefinition[] | undefined,
+    group: NgxLowcodeSetterDefinition['group'],
+    layoutMode?: NgxLowcodeLayoutMode | null
+  ): NgxLowcodeSetterDefinition[] {
+    return (setters ?? []).filter((setter) => {
+      const setterGroup = setter.group ?? 'properties';
+      if (setterGroup !== group) {
+        return false;
+      }
+      if (!setter.layoutModes?.length) {
+        return true;
+      }
+      return layoutMode ? setter.layoutModes.includes(layoutMode) : false;
+    });
+  }
+
+  private resolveLayoutMode(value: unknown): NgxLowcodeLayoutMode {
+    return value === 'flex-grid' || value === 'flex' ? value : 'grid';
+  }
+
+  private resolveEffectiveLayoutMode(node: NgxLowcodeNodeSchema | null | undefined): NgxLowcodeLayoutMode | null {
+    if (!node) {
+      return null;
+    }
+    if (node.componentType === 'section' || node.componentType === 'page') {
+      return 'flex';
+    }
+    return this.resolveLayoutMode(node.props['layoutMode']);
   }
 }

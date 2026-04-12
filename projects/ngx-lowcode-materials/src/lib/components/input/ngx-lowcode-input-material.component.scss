@@ -1,9 +1,5 @@
-.ngx-lowcode-field {
-  display: grid;
-  gap: 8px;
-}
+@use '../../styles/form-field.shared';
 
-.ngx-lowcode-field span {
-  font-size: 13px;
-  color: #344054;
+:host ::ng-deep input[thyInput] {
+  width: 100%;
 }

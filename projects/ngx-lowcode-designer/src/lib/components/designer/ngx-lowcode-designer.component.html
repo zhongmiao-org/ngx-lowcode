@@ -1,4 +1,4 @@
-<div class="ngx-lowcode-designer" [style.grid-template-columns]="layoutColumns()">
+<div class="ngx-lowcode-designer" cdkDropListGroup [style.grid-template-columns]="layoutColumns()">
   <ngx-lowcode-designer-sidebar
     [collapsed]="leftSidebarCollapsed()"
     [t]="t()"
@@ -36,7 +36,6 @@
       cdkDropList
       [id]="stageDropListId"
       [cdkDropListData]="editorSchema().layoutTree"
-      [cdkDropListConnectedTo]="[paletteDropListId]"
       [cdkDropListSortingDisabled]="true"
       (cdkDropListDropped)="handleMaterialDrop($event)"
       (dragover)="handleStageDragOver($event)"
@@ -51,6 +50,7 @@
         [context]="{}"
         (selectionChange)="handleRendererSelectionChange($event)"
         (dropTargetChange)="handleRendererDropTargetChange($event)"
+        (nodeAddRequest)="handleNodeAdd($event)"
         (nodeMoveRequest)="handleNodeMove($event)"
         (nodeDeleteRequest)="handleNodeDelete($event)">
       </ngx-lowcode-renderer>

@@ -1,5 +1,4 @@
-<label class="ngx-lowcode-field">
-  <span>{{ label() }}</span>
+<thy-form-group class="ngx-lowcode-form-field" [thyLabelText]="label()">
   <thy-select
     class="ngx-lowcode-select"
     thySize="md"
@@ -10,4 +9,4 @@
       <thy-option [thyValue]="option.value" [thyLabelText]="option.label"></thy-option>
     }
   </thy-select>
-</label>
+</thy-form-group>
