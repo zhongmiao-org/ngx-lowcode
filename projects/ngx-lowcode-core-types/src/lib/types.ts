@@ -13,6 +13,7 @@ export interface NgxLowcodeSetterDefinition {
   type: NgxLowcodeSetterType;
   placeholder?: string;
   options?: NgxLowcodeSetterOption[];
+  suffix?: string;
   min?: number;
   max?: number;
 }
@@ -41,6 +42,7 @@ export interface NgxLowcodeNodeSchema {
 export interface NgxLowcodeDropTarget {
   parentId: string | null;
   slot?: string | null;
+  insertionIndex?: number | null;
 }
 
 export interface NgxLowcodeDatasourceDefinition {
@@ -125,8 +127,12 @@ export interface NgxLowcodeRuntimeContext {
   state: Signal<Record<string, unknown>>;
   selection: Signal<string | null>;
   dropTarget?: Signal<NgxLowcodeDropTarget | null>;
+  draggingNode?: Signal<string | null>;
   setSelection: (nodeId: string | null) => void;
   setState: (patch: Record<string, unknown>) => void;
+  setDraggingNode?: (nodeId: string | null) => void;
+  requestNodeMove?: (nodeId: string, target: NgxLowcodeDropTarget) => void;
+  requestNodeDelete?: (nodeId: string) => void;
   executeActionById: (actionId?: string, payload?: unknown) => Promise<void>;
   executeDatasourceById: (datasourceId: string, payload?: unknown) => Promise<unknown>;
 }
@@ -164,6 +170,13 @@ export type NgxLowcodeEditorCommand =
       componentType: string;
       parentId?: string | null;
       slot?: string | null;
+    }
+  | {
+      type: 'move-node';
+      nodeId: string;
+      parentId?: string | null;
+      slot?: string | null;
+      insertionIndex?: number | null;
     }
   | {
       type: 'duplicate-node';

@@ -297,6 +297,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/demo/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "./node_modules/@tethys/icons",
+                "output": "/assets/icons/"
               }
             ],
             "styles": [
@@ -356,6 +361,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/demo/public"
+              },
+              {
+                "glob": "**/*",
+                "input": "./node_modules/@tethys/icons",
+                "output": "/assets/icons/"
               }
             ],
             "styles": [

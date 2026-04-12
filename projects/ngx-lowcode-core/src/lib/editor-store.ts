@@ -1,5 +1,15 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { cloneSchema, createDefaultPageSchema, createNodeFromDefinition, appendNode, duplicateNodeAndReturnId, findNodeById, removeNodeById, updateNodeById } from 'ngx-lowcode-core-utils';
+import {
+  cloneSchema,
+  createDefaultPageSchema,
+  createNodeFromDefinition,
+  appendNode,
+  duplicateNodeAndReturnId,
+  findNodeById,
+  moveNode,
+  removeNodeById,
+  updateNodeById
+} from 'ngx-lowcode-core-utils';
 import { NgxLowcodeEditorCommand, NgxLowcodeEditorState, NgxLowcodeNodeSchema, NgxLowcodePageSchema } from 'ngx-lowcode-core-types';
 import { NgxLowcodeMaterialRegistry } from './material-registry';
 
@@ -42,6 +52,9 @@ export class NgxLowcodeEditorStore {
         return;
       case 'add-node':
         this.addNode(command.componentType, command.parentId ?? null, command.slot ?? null);
+        return;
+      case 'move-node':
+        this.moveNode(command.nodeId, command.parentId ?? null, command.slot ?? null, command.insertionIndex ?? null);
         return;
       case 'duplicate-node':
         this.duplicateNode(command.nodeId);
@@ -133,6 +146,14 @@ export class NgxLowcodeEditorStore {
 
     nextSchema.layoutTree = result.nodes;
     this.commitSchema(nextSchema, result.duplicatedNodeId, true);
+  }
+
+  private moveNode(nodeId: string, parentId: string | null, slot: string | null, insertionIndex: number | null): void {
+    const currentState = this.stateSignal();
+    const nextSchema = cloneSchema(currentState.schema);
+    nextSchema.layoutTree = moveNode(nextSchema.layoutTree, nodeId, parentId, slot, insertionIndex);
+
+    this.commitSchema(nextSchema, nodeId, true);
   }
 
   private removeNode(nodeId: string): void {

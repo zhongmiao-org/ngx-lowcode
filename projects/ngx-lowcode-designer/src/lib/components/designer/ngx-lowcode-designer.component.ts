@@ -38,6 +38,7 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
   private readonly registry = inject(NgxLowcodeMaterialRegistry);
   private readonly editorStore = inject(NgxLowcodeEditorStore);
   protected isPaletteDragging = false;
+  protected draggingNodeId: string | null = null;
   private resizeCleanup: (() => void) | null = null;
 
   readonly activeDropTarget = signal<NgxLowcodeDropTarget | null>(null);
@@ -135,6 +136,9 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
 
   handlePaletteDragStateChange(isDragging: boolean): void {
     this.isPaletteDragging = isDragging;
+    if (isDragging) {
+      this.draggingNodeId = null;
+    }
     this.activeDropTarget.set(null);
   }
 
@@ -146,10 +150,56 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
   }
 
   handleRendererDropTargetChange(target: NgxLowcodeDropTarget | null): void {
-    if (!this.isPaletteDragging) {
+    if (!this.isPaletteDragging && !this.draggingNodeId) {
       return;
     }
     this.activeDropTarget.set(target);
+  }
+
+  handleNodeDragStateChange(event: { nodeId: string | null; dragging: boolean }): void {
+    this.draggingNodeId = event.dragging ? event.nodeId : null;
+    if (event.dragging) {
+      this.isPaletteDragging = false;
+    }
+    if (!event.dragging) {
+      this.activeDropTarget.set(null);
+    }
+  }
+
+  handleNodeMove(event: { nodeId: string; target: NgxLowcodeDropTarget }): void {
+    this.editorStore.dispatch({
+      type: 'move-node',
+      nodeId: event.nodeId,
+      parentId: event.target.parentId,
+      slot: event.target.slot ?? null,
+      insertionIndex: event.target.insertionIndex ?? null
+    });
+    this.draggingNodeId = null;
+    this.activeDropTarget.set(null);
+    this.emitSchemaChange();
+    this.emitSelectionChange();
+  }
+
+  handleNodeDelete(nodeId: string): void {
+    this.editorStore.dispatch({ type: 'select-node', nodeId });
+    this.deleteSelected();
+  }
+
+  handleStageDragOver(event: DragEvent): void {
+    if (!this.draggingNodeId) {
+      return;
+    }
+    event.preventDefault();
+    this.activeDropTarget.set({ parentId: this.editorSchema().layoutTree[0]?.id ?? null, slot: null });
+  }
+
+  handleStageDrop(event: DragEvent): void {
+    if (!this.draggingNodeId) {
+      return;
+    }
+    event.preventDefault();
+    const target = this.activeDropTarget() ?? { parentId: this.editorSchema().layoutTree[0]?.id ?? null, slot: null };
+    this.handleNodeMove({ nodeId: this.draggingNodeId, target });
   }
 
   selectNode(nodeId: string): void {

@@ -1,3 +1,43 @@
 :host {
-  display: contents;
+  display: block;
+}
+
+.ngx-lowcode-node-list {
+  display: grid;
+  gap: 12px;
+  min-height: 24px;
+}
+
+.ngx-lowcode-node-list__item {
+  transition: transform 180ms ease;
+}
+
+.ngx-lowcode-node-list__item.cdk-drag-animating {
+  transition: transform 220ms ease;
+}
+
+.ngx-lowcode-node-list.cdk-drop-list-dragging .ngx-lowcode-node-list__item:not(.cdk-drag-placeholder) {
+  transition: transform 220ms ease;
+}
+
+.ngx-lowcode-node-list__item.cdk-drag-placeholder {
+  min-height: 54px;
+}
+
+.ngx-lowcode-drag-placeholder {
+  min-height: 54px;
+  border: 2px dashed #14b8a6;
+  border-radius: 12px;
+  background: rgba(204, 251, 241, 0.28);
+}
+
+.ngx-lowcode-drag-preview {
+  max-width: 240px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 12px;
+  line-height: 1.4;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.28);
 }

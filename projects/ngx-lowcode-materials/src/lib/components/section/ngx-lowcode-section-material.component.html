@@ -1,16 +1,117 @@
 <section class="ngx-lowcode-section" [ngStyle]="sectionStyle()">
   <header class="ngx-lowcode-section__header">{{ title() }}</header>
   <div class="ngx-lowcode-section__body" [ngStyle]="bodyStyle()">
-    @for (column of distributedChildren(); track $index) {
+    @if (layoutMode() === 'grid') {
+      <thy-grid
+        class="ngx-lowcode-section__grid"
+        cdkDropList
+        [cdkDropListData]="dropListData()"
+        [cdkDropListDisabled]="runtime().mode !== 'design'"
+        (cdkDropListDropped)="handleDrop($any($event))"
+        [thyCols]="thyCols()"
+        [thyXGap]="thyXGap()"
+        [thyYGap]="thyYGap()"
+        [thyGap]="thyGap()"
+        [thyResponsive]="thyResponsive()">
+        @for (item of renderedChildren(); track trackChild($index, item); let index = $index) {
+          <thy-grid-item
+            class="ngx-lowcode-section__item"
+            cdkDrag
+            [cdkDragData]="item.child"
+            [cdkDragDisabled]="runtime().mode !== 'design'"
+            (cdkDragStarted)="handleDragStart(item.child.id)"
+            (cdkDragEnded)="handleDragEnd()"
+            [thySpan]="item.span"
+            [thyOffset]="item.offset"
+            [class.ngx-lowcode-section__item--active-drop]="activeDropIndex() === index">
+            <div *cdkDragPreview class="ngx-lowcode-section__drag-preview">
+              {{ dragPreviewLabel(item.child) }}
+            </div>
+            <div *cdkDragPlaceholder class="ngx-lowcode-section__drag-placeholder"></div>
+            <ngx-lowcode-node-renderer
+              [node]="item.child"
+              [parentId]="node().id"
+              [slot]="null"
+              [siblingIndex]="index"
+              [runtime]="runtime()">
+            </ngx-lowcode-node-renderer>
+          </thy-grid-item>
+        }
+      </thy-grid>
+    } @else if (layoutMode() === 'flex-grid') {
       <div
-        class="ngx-lowcode-section__column"
-        [class.ngx-lowcode-section__column--active-drop]="activeDropSlot() === columnSlotName($index)"
-        [class.ngx-lowcode-section__column--empty]="!column.length">
-        <ngx-lowcode-render-children [nodes]="column" [runtime]="runtime()"></ngx-lowcode-render-children>
-        @if (showColumnDropPlaceholder(column, $index)) {
-          <div class="ngx-lowcode-section__drop-placeholder">{{ columnPlaceholderLabel($index) }}</div>
+        class="ngx-lowcode-section__row"
+        thyRow
+        cdkDropList
+        [cdkDropListData]="dropListData()"
+        [cdkDropListDisabled]="runtime().mode !== 'design'"
+        (cdkDropListDropped)="handleDrop($any($event))"
+        [thyGutter]="coerceNumericGap(thyGap())">
+        @for (item of renderedChildren(); track trackChild($index, item); let index = $index) {
+          <div
+            class="ngx-lowcode-section__item ngx-lowcode-section__item--row"
+            [thyCol]="coerceNumericSpan(item.span)"
+            cdkDrag
+            [cdkDragData]="item.child"
+            [cdkDragDisabled]="runtime().mode !== 'design'"
+            (cdkDragStarted)="handleDragStart(item.child.id)"
+            (cdkDragEnded)="handleDragEnd()"
+            [class.ngx-lowcode-section__item--active-drop]="activeDropIndex() === index">
+            <div *cdkDragPreview class="ngx-lowcode-section__drag-preview">
+              {{ dragPreviewLabel(item.child) }}
+            </div>
+            <div *cdkDragPlaceholder class="ngx-lowcode-section__drag-placeholder"></div>
+            <ngx-lowcode-node-renderer
+              [node]="item.child"
+              [parentId]="node().id"
+              [slot]="null"
+              [siblingIndex]="index"
+              [runtime]="runtime()">
+            </ngx-lowcode-node-renderer>
+          </div>
         }
       </div>
+    } @else {
+      <thy-flex
+        class="ngx-lowcode-section__flex"
+        cdkDropList
+        [cdkDropListData]="dropListData()"
+        [cdkDropListDisabled]="runtime().mode !== 'design'"
+        (cdkDropListDropped)="handleDrop($any($event))"
+        [thyDirection]="thyDirection()"
+        [thyWrap]="thyWrap()"
+        [thyJustifyContent]="thyJustifyContent()"
+        [thyAlignItems]="thyAlignItems()"
+        [thyGap]="+(thyGap() || 0)">
+        @for (item of renderedChildren(); track trackChild($index, item); let index = $index) {
+          <thy-flex-item
+            class="ngx-lowcode-section__item ngx-lowcode-section__item--flex"
+            [thyGrow]="item.flexItem.grow"
+            [thyShrink]="item.flexItem.shrink"
+            [thyBasis]="item.flexItem.basis"
+            cdkDrag
+            [cdkDragData]="item.child"
+            [cdkDragDisabled]="runtime().mode !== 'design'"
+            (cdkDragStarted)="handleDragStart(item.child.id)"
+            (cdkDragEnded)="handleDragEnd()"
+            [class.ngx-lowcode-section__item--active-drop]="activeDropIndex() === index">
+            <div *cdkDragPreview class="ngx-lowcode-section__drag-preview">
+              {{ dragPreviewLabel(item.child) }}
+            </div>
+            <div *cdkDragPlaceholder class="ngx-lowcode-section__drag-placeholder"></div>
+            <ngx-lowcode-node-renderer
+              [node]="item.child"
+              [parentId]="node().id"
+              [slot]="null"
+              [siblingIndex]="index"
+              [runtime]="runtime()">
+            </ngx-lowcode-node-renderer>
+          </thy-flex-item>
+        }
+      </thy-flex>
+    }
+    @if (showDropPlaceholder()) {
+      <div class="ngx-lowcode-section__drop-placeholder">Drop components into this section</div>
     }
   </div>
 </section>

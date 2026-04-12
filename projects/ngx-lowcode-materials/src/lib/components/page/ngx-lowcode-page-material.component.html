@@ -6,7 +6,12 @@
     }
   </section>
   <section class="ngx-lowcode-page__body">
-    <ngx-lowcode-render-children [nodes]="node().children ?? []" [runtime]="runtime()"></ngx-lowcode-render-children>
+    <ngx-lowcode-render-children
+      [nodes]="node().children ?? []"
+      [parentId]="node().id"
+      [slot]="null"
+      [runtime]="runtime()">
+    </ngx-lowcode-render-children>
     @if (showEmptyDropzone()) {
       <div class="ngx-lowcode-empty-dropzone">Drop components into this page</div>
     }

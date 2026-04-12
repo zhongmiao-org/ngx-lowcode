@@ -4,6 +4,7 @@
   [class.ngx-lowcode-node-shell--selected]="isSelected()"
   [class.ngx-lowcode-node-shell--drop-target]="isDropTarget()"
   [class.ngx-lowcode-node-shell--can-drop]="canAcceptDrop()"
+  [class.ngx-lowcode-node-shell--dragging]="isDraggingNode()"
   (mousemove)="handlePointerMove($event)"
   (mouseleave)="handleMouseLeave()"
   (click)="selectNode($event)">
@@ -17,6 +18,14 @@
   }
   @if (isSelected()) {
     <div class="ngx-lowcode-node-shell__badge">{{ node().componentType }}</div>
+    @if (runtime().mode === 'design') {
+      <button
+        type="button"
+        class="ngx-lowcode-node-shell__delete"
+        (click)="requestDelete($event)">
+        ×
+      </button>
+    }
   }
   @if (isDropTarget()) {
     <div class="ngx-lowcode-node-shell__drop-hint">{{ dropHintLabel() }}</div>

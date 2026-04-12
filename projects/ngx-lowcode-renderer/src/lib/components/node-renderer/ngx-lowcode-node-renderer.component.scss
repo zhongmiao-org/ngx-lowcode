@@ -22,6 +22,10 @@
   z-index: 1;
 }
 
+.ngx-lowcode-node-shell--dragging {
+  opacity: 0.45;
+}
+
 .ngx-lowcode-node-shell--can-drop.ngx-lowcode-node-shell--design {
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
 }
@@ -57,6 +61,22 @@
   font-size: 12px;
   line-height: 18px;
   pointer-events: none;
+}
+
+.ngx-lowcode-node-shell__delete {
+  position: absolute;
+  top: -12px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #d0d5dd;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #344054;
+  font-size: 16px;
+  line-height: 1;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+  z-index: 3;
 }
 
 .ngx-lowcode-node-missing {

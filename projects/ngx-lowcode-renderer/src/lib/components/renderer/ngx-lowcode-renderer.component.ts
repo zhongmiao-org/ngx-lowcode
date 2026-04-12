@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { NGX_LOWCODE_CONFIG } from 'ngx-lowcode-core';
 import {
   NgxLowcodeActionDefinition,
@@ -17,9 +18,10 @@ import { NgxLowcodeRenderChildrenComponent } from '../render-children/ngx-lowcod
 @Component({
   selector: 'ngx-lowcode-renderer',
   standalone: true,
-  imports: [CommonModule, NgxLowcodeRenderChildrenComponent],
+  imports: [CommonModule, DragDropModule, NgxLowcodeRenderChildrenComponent],
   templateUrl: './ngx-lowcode-renderer.component.html',
-  styleUrl: './ngx-lowcode-renderer.component.scss'
+  styleUrl: './ngx-lowcode-renderer.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxLowcodeRendererComponent {
   private readonly config = inject(NGX_LOWCODE_CONFIG, { optional: true }) as NgxLowcodeConfig | null;
@@ -31,13 +33,17 @@ export class NgxLowcodeRendererComponent {
   readonly mode = input<'design' | 'runtime'>('runtime');
   readonly selectedNodeId = input<string | null>(null);
   readonly paletteDragging = input(false);
+  readonly draggingNodeId = input<string | null>(null);
   readonly hoveredDropTarget = input<NgxLowcodeDropTarget | null>(null);
   readonly selectionChange = output<string | null>();
   readonly dropTargetChange = output<NgxLowcodeDropTarget | null>();
+  readonly nodeMoveRequest = output<{ nodeId: string; target: NgxLowcodeDropTarget }>();
+  readonly nodeDeleteRequest = output<string>();
 
   private readonly stateSignal = signal<Record<string, unknown>>({});
   private readonly selectionSignal = signal<string | null>(null);
   private readonly dropTargetSignal = signal<NgxLowcodeDropTarget | null>(null);
+  private readonly draggingNodeSignal = signal<string | null>(null);
 
   constructor() {
     effect(
@@ -48,6 +54,7 @@ export class NgxLowcodeRendererComponent {
         });
         this.selectionSignal.set(this.selectedNodeId());
         this.dropTargetSignal.set(this.hoveredDropTarget());
+        this.draggingNodeSignal.set(this.draggingNodeId());
       },
       { allowSignalWrites: true }
     );
@@ -62,6 +69,7 @@ export class NgxLowcodeRendererComponent {
       state: this.stateSignal.asReadonly(),
       selection: this.selectionSignal.asReadonly(),
       dropTarget: this.dropTargetSignal.asReadonly(),
+      draggingNode: this.draggingNodeSignal.asReadonly(),
       setSelection: (nodeId: string | null) => {
         this.selectionSignal.set(nodeId);
         this.selectionChange.emit(nodeId);
@@ -71,6 +79,15 @@ export class NgxLowcodeRendererComponent {
           ...current,
           ...patch
         }));
+      },
+      setDraggingNode: (nodeId: string | null) => {
+        this.draggingNodeSignal.set(nodeId);
+      },
+      requestNodeMove: (nodeId: string, target: NgxLowcodeDropTarget) => {
+        this.nodeMoveRequest.emit({ nodeId, target });
+      },
+      requestNodeDelete: (nodeId: string) => {
+        this.nodeDeleteRequest.emit(nodeId);
       },
       executeActionById: async (actionId?: string, payload?: unknown) => {
         if (!actionId) {

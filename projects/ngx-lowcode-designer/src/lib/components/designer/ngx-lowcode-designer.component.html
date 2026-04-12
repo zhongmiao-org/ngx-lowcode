@@ -32,22 +32,27 @@
 
     <section
       class="ngx-lowcode-stage"
-      [class.ngx-lowcode-stage--root-drop-target]="isPaletteDragging && !activeDropTarget()"
+      [class.ngx-lowcode-stage--root-drop-target]="(isPaletteDragging || draggingNodeId) && !activeDropTarget()"
       cdkDropList
       [id]="stageDropListId"
       [cdkDropListData]="editorSchema().layoutTree"
       [cdkDropListConnectedTo]="[paletteDropListId]"
       [cdkDropListSortingDisabled]="true"
-      (cdkDropListDropped)="handleMaterialDrop($event)">
+      (cdkDropListDropped)="handleMaterialDrop($event)"
+      (dragover)="handleStageDragOver($event)"
+      (drop)="handleStageDrop($event)">
       <ngx-lowcode-renderer
         [schema]="editorSchema()"
         [mode]="'design'"
         [selectedNodeId]="selectedNodeId()"
         [paletteDragging]="isPaletteDragging"
+        [draggingNodeId]="draggingNodeId"
         [hoveredDropTarget]="activeDropTarget()"
         [context]="{}"
         (selectionChange)="handleRendererSelectionChange($event)"
-        (dropTargetChange)="handleRendererDropTargetChange($event)">
+        (dropTargetChange)="handleRendererDropTargetChange($event)"
+        (nodeMoveRequest)="handleNodeMove($event)"
+        (nodeDeleteRequest)="handleNodeDelete($event)">
       </ngx-lowcode-renderer>
     </section>
   </main>
@@ -58,8 +63,7 @@
     [collapsed]="rightSidebarCollapsed()"
     [t]="t()"
     [editorSchema]="editorSchema()"
-    [selectedNode]="selectedNode()"
-    [selectedDefinition]="selectedDefinition()"
+    [selectedNodeId]="selectedNodeId()"
     [styleUnits]="styleUnits"
     [styleDimensions]="styleDimensions()"
     (toggleCollapse)="toggleRightSidebar()"

@@ -36,6 +36,18 @@
   margin-bottom: 12px;
 }
 
+.ngx-lowcode-panel--debug {
+  border-style: dashed;
+}
+
+.ngx-lowcode-debug {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  color: #475467;
+  word-break: break-all;
+}
+
 .ngx-lowcode-props__meta {
   display: grid;
   gap: 4px;
@@ -43,24 +55,15 @@
   color: #667085;
 }
 
-.ngx-lowcode-props__sub-title {
-  margin: 16px 0 10px;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #475467;
-}
-
 .ngx-lowcode-prop-row {
   display: grid;
   gap: 8px;
   margin-bottom: 12px;
-  grid-column: 1 / -1;
+  grid-column: span 1;
 }
 
-.ngx-lowcode-prop-row--half {
-  grid-column: span 1;
+.ngx-lowcode-prop-row--full {
+  grid-column: 1 / -1;
 }
 
 .ngx-lowcode-prop-row span {
@@ -78,6 +81,21 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 96px;
   gap: 8px;
+}
+
+.ngx-lowcode-color-field {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.ngx-lowcode-color-swatch {
+  width: 40px;
+  height: 36px;
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
 }
 
 .ngx-lowcode-props__actions {
@@ -138,12 +156,44 @@ textarea {
   color: #667085;
 }
 
+thy-collapse {
+  display: block;
+}
+
+thy-collapse-item + thy-collapse-item {
+  margin-top: 8px;
+}
+
+:host ::ng-deep .thy-collapse-item {
+  border: 1px solid #eaecf0;
+  border-radius: 12px;
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+:host ::ng-deep .thy-collapse-header {
+  padding: 12px 14px;
+  font-weight: 700;
+  color: #101828;
+}
+
+:host ::ng-deep .thy-collapse-content-box {
+  padding: 14px;
+  background: #ffffff;
+}
+
 @media (max-width: 1200px) {
   .ngx-lowcode-props-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .ngx-lowcode-prop-row--half {
+  .ngx-lowcode-prop-row,
+  .ngx-lowcode-prop-row--full {
     grid-column: 1 / -1;
+  }
+
+  .ngx-lowcode-size-editor,
+  .ngx-lowcode-color-field {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

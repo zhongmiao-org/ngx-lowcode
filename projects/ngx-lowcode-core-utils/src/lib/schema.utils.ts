@@ -110,6 +110,125 @@ export function appendNode(
   });
 }
 
+function insertIntoSiblings(
+  siblings: NgxLowcodeNodeSchema[],
+  nextNode: NgxLowcodeNodeSchema,
+  slot: string | null,
+  insertionIndex: number | null
+): NgxLowcodeNodeSchema[] {
+  if (insertionIndex === null || insertionIndex === undefined) {
+    return [...siblings, nextNode];
+  }
+
+  const normalizedSlot = slot ?? null;
+  const slottedIndices = siblings
+    .map((child, index) => ({ child, index }))
+    .filter(({ child }) => (child.slot ?? null) === normalizedSlot)
+    .map(({ index }) => index);
+
+  const boundedIndex = Math.max(0, Math.min(insertionIndex, slottedIndices.length));
+
+  if (!slottedIndices.length) {
+    const nextSiblings = [...siblings];
+    nextSiblings.splice(boundedIndex, 0, nextNode);
+    return nextSiblings;
+  }
+
+  const absoluteIndex =
+    boundedIndex >= slottedIndices.length ? slottedIndices[slottedIndices.length - 1] + 1 : slottedIndices[boundedIndex];
+  const nextSiblings = [...siblings];
+  nextSiblings.splice(absoluteIndex, 0, nextNode);
+  return nextSiblings;
+}
+
+export function insertNode(
+  nodes: NgxLowcodeNodeSchema[],
+  parentId: string | null,
+  nextNode: NgxLowcodeNodeSchema,
+  slot?: string | null,
+  insertionIndex?: number | null
+): NgxLowcodeNodeSchema[] {
+  if (!parentId) {
+    return insertIntoSiblings(nodes, nextNode, slot ?? null, insertionIndex ?? null);
+  }
+
+  return nodes.map((node) => {
+    if (node.id === parentId) {
+      return {
+        ...node,
+        children: insertIntoSiblings(node.children ?? [], nextNode, slot ?? null, insertionIndex ?? null)
+      };
+    }
+    return {
+      ...node,
+      children: insertNode(node.children ?? [], parentId, nextNode, slot, insertionIndex)
+    };
+  });
+}
+
+export function isDescendantNode(nodes: NgxLowcodeNodeSchema[], ancestorId: string, nodeId: string): boolean {
+  const ancestor = findNodeById(nodes, ancestorId);
+  if (!ancestor) {
+    return false;
+  }
+  return Boolean(findNodeById(ancestor.children ?? [], nodeId));
+}
+
+export function removeNodeAndReturn(
+  nodes: NgxLowcodeNodeSchema[],
+  nodeId: string
+): { nodes: NgxLowcodeNodeSchema[]; removedNode: NgxLowcodeNodeSchema | null } {
+  let removedNode: NgxLowcodeNodeSchema | null = null;
+
+  const nextNodes = nodes
+    .filter((node) => {
+      if (node.id === nodeId) {
+        removedNode = node;
+        return false;
+      }
+      return true;
+    })
+    .map((node) => {
+      const result = removeNodeAndReturn(node.children ?? [], nodeId);
+      if (result.removedNode) {
+        removedNode = result.removedNode;
+      }
+      return {
+        ...node,
+        children: result.nodes
+      };
+    });
+
+  return {
+    nodes: nextNodes,
+    removedNode
+  };
+}
+
+export function moveNode(
+  nodes: NgxLowcodeNodeSchema[],
+  nodeId: string,
+  parentId: string | null,
+  slot?: string | null,
+  insertionIndex?: number | null
+): NgxLowcodeNodeSchema[] {
+  if (nodeId === parentId || (parentId && isDescendantNode(nodes, nodeId, parentId))) {
+    return nodes;
+  }
+
+  const result = removeNodeAndReturn(nodes, nodeId);
+  if (!result.removedNode) {
+    return nodes;
+  }
+
+  const nextNode: NgxLowcodeNodeSchema = {
+    ...result.removedNode,
+    slot: slot ?? undefined
+  };
+
+  return insertNode(result.nodes, parentId, nextNode, slot, insertionIndex);
+}
+
 export function duplicateNode(nodes: NgxLowcodeNodeSchema[], nodeId: string): NgxLowcodeNodeSchema[] {
   return duplicateNodeAndReturnId(nodes, nodeId).nodes;
 }

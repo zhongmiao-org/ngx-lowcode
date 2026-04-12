@@ -1,9 +1,31 @@
-@for (node of nodes(); track node.id) {
-  <ngx-lowcode-node-renderer
-    [node]="node"
-    [runtime]="runtime()"
-    [paletteDragging]="paletteDragging()"
-    [hoveredDropTarget]="hoveredDropTarget()"
-    (dropTargetChange)="dropTargetChange.emit($event)">
-  </ngx-lowcode-node-renderer>
-}
+<div
+  class="ngx-lowcode-node-list"
+  cdkDropList
+  [cdkDropListData]="dropListData()"
+  [cdkDropListDisabled]="runtime().mode !== 'design'"
+  (cdkDropListDropped)="handleDrop($event)">
+  @for (node of nodes(); track node.id; let index = $index) {
+    <div
+      class="ngx-lowcode-node-list__item"
+      cdkDrag
+      [cdkDragData]="node"
+      [cdkDragDisabled]="runtime().mode !== 'design'"
+      (cdkDragStarted)="handleDragStart(node.id)"
+      (cdkDragEnded)="handleDragEnd()">
+      <div *cdkDragPreview class="ngx-lowcode-drag-preview">
+        {{ dragPreviewLabel(node) }}
+      </div>
+      <div *cdkDragPlaceholder class="ngx-lowcode-drag-placeholder"></div>
+      <ngx-lowcode-node-renderer
+        [node]="node"
+        [parentId]="parentId()"
+        [slot]="slot()"
+        [siblingIndex]="index"
+        [runtime]="runtime()"
+        [paletteDragging]="paletteDragging()"
+        [hoveredDropTarget]="hoveredDropTarget()"
+        (dropTargetChange)="dropTargetChange.emit($event)">
+      </ngx-lowcode-node-renderer>
+    </div>
+  }
+</div>

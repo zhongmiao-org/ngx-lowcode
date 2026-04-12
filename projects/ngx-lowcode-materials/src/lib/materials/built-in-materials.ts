@@ -38,26 +38,65 @@ export const builtInMaterials: NgxLowcodeComponentDefinition[] = [
     component: NgxLowcodeSectionMaterialComponent,
     setterSchema: [
       { key: 'title', label: 'Title', type: 'text' },
-      { key: 'layout', label: 'Layout', type: 'select', options: [
-        { label: 'Stack', value: 'stack' },
-        { label: '2 Columns', value: 'two-column' },
-        { label: '3 Columns', value: 'three-column' }
+      { key: 'layoutMode', label: 'Layout Mode', type: 'select', options: [
+        { label: 'Grid', value: 'grid' },
+        { label: 'Flex Grid', value: 'flex-grid' },
+        { label: 'Flex', value: 'flex' }
       ] },
-      { key: 'minHeight', label: 'Min Height', type: 'number', min: 80 },
-      { key: 'height', label: 'Fixed Height', type: 'number', min: 0 },
-      { key: 'padding', label: 'Padding', type: 'number', min: 0 },
-      { key: 'gap', label: 'Gap', type: 'number', min: 0 }
+      { key: 'thyCols', label: 'thyCols', type: 'text', placeholder: '24 or 24 md:12' },
+      { key: 'thyXGap', label: 'thyXGap', type: 'text', placeholder: '0 or sm:8 md:16' },
+      { key: 'thyYGap', label: 'thyYGap', type: 'text', placeholder: '0 or sm:8 md:16' },
+      { key: 'thyGap', label: 'thyGap', type: 'text', placeholder: '0 or sm:8 md:16' },
+      { key: 'thyResponsive', label: 'thyResponsive', type: 'select', options: [
+        { label: 'None', value: 'none' },
+        { label: 'Self', value: 'self' },
+        { label: 'Screen', value: 'screen' }
+      ] },
+      { key: 'thyDirection', label: 'thyDirection', type: 'select', options: [
+        { label: 'Row', value: 'row' },
+        { label: 'Column', value: 'column' },
+        { label: 'Row Reverse', value: 'row-reverse' },
+        { label: 'Column Reverse', value: 'column-reverse' }
+      ] },
+      { key: 'thyWrap', label: 'thyWrap', type: 'select', options: [
+        { label: 'No Wrap', value: 'nowrap' },
+        { label: 'Wrap', value: 'wrap' },
+        { label: 'Wrap Reverse', value: 'wrap-reverse' }
+      ] },
+      { key: 'thyJustifyContent', label: 'thyJustifyContent', type: 'select', options: [
+        { label: 'Start', value: 'start' },
+        { label: 'Center', value: 'center' },
+        { label: 'End', value: 'end' },
+        { label: 'Space Between', value: 'space-between' },
+        { label: 'Space Around', value: 'space-around' }
+      ] },
+      { key: 'thyAlignItems', label: 'thyAlignItems', type: 'select', options: [
+        { label: 'Stretch', value: 'stretch' },
+        { label: 'Start', value: 'start' },
+        { label: 'Center', value: 'center' },
+        { label: 'End', value: 'end' },
+        { label: 'Baseline', value: 'baseline' }
+      ] },
+      { key: 'minHeight', label: 'Min Height', type: 'number', min: 80, suffix: 'px' },
+      { key: 'height', label: 'Height', type: 'number', min: 0, suffix: 'px' },
+      { key: 'padding', label: 'Padding', type: 'number', min: 0, suffix: 'px' }
     ],
     createNode: (options: NgxLowcodeMaterialCreateNodeOptions) => ({
       id: options.id,
       componentType: 'section',
       props: {
         title: 'Section',
-        layout: 'stack',
+        layoutMode: 'grid',
+        thyCols: 24,
+        thyGap: 16,
+        thyResponsive: 'screen',
+        thyDirection: 'row',
+        thyWrap: 'wrap',
+        thyJustifyContent: 'start',
+        thyAlignItems: 'stretch',
         minHeight: 240,
         height: '',
-        padding: 16,
-        gap: 16
+        padding: 16
       },
       children: []
     })

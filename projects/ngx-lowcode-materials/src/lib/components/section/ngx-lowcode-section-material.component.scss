@@ -17,20 +17,58 @@
   overflow: visible;
 }
 
-.ngx-lowcode-section__column {
+.ngx-lowcode-section__grid {
+  display: block;
+}
+
+.ngx-lowcode-section__row,
+.ngx-lowcode-section__flex {
+  display: block;
+}
+
+.ngx-lowcode-section__item {
   min-width: 0;
   min-height: 80px;
   position: relative;
 }
 
-.ngx-lowcode-section__column--active-drop {
+.ngx-lowcode-section__item--row,
+.ngx-lowcode-section__item--flex {
+  display: block;
+}
+
+.ngx-lowcode-section__drag-preview {
+  min-width: 160px;
+  max-width: 240px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.28);
+  pointer-events: none;
+}
+
+.ngx-lowcode-section__drag-placeholder {
+  min-height: 80px;
+  border: 2px dashed rgba(20, 184, 166, 0.8);
+  border-radius: 12px;
+  background: rgba(204, 251, 241, 0.4);
+}
+
+.ngx-lowcode-section__item--active-drop {
   box-shadow: inset 0 0 0 2px rgba(13, 148, 136, 0.65);
   border-radius: 12px;
   background: linear-gradient(180deg, rgba(240, 253, 250, 0.9) 0%, rgba(236, 254, 255, 0.8) 100%);
 }
 
-.ngx-lowcode-section__column--empty {
-  min-height: 120px;
+.cdk-drop-list-dragging .ngx-lowcode-section__item {
+  transition: transform 160ms ease;
+}
+
+.ngx-lowcode-section__item.cdk-drag-placeholder {
+  opacity: 1;
 }
 
 .ngx-lowcode-section__drop-placeholder {

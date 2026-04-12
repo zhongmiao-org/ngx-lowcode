@@ -1,10 +1,12 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { createDefaultPageSchema } from 'ngx-lowcode-core-utils';
 import { NgxLowcodePageSchema, NgxLowcodeNodeSchema } from 'ngx-lowcode-core-types';
 import { NgxLowcodeDesignerComponent } from 'ngx-lowcode-designer';
 import { NgxLowcodeDesignerLocale } from 'ngx-lowcode-i18n';
 import { NgxLowcodeRendererComponent } from 'ngx-lowcode-renderer';
 import { mockPageSchema } from 'ngx-lowcode-testing';
+import { ThyIconRegistry } from 'ngx-tethys/icon';
 
 @Component({
   selector: 'app-root',
@@ -183,11 +185,17 @@ import { mockPageSchema } from 'ngx-lowcode-testing';
   ]
 })
 export class AppComponent {
+  private readonly iconRegistry = inject(ThyIconRegistry);
+  private readonly sanitizer = inject(DomSanitizer);
   readonly schema = signal<NgxLowcodePageSchema>(structuredClone(mockPageSchema));
   readonly lastCommand = signal('ready');
   readonly locale = signal<NgxLowcodeDesignerLocale>('zh-CN');
   readonly nodeCount = computed(() => this.countNodes(this.schema().layoutTree));
   readonly copy = computed(() => demoCopy[this.locale() as keyof typeof demoCopy]);
+
+  constructor() {
+    this.iconRegistry.addSvgIconSet(this.sanitizer.bypassSecurityTrustResourceUrl('assets/icons/defs/svg/sprite.defs.svg'));
+  }
 
   loadPreset(preset: 'orders' | 'landing' | 'blank'): void {
     if (preset === 'orders') {
@@ -271,50 +279,44 @@ function createLandingSchema(): NgxLowcodePageSchema {
     layoutTree: [
       {
         id: 'landing-root',
-        componentType: 'page',
+        componentType: 'section',
         props: {
-          title: 'Growth Landing',
-          description: 'Switch presets to validate page rendering and editor state.'
+          title: 'Growth Landing Root',
+          layoutMode: 'grid',
+          thyCols: 24,
+          thyGap: 20,
+          thyResponsive: 'screen',
+          minHeight: 180,
+          padding: 24
+        },
+        style: {
+          background: 'linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)'
         },
         children: [
           {
-            id: 'hero-section',
-            componentType: 'section',
+            id: 'hero-text',
+            componentType: 'text',
             props: {
-              title: 'Hero',
-              layout: 'two-column',
-              minHeight: 180,
-              padding: 24,
-              gap: 20
+              text: '{{ state.heroTitle }}',
+              thySpan: '24 md:14'
             },
             style: {
-              background: 'linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)'
+              color: '#1d4ed8',
+              fontSize: '28px',
+              fontWeight: '700',
+              marginBottom: '12px'
+            }
+          },
+          {
+            id: 'hero-subtitle',
+            componentType: 'text',
+            props: {
+              text: 'Use the designer on top to change copy, spacing, actions and runtime state.',
+              thySpan: '24 md:10'
             },
-            children: [
-              {
-                id: 'hero-text',
-                componentType: 'text',
-                props: {
-                  text: '{{ state.heroTitle }}'
-                },
-                style: {
-                  color: '#1d4ed8',
-                  fontSize: '28px',
-                  fontWeight: '700',
-                  marginBottom: '12px'
-                }
-              },
-              {
-                id: 'hero-subtitle',
-                componentType: 'text',
-                props: {
-                  text: 'Use the designer on top to change copy, spacing, actions and runtime state.'
-                },
-                style: {
-                  color: '#475467'
-                }
-              }
-            ]
+            style: {
+              color: '#475467'
+            }
           }
         ]
       }
