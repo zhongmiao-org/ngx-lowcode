@@ -17,11 +17,10 @@ type DropListOrientation = 'horizontal' | 'vertical' | 'mixed';
 const defaultMaterialsI18n = getMaterialsI18n('zh-CN');
 
 @Component({
-  selector: 'ngx-lowcode-form-material',
-  standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule, ThyFormModule, ThyGridModule, NgxLowcodeNodeRendererComponent],
-  templateUrl: './ngx-lowcode-form-material.component.html',
-  styleUrl: './ngx-lowcode-form-material.component.scss'
+    selector: 'ngx-lowcode-form-material',
+    imports: [CommonModule, FormsModule, DragDropModule, ThyFormModule, ThyGridModule, NgxLowcodeNodeRendererComponent],
+    templateUrl: './ngx-lowcode-form-material.component.html',
+    styleUrl: './ngx-lowcode-form-material.component.scss'
 })
 export class NgxLowcodeFormMaterialComponent {
   readonly suppressedDragNodeId = signal<string | null>(null);

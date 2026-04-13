@@ -4,11 +4,10 @@ import { NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core
 import { ThyButtonModule } from 'ngx-tethys/button';
 
 @Component({
-  selector: 'ngx-lowcode-button-material',
-  standalone: true,
-  imports: [CommonModule, ThyButtonModule],
-  templateUrl: './ngx-lowcode-button-material.component.html',
-  styleUrl: './ngx-lowcode-button-material.component.scss'
+    selector: 'ngx-lowcode-button-material',
+    imports: [CommonModule, ThyButtonModule],
+    templateUrl: './ngx-lowcode-button-material.component.html',
+    styleUrl: './ngx-lowcode-button-material.component.scss'
 })
 export class NgxLowcodeButtonMaterialComponent {
   readonly node = input.required<NgxLowcodeNodeSchema>();

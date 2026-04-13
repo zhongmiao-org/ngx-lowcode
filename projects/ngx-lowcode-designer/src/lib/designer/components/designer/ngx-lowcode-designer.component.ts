@@ -1,5 +1,5 @@
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
-import { CommonModule } from '@angular/common';
+
 import { Component, OnChanges, OnDestroy, SimpleChanges, computed, inject, input, output, signal } from '@angular/core';
 import { NgxLowcodeEditorStore, NgxLowcodeMaterialRegistry } from 'ngx-lowcode-core';
 import {
@@ -27,9 +27,7 @@ import { ThyButtonModule } from 'ngx-tethys/button';
 
 @Component({
   selector: 'ngx-lowcode-designer',
-  standalone: true,
   imports: [
-    CommonModule,
     DragDropModule,
     NgxLowcodeRendererComponent,
     NgxLowcodeDesignerSidebarComponent,

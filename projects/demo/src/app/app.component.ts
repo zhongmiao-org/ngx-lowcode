@@ -9,10 +9,9 @@ import { mockPageSchema } from 'ngx-lowcode-testing';
 import { ThyIconRegistry } from 'ngx-tethys/icon';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [NgxLowcodeDesignerComponent, NgxLowcodeRendererComponent],
-  template: `
+    selector: 'app-root',
+    imports: [NgxLowcodeDesignerComponent, NgxLowcodeRendererComponent],
+    template: `
     <div class="demo-shell">
       <section class="demo-shell__hero">
         <p class="demo-shell__eyebrow">ngx-lowcode</p>
@@ -85,8 +84,8 @@ import { ThyIconRegistry } from 'ngx-tethys/icon';
       </section>
     </div>
   `,
-  styles: [
-    `
+    styles: [
+        `
       .demo-shell {
         min-height: 100vh;
         background:
@@ -189,7 +188,7 @@ import { ThyIconRegistry } from 'ngx-tethys/icon';
         font-size: 13px;
       }
     `
-  ]
+    ]
 })
 export class AppComponent {
   private readonly iconRegistry = inject(ThyIconRegistry);

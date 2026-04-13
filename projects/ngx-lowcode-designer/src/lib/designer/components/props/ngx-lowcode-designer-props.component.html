@@ -47,7 +47,7 @@
         <thy-collapse-item
           [thyTitle]="t().properties"
           [thyActive]="basicPanelExpanded()"
-          (thyActiveChange)="basicPanelExpanded.set($event.active)"
+          (thyActiveChange)="basicPanelExpanded.set($event)"
         >
           <div class="ngx-lowcode-props-grid">
             <div class="ngx-lowcode-prop-row">
@@ -115,7 +115,7 @@
           <thy-collapse-item
             [thyTitle]="t().layout"
             [thyActive]="layoutPanelExpanded()"
-            (thyActiveChange)="layoutPanelExpanded.set($event.active)"
+            (thyActiveChange)="layoutPanelExpanded.set($event)"
           >
             <div class="ngx-lowcode-props-grid">
               @for (setter of layoutSetters(); track setter.key) {
@@ -222,7 +222,7 @@
         <thy-collapse-item
           [thyTitle]="t().style"
           [thyActive]="stylePanelExpanded()"
-          (thyActiveChange)="stylePanelExpanded.set($event.active)"
+          (thyActiveChange)="stylePanelExpanded.set($event)"
         >
           <div class="ngx-lowcode-props-grid">
             <div class="ngx-lowcode-prop-row ngx-lowcode-prop-row--full">

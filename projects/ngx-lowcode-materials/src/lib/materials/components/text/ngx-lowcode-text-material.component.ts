@@ -4,11 +4,10 @@ import { NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core
 import { interpolateTemplate } from '../../utils/template.util';
 
 @Component({
-  selector: 'ngx-lowcode-text-material',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './ngx-lowcode-text-material.component.html',
-  styleUrl: './ngx-lowcode-text-material.component.scss'
+    selector: 'ngx-lowcode-text-material',
+    imports: [CommonModule],
+    templateUrl: './ngx-lowcode-text-material.component.html',
+    styleUrl: './ngx-lowcode-text-material.component.scss'
 })
 export class NgxLowcodeTextMaterialComponent {
   readonly node = input.required<NgxLowcodeNodeSchema>();

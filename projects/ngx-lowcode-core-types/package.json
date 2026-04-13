@@ -2,7 +2,7 @@
   "name": "ngx-lowcode-core-types",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/core": "^18.2.0"
+    "@angular/core": "^21.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
