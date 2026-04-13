@@ -1,5 +1,5 @@
 import { CdkDragEnd, CdkDragStart, DragDropModule } from '@angular/cdk/drag-drop';
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgxLowcodeComponentDefinition, NgxLowcodeNodeSchema, NgxLowcodePageSchema } from 'ngx-lowcode-core-types';
@@ -11,8 +11,7 @@ import { resolveLowcodeMaterialIcon } from '../../../core';
 
 @Component({
   selector: 'ngx-lowcode-designer-sidebar',
-  standalone: true,
-  imports: [CommonModule, DragDropModule, FormsModule, ThyButtonModule, ThyInputModule, ThyTreeModule],
+  imports: [DragDropModule, FormsModule, ThyButtonModule, ThyInputModule, ThyTreeModule],
   templateUrl: './ngx-lowcode-designer-sidebar.component.html',
   styleUrl: './ngx-lowcode-designer-sidebar.component.scss'
 })

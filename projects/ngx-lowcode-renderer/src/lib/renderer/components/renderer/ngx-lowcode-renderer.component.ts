@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { NGX_LOWCODE_CONFIG } from 'ngx-lowcode-core';
@@ -18,8 +17,7 @@ import { NgxLowcodeDropListRegistryService } from '../../services/drop-list-regi
 
 @Component({
   selector: 'ngx-lowcode-renderer',
-  standalone: true,
-  imports: [CommonModule, DragDropModule, NgxLowcodeRenderChildrenComponent],
+  imports: [DragDropModule, NgxLowcodeRenderChildrenComponent],
   templateUrl: './ngx-lowcode-renderer.component.html',
   styleUrl: './ngx-lowcode-renderer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

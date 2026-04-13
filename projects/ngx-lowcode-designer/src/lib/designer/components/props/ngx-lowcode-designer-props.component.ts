@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { findNodeById, findParentNode } from 'ngx-lowcode-core-utils';
@@ -24,9 +23,7 @@ import { ThySwitchModule } from 'ngx-tethys/switch';
 
 @Component({
   selector: 'ngx-lowcode-designer-props',
-  standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     ThyButtonModule,
     ThyCollapseModule,

@@ -30,12 +30,11 @@ type ThyFlexAlignSelf = 'auto' | 'stretch' | 'center' | 'baseline' | 'flex-start
 type DropListOrientation = 'horizontal' | 'vertical' | 'mixed';
 
 @Component({
-  selector: 'ngx-lowcode-section-material',
-  standalone: true,
-  imports: [CommonModule, DragDropModule, NgxLowcodeNodeRendererComponent, ThyGridModule],
-  templateUrl: './ngx-lowcode-section-material.component.html',
-  styleUrl: './ngx-lowcode-section-material.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'ngx-lowcode-section-material',
+    imports: [CommonModule, DragDropModule, NgxLowcodeNodeRendererComponent, ThyGridModule],
+    templateUrl: './ngx-lowcode-section-material.component.html',
+    styleUrl: './ngx-lowcode-section-material.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxLowcodeSectionMaterialComponent {
   readonly suppressedDragNodeId = signal<string | null>(null);

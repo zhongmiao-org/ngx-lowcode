@@ -2,14 +2,14 @@
   "name": "ngx-lowcode-materials",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "^18.2.0",
-    "@angular/core": "^18.2.0",
-    "@angular/forms": "^18.2.0",
+    "@angular/common": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.0",
     "ngx-lowcode-core": "^0.0.1",
     "ngx-lowcode-core-types": "^0.0.1",
     "ngx-lowcode-i18n": "^0.0.1",
     "ngx-lowcode-renderer": "^0.0.1",
-    "ngx-tethys": "^18.2.17"
+    "ngx-tethys": "^21.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

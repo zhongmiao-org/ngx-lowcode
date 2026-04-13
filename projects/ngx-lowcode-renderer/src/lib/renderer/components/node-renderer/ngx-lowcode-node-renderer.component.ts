@@ -4,12 +4,11 @@ import { NgxLowcodeMaterialRegistry } from 'ngx-lowcode-core';
 import { NgxLowcodeDropTarget, NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
 
 @Component({
-  selector: 'ngx-lowcode-node-renderer',
-  standalone: true,
-  imports: [CommonModule, NgComponentOutlet],
-  templateUrl: './ngx-lowcode-node-renderer.component.html',
-  styleUrl: './ngx-lowcode-node-renderer.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'ngx-lowcode-node-renderer',
+    imports: [CommonModule, NgComponentOutlet],
+    templateUrl: './ngx-lowcode-node-renderer.component.html',
+    styleUrl: './ngx-lowcode-node-renderer.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxLowcodeNodeRendererComponent {
   private readonly registry = inject(NgxLowcodeMaterialRegistry);

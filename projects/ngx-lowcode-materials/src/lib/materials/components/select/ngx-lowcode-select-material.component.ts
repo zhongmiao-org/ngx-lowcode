@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
@@ -8,8 +7,7 @@ import { ThySelectModule } from 'ngx-tethys/select';
 
 @Component({
   selector: 'ngx-lowcode-select-material',
-  standalone: true,
-  imports: [CommonModule, FormsModule, ThyFormModule, ThySelectModule, ThyOption],
+  imports: [FormsModule, ThyFormModule, ThySelectModule, ThyOption],
   templateUrl: './ngx-lowcode-select-material.component.html',
   styleUrl: './ngx-lowcode-select-material.component.scss'
 })
