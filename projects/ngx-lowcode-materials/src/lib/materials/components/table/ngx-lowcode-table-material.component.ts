@@ -1,12 +1,11 @@
-import { CommonModule } from '@angular/common';
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
 
 @Component({
-    selector: 'ngx-lowcode-table-material',
-    imports: [CommonModule],
-    templateUrl: './ngx-lowcode-table-material.component.html',
-    styleUrl: './ngx-lowcode-table-material.component.scss'
+  selector: 'ngx-lowcode-table-material',
+  templateUrl: './ngx-lowcode-table-material.component.html',
+  styleUrl: './ngx-lowcode-table-material.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxLowcodeTableMaterialComponent {
   readonly node = input.required<NgxLowcodeNodeSchema>();

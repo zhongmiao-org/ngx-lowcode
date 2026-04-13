@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
 import { ThyFormModule } from 'ngx-tethys/form';
@@ -9,7 +9,8 @@ import { ThySelectModule } from 'ngx-tethys/select';
   selector: 'ngx-lowcode-select-material',
   imports: [FormsModule, ThyFormModule, ThySelectModule, ThyOption],
   templateUrl: './ngx-lowcode-select-material.component.html',
-  styleUrl: './ngx-lowcode-select-material.component.scss'
+  styleUrl: './ngx-lowcode-select-material.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxLowcodeSelectMaterialComponent {
   readonly node = input.required<NgxLowcodeNodeSchema>();

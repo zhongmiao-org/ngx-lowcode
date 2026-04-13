@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, output } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { NGX_LOWCODE_CONFIG } from 'ngx-lowcode-core';
 import {
@@ -41,27 +41,14 @@ export class NgxLowcodeRendererComponent {
   readonly nodeMoveRequest = output<{ nodeId: string; target: NgxLowcodeDropTarget }>();
   readonly nodeDeleteRequest = output<string>();
 
-  private readonly stateSignal = signal<Record<string, unknown>>({});
-  private readonly selectionSignal = signal<string | null>(null);
-  private readonly dropTargetSignal = signal<NgxLowcodeDropTarget | null>(null);
-  private readonly draggingNodeSignal = signal<string | null>(null);
-  private readonly paletteDraggingSignal = signal(false);
-
-  constructor() {
-    effect(
-      () => {
-        this.stateSignal.set({
-          ...this.schema().state,
-          ...this.context()
-        });
-        this.selectionSignal.set(this.selectedNodeId());
-        this.dropTargetSignal.set(this.hoveredDropTarget());
-        this.draggingNodeSignal.set(this.draggingNodeId());
-        this.paletteDraggingSignal.set(this.paletteDragging());
-      },
-      { allowSignalWrites: true }
-    );
-  }
+  private readonly stateSignal = linkedSignal<Record<string, unknown>>(() => ({
+    ...this.schema().state,
+    ...this.context()
+  }));
+  private readonly selectionSignal = linkedSignal<string | null>(() => this.selectedNodeId());
+  private readonly dropTargetSignal = linkedSignal<NgxLowcodeDropTarget | null>(() => this.hoveredDropTarget());
+  private readonly draggingNodeSignal = linkedSignal<string | null>(() => this.draggingNodeId());
+  private readonly paletteDraggingSignal = linkedSignal<boolean>(() => this.paletteDragging());
 
   readonly runtime = computed<NgxLowcodeRuntimeContext>(() => {
     const mode = this.mode();

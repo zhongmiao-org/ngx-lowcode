@@ -32,7 +32,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/ngx-lowcode-i18n/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "polyfills": []
           }
         }
       }
@@ -62,7 +62,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/ngx-lowcode-core-types/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "polyfills": []
           }
         }
       }
@@ -92,7 +92,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/ngx-lowcode-core-utils/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "polyfills": []
           }
         }
       }
@@ -122,7 +122,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/ngx-lowcode-core/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "polyfills": []
           }
         }
       }
@@ -152,7 +152,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/ngx-lowcode-renderer/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "polyfills": []
           }
         }
       }
@@ -182,7 +182,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/ngx-lowcode-designer/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "polyfills": []
           }
         }
       }
@@ -212,7 +212,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/ngx-lowcode-materials/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "polyfills": []
           }
         }
       }
@@ -242,7 +242,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/ngx-lowcode-testing/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "polyfills": []
           }
         }
       }
@@ -264,7 +264,7 @@
             "outputPath": "dist/demo",
             "index": "projects/demo/src/index.html",
             "browser": "projects/demo/src/main.ts",
-            "polyfills": ["zone.js"],
+            "polyfills": [],
             "tsConfig": "projects/demo/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -323,7 +323,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "polyfills": ["zone.js", "zone.js/testing"],
+            "polyfills": [],
             "tsConfig": "projects/demo/tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -368,7 +368,7 @@
           "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/ngx-lowcode-puzzle-adapter/tsconfig.spec.json",
-            "polyfills": ["zone.js", "zone.js/testing"]
+            "polyfills": []
           }
         }
       }

@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { createDefaultPageSchema } from 'ngx-lowcode-core-utils';
 import { NgxLowcodePageSchema, NgxLowcodeNodeSchema } from 'ngx-lowcode-core-types';
@@ -9,9 +9,10 @@ import { mockPageSchema } from 'ngx-lowcode-testing';
 import { ThyIconRegistry } from 'ngx-tethys/icon';
 
 @Component({
-    selector: 'app-root',
-    imports: [NgxLowcodeDesignerComponent, NgxLowcodeRendererComponent],
-    template: `
+  selector: 'app-root',
+  imports: [NgxLowcodeDesignerComponent, NgxLowcodeRendererComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     <div class="demo-shell">
       <section class="demo-shell__hero">
         <p class="demo-shell__eyebrow">ngx-lowcode</p>
@@ -84,8 +85,8 @@ import { ThyIconRegistry } from 'ngx-tethys/icon';
       </section>
     </div>
   `,
-    styles: [
-        `
+  styles: [
+    `
       .demo-shell {
         min-height: 100vh;
         background:
@@ -188,16 +189,16 @@ import { ThyIconRegistry } from 'ngx-tethys/icon';
         font-size: 13px;
       }
     `
-    ]
+  ]
 })
 export class AppComponent {
   private readonly iconRegistry = inject(ThyIconRegistry);
   private readonly sanitizer = inject(DomSanitizer);
-  readonly schema = signal<NgxLowcodePageSchema>(structuredClone(mockPageSchema));
-  readonly lastCommand = signal('ready');
-  readonly locale = signal<NgxLowcodeDesignerLocale>('zh-CN');
-  readonly nodeCount = computed(() => this.countNodes(this.schema().layoutTree));
-  readonly copy = computed(() => demoCopy[this.locale() as keyof typeof demoCopy]);
+  protected readonly schema = signal<NgxLowcodePageSchema>(structuredClone(mockPageSchema));
+  protected readonly lastCommand = signal('ready');
+  protected readonly locale = signal<NgxLowcodeDesignerLocale>('zh-CN');
+  protected readonly nodeCount = computed(() => this.countNodes(this.schema().layoutTree));
+  protected readonly copy = computed(() => demoCopy[this.locale() as keyof typeof demoCopy]);
 
   constructor() {
     this.iconRegistry.addSvgIconSet(
@@ -205,7 +206,7 @@ export class AppComponent {
     );
   }
 
-  loadPreset(preset: 'orders' | 'landing' | 'blank'): void {
+  protected loadPreset(preset: 'orders' | 'landing' | 'blank'): void {
     if (preset === 'orders') {
       this.schema.set(structuredClone(mockPageSchema));
       this.lastCommand.set(this.copy().ordersLoaded);

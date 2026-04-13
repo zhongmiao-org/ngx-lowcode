@@ -1,6 +1,5 @@
-import { CommonModule } from '@angular/common';
 import { CdkDragDrop, CdkDragEnter, CdkDragExit, DragDropModule } from '@angular/cdk/drag-drop';
-import { Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   NgxLowcodeDropTarget,
@@ -17,10 +16,11 @@ type DropListOrientation = 'horizontal' | 'vertical' | 'mixed';
 const defaultMaterialsI18n = getMaterialsI18n('zh-CN');
 
 @Component({
-    selector: 'ngx-lowcode-form-material',
-    imports: [CommonModule, FormsModule, DragDropModule, ThyFormModule, ThyGridModule, NgxLowcodeNodeRendererComponent],
-    templateUrl: './ngx-lowcode-form-material.component.html',
-    styleUrl: './ngx-lowcode-form-material.component.scss'
+  selector: 'ngx-lowcode-form-material',
+  imports: [FormsModule, DragDropModule, ThyFormModule, ThyGridModule, NgxLowcodeNodeRendererComponent],
+  templateUrl: './ngx-lowcode-form-material.component.html',
+  styleUrl: './ngx-lowcode-form-material.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxLowcodeFormMaterialComponent {
   readonly suppressedDragNodeId = signal<string | null>(null);

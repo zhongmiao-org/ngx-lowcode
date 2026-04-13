@@ -1,6 +1,6 @@
 import { CdkDragEnd, CdkDragStart, DragDropModule } from '@angular/cdk/drag-drop';
 
-import { Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnChanges, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgxLowcodeComponentDefinition, NgxLowcodeNodeSchema, NgxLowcodePageSchema } from 'ngx-lowcode-core-types';
 import { getMaterialsI18n, NgxLowcodeDesignerI18n, NgxLowcodeLocale } from 'ngx-lowcode-i18n';
@@ -13,9 +13,10 @@ import { resolveLowcodeMaterialIcon } from '../../../core';
   selector: 'ngx-lowcode-designer-sidebar',
   imports: [DragDropModule, FormsModule, ThyButtonModule, ThyInputModule, ThyTreeModule],
   templateUrl: './ngx-lowcode-designer-sidebar.component.html',
-  styleUrl: './ngx-lowcode-designer-sidebar.component.scss'
+  styleUrl: './ngx-lowcode-designer-sidebar.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NgxLowcodeDesignerSidebarComponent {
+export class NgxLowcodeDesignerSidebarComponent implements OnChanges {
   readonly collapsed = input(false);
   readonly locale = input<NgxLowcodeLocale>('zh-CN');
   readonly t = input.required<NgxLowcodeDesignerI18n>();
@@ -35,7 +36,9 @@ export class NgxLowcodeDesignerSidebarComponent {
   readonly outlineNameDraft = signal('');
   readonly expandedOutlineNodeIds = signal<string[]>([]);
   readonly knownOutlineNodeIds = signal<string[]>([]);
-  readonly groupedMaterials = signal<Array<{ category: string; items: NgxLowcodeComponentDefinition[] }>>([]);
+  readonly groupedMaterials = computed<Array<{ category: string; items: NgxLowcodeComponentDefinition[] }>>(() =>
+    this.groupMaterials(this.availableMaterials())
+  );
   readonly outlineTreeNodes = computed<ThyTreeNodeData[]>(() =>
     this.editorSchema().layoutTree.map((node) => this.mapOutlineNode(node))
   );
@@ -48,44 +51,8 @@ export class NgxLowcodeDesignerSidebarComponent {
   private suppressNextPaletteClick = false;
   private isPaletteDragging = false;
 
-  constructor() {
-    this.groupedMaterials.set([]);
-  }
-
   ngOnChanges(): void {
-    const categoryOrder = [
-      this.materialsI18n().categories.common,
-      this.materialsI18n().categories.layout,
-      this.materialsI18n().categories.navigation,
-      this.materialsI18n().categories.dataEntry,
-      this.materialsI18n().categories.dataDisplay,
-      this.materialsI18n().categories.feedback,
-      this.materialsI18n().categories.other
-    ];
-    const groups = new Map<string, NgxLowcodeComponentDefinition[]>();
-    for (const material of this.availableMaterials()) {
-      const category = material.category || this.materialsI18n().categories.other;
-      groups.set(category, [...(groups.get(category) ?? []), material]);
-    }
-    const normalized = [...groups.entries()]
-      .sort((a, b) => categoryOrder.indexOf(a[0]) - categoryOrder.indexOf(b[0]))
-      .map(([category, items]) => ({ category, items }));
-    this.groupedMaterials.set(normalized);
-
-    const outlineNodeIds = this.collectOutlineNodeIds(this.editorSchema().layoutTree);
-    const knownIds = new Set(this.knownOutlineNodeIds());
-    if (!this.expandedOutlineNodeIds().length) {
-      this.expandedOutlineNodeIds.set(outlineNodeIds);
-    } else {
-      const nextExpanded = new Set(this.expandedOutlineNodeIds().filter((id) => outlineNodeIds.includes(id)));
-      for (const nodeId of outlineNodeIds) {
-        if (!knownIds.has(nodeId)) {
-          nextExpanded.add(nodeId);
-        }
-      }
-      this.expandedOutlineNodeIds.set([...nextExpanded]);
-    }
-    this.knownOutlineNodeIds.set(outlineNodeIds);
+    this.syncExpandedOutlineNodeIds();
   }
 
   handleMaterialClick(materialType: string): void {
@@ -204,6 +171,45 @@ export class NgxLowcodeDesignerSidebarComponent {
   private extractOutlineNodeId(event: ThyTreeEmitEvent<NgxLowcodeNodeSchema>): string | null {
     const origin = event.node?.origin?.origin as NgxLowcodeNodeSchema | undefined;
     return origin?.id ?? null;
+  }
+
+  private groupMaterials(
+    materials: NgxLowcodeComponentDefinition[]
+  ): Array<{ category: string; items: NgxLowcodeComponentDefinition[] }> {
+    const categoryOrder = [
+      this.materialsI18n().categories.common,
+      this.materialsI18n().categories.layout,
+      this.materialsI18n().categories.navigation,
+      this.materialsI18n().categories.dataEntry,
+      this.materialsI18n().categories.dataDisplay,
+      this.materialsI18n().categories.feedback,
+      this.materialsI18n().categories.other
+    ];
+    const groups = new Map<string, NgxLowcodeComponentDefinition[]>();
+    for (const material of materials) {
+      const category = material.category || this.materialsI18n().categories.other;
+      groups.set(category, [...(groups.get(category) ?? []), material]);
+    }
+    return [...groups.entries()]
+      .sort((a, b) => categoryOrder.indexOf(a[0]) - categoryOrder.indexOf(b[0]))
+      .map(([category, items]) => ({ category, items }));
+  }
+
+  private syncExpandedOutlineNodeIds(): void {
+    const outlineNodeIds = this.collectOutlineNodeIds(this.editorSchema().layoutTree);
+    const knownIds = new Set(this.knownOutlineNodeIds());
+    if (!this.expandedOutlineNodeIds().length) {
+      this.expandedOutlineNodeIds.set(outlineNodeIds);
+    } else {
+      const nextExpanded = new Set(this.expandedOutlineNodeIds().filter((id) => outlineNodeIds.includes(id)));
+      for (const nodeId of outlineNodeIds) {
+        if (!knownIds.has(nodeId)) {
+          nextExpanded.add(nodeId);
+        }
+      }
+      this.expandedOutlineNodeIds.set([...nextExpanded]);
+    }
+    this.knownOutlineNodeIds.set(outlineNodeIds);
   }
 
   private collectOutlineNodeIds(nodes: NgxLowcodeNodeSchema[]): string[] {
