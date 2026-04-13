@@ -1,2 +1,1 @@
-export * from './lib/mock-executors';
-export * from './lib/mock-page-schema';
+export * from './lib/testing';

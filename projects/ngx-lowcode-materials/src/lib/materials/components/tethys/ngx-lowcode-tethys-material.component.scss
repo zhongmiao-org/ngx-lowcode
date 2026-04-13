@@ -1,0 +1,94 @@
+@use '../../styles/form-field.shared' as *;
+
+.ngx-lowcode-tethys {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.ngx-lowcode-tethys__panel {
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #475569;
+}
+
+.ngx-lowcode-tethys__icon,
+.ngx-lowcode-tethys__switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ngx-lowcode-tethys__switch,
+.ngx-lowcode-tethys__choice-row,
+.ngx-lowcode-tethys__upload {
+  min-height: 32px;
+}
+
+.ngx-lowcode-tethys__switch {
+  justify-content: flex-start;
+}
+
+.ngx-lowcode-tethys__choice-row,
+.ngx-lowcode-tethys__upload {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ngx-lowcode-tethys__radio-group {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding-top: 6px;
+  justify-items: start;
+}
+
+.ngx-lowcode-tethys__control {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.ngx-lowcode-tethys__upload-value {
+  font-size: 12px;
+  color: #667085;
+  overflow-wrap: anywhere;
+}
+
+.ngx-lowcode-tethys__image {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+thy-anchor,
+thy-menu,
+thy-list,
+thy-card,
+thy-statistic,
+thy-progress,
+thy-date-picker,
+thy-tabs {
+  display: block;
+  width: 100%;
+}
+
+:host ::ng-deep .thy-select-custom,
+:host ::ng-deep .thy-select-control,
+:host ::ng-deep .thy-select-selection,
+:host ::ng-deep .thy-input-number,
+:host ::ng-deep .thy-input-number-input-group,
+:host ::ng-deep .thy-input-number-input,
+:host ::ng-deep .thy-calendar-picker,
+:host ::ng-deep .thy-calendar-picker-input {
+  width: 100%;
+  min-width: 0;
+}

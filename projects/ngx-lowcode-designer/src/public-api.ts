@@ -1,1 +1,1 @@
-export * from './lib/components/designer/ngx-lowcode-designer.component';
+export { NgxLowcodeDesignerComponent } from './lib/designer';

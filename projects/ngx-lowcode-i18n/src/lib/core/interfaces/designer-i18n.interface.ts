@@ -1,0 +1,57 @@
+import type { NgxLowcodeLocale } from '../types';
+
+export type NgxLowcodeDesignerLocale = NgxLowcodeLocale;
+
+export interface NgxLowcodeDesignerI18n {
+  materials: string;
+  outline: string;
+  page: string;
+  properties: string;
+  layout: string;
+  style: string;
+  runtimeModel: string;
+  state: string;
+  datasources: string;
+  actions: string;
+  pageTitle: string;
+  pageDescription: string;
+  pageId: string;
+  nodeCount: string;
+  nodeName: string;
+  nodeNamePlaceholder: string;
+  selectNodeHint: string;
+  duplicate: string;
+  delete: string;
+  undo: string;
+  redo: string;
+  preview: string;
+  save: string;
+  publish: string;
+  applyState: string;
+  applyDatasources: string;
+  applyActions: string;
+  stateJsonError: string;
+  datasourcesJsonError: string;
+  actionsJsonError: string;
+  textColor: string;
+  background: string;
+  padding: string;
+  paddingTop: string;
+  paddingRight: string;
+  paddingBottom: string;
+  paddingLeft: string;
+  marginTop: string;
+  marginRight: string;
+  marginBottom: string;
+  marginLeft: string;
+  width: string;
+  height: string;
+  minWidth: string;
+  minHeight: string;
+  unit: string;
+  collapseLeft: string;
+  expandLeft: string;
+  collapseRight: string;
+  expandRight: string;
+  dragMaterial: string;
+}

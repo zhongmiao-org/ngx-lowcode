@@ -1,0 +1,15 @@
+@use '../../styles/form-field.shared' as *;
+
+.ngx-lowcode-select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+
+:host ::ng-deep .thy-select-custom,
+:host ::ng-deep .thy-select-control,
+:host ::ng-deep .thy-select-selection {
+  width: 100%;
+  min-width: 0;
+}
