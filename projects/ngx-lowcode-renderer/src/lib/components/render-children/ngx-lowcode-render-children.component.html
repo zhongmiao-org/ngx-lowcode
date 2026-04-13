@@ -1,9 +1,0 @@
-@for (node of nodes(); track node.id) {
-  <ngx-lowcode-node-renderer
-    [node]="node"
-    [runtime]="runtime()"
-    [paletteDragging]="paletteDragging()"
-    [hoveredDropTarget]="hoveredDropTarget()"
-    (dropTargetChange)="dropTargetChange.emit($event)">
-  </ngx-lowcode-node-renderer>
-}

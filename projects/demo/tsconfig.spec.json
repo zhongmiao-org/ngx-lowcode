@@ -4,38 +4,17 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/spec",
-    "types": [
-      "jasmine"
-    ],
+    "types": ["jasmine"],
     "paths": {
-      "ngx-lowcode-core-types": [
-        "projects/ngx-lowcode-core-types/src/public-api.ts"
-      ],
-      "ngx-lowcode-core-utils": [
-        "projects/ngx-lowcode-core-utils/src/public-api.ts"
-      ],
-      "ngx-lowcode-core": [
-        "projects/ngx-lowcode-core/src/public-api.ts"
-      ],
-      "ngx-lowcode-i18n": [
-        "projects/ngx-lowcode-i18n/src/public-api.ts"
-      ],
-      "ngx-lowcode-designer": [
-        "projects/ngx-lowcode-designer/src/public-api.ts"
-      ],
-      "ngx-lowcode-materials": [
-        "projects/ngx-lowcode-materials/src/public-api.ts"
-      ],
-      "ngx-lowcode-renderer": [
-        "projects/ngx-lowcode-renderer/src/public-api.ts"
-      ],
-      "ngx-lowcode-testing": [
-        "projects/ngx-lowcode-testing/src/public-api.ts"
-      ]
+      "ngx-lowcode-core-types": ["projects/ngx-lowcode-core-types/src/public-api.ts"],
+      "ngx-lowcode-core-utils": ["projects/ngx-lowcode-core-utils/src/public-api.ts"],
+      "ngx-lowcode-core": ["projects/ngx-lowcode-core/src/public-api.ts"],
+      "ngx-lowcode-i18n": ["projects/ngx-lowcode-i18n/src/public-api.ts"],
+      "ngx-lowcode-designer": ["projects/ngx-lowcode-designer/src/public-api.ts"],
+      "ngx-lowcode-materials": ["projects/ngx-lowcode-materials/src/public-api.ts"],
+      "ngx-lowcode-renderer": ["projects/ngx-lowcode-renderer/src/public-api.ts"],
+      "ngx-lowcode-testing": ["projects/ngx-lowcode-testing/src/public-api.ts"]
     }
   },
-  "include": [
-    "src/**/*.spec.ts",
-    "src/**/*.d.ts"
-  ]
+  "include": ["src/**/*.spec.ts", "src/**/*.d.ts"]
 }

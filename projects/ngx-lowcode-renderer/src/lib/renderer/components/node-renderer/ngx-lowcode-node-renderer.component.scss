@@ -1,0 +1,106 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.ngx-lowcode-node-shell {
+  position: relative;
+  overflow: visible;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.ngx-lowcode-node-shell--design {
+  cursor: pointer;
+  border-radius: 12px;
+  transition:
+    box-shadow 120ms ease,
+    background-color 120ms ease;
+}
+
+.ngx-lowcode-node-shell--design:hover {
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.35);
+  background: rgba(239, 246, 255, 0.3);
+}
+
+.ngx-lowcode-node-shell--selected {
+  box-shadow: 0 0 0 2px #2563eb;
+  background: rgba(239, 246, 255, 0.55);
+  z-index: 1;
+}
+
+.ngx-lowcode-node-shell--dragging {
+  opacity: 0.45;
+}
+
+.ngx-lowcode-node-shell__edge {
+  position: absolute;
+  z-index: 2;
+}
+
+.ngx-lowcode-node-shell__edge--vertical {
+  left: 0;
+  right: 0;
+  height: 18px;
+}
+
+.ngx-lowcode-node-shell__edge--horizontal {
+  top: 0;
+  bottom: 0;
+  width: 18px;
+}
+
+.ngx-lowcode-node-shell__edge--before.ngx-lowcode-node-shell__edge--vertical {
+  top: -9px;
+}
+
+.ngx-lowcode-node-shell__edge--after.ngx-lowcode-node-shell__edge--vertical {
+  bottom: -9px;
+}
+
+.ngx-lowcode-node-shell__edge--before.ngx-lowcode-node-shell__edge--horizontal {
+  left: -9px;
+}
+
+.ngx-lowcode-node-shell__edge--after.ngx-lowcode-node-shell__edge--horizontal {
+  right: -9px;
+}
+
+.ngx-lowcode-node-shell__badge {
+  position: absolute;
+  top: -10px;
+  left: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 18px;
+  pointer-events: none;
+}
+
+.ngx-lowcode-node-shell__delete {
+  position: absolute;
+  top: -12px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #d0d5dd;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #344054;
+  font-size: 16px;
+  line-height: 1;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+  z-index: 3;
+}
+
+.ngx-lowcode-node-missing {
+  border: 1px dashed #ff7875;
+  padding: 12px;
+  border-radius: 8px;
+  color: #cf1322;
+  background: #fff1f0;
+}

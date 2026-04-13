@@ -1,0 +1,5 @@
+@use '../../styles/form-field.shared' as *;
+
+:host ::ng-deep input[thyInput] {
+  width: 100%;
+}

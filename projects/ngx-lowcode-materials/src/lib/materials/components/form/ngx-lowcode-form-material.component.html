@@ -1,0 +1,77 @@
+<form class="ngx-lowcode-form" thyForm [thyLayout]="thyLayout()" [ngStyle]="formStyle()">
+  <div class="ngx-lowcode-form__title">{{ title() }}</div>
+  <div
+    class="ngx-lowcode-form__grid"
+    thyFlex
+    thyDirection="row"
+    thyWrap="wrap"
+    thyAlignItems="stretch"
+    [thyGap]="12"
+    cdkDropList
+    [cdkDropListData]="dropListData()"
+    [cdkDropListDisabled]="runtime().mode !== 'design'"
+    [cdkDropListOrientation]="dropListOrientation()"
+    (cdkDropListEntered)="logDropListEntered($any($event))"
+    (cdkDropListExited)="logDropListExited($any($event))"
+    (cdkDropListDropped)="handleDrop($any($event))"
+  >
+    @for (child of node().children ?? []; track child.id; let index = $index) {
+      @if (canDragChild(child)) {
+        <div
+          class="ngx-lowcode-form__item"
+          [class.ngx-lowcode-form__item--section]="child.componentType === 'section'"
+          thyFlexItem
+          [thyGrow]="0"
+          [thyShrink]="0"
+          thyBasis="100%"
+          cdkDrag
+          [cdkDragData]="child"
+          [cdkDragDisabled]="runtime().mode !== 'design' || isDragSuppressed(child.id)"
+          (pointerdown)="prepareDrag($event, child.id)"
+          (pointerup)="clearPreparedDrag(child.id)"
+          (pointercancel)="clearPreparedDrag(child.id)"
+          (cdkDragStarted)="handleDragStart(child.id)"
+          (cdkDragEnded)="handleDragEnd()"
+        >
+          <div *cdkDragPreview class="ngx-lowcode-form__drag-preview">
+            {{ dragPreviewLabel(child) }}
+          </div>
+          <div class="ngx-lowcode-form__drag-shell">
+            <ngx-lowcode-node-renderer
+              [node]="child"
+              [parentId]="node().id"
+              [slot]="null"
+              [siblingIndex]="index"
+              [parentOrientation]="'vertical'"
+              [disableSiblingHotspots]="true"
+              [runtime]="runtime()"
+            >
+            </ngx-lowcode-node-renderer>
+          </div>
+        </div>
+      } @else {
+        <div
+          class="ngx-lowcode-form__item"
+          [class.ngx-lowcode-form__item--section]="child.componentType === 'section'"
+          thyFlexItem
+          [thyGrow]="0"
+          [thyShrink]="0"
+          thyBasis="100%"
+        >
+          <div class="ngx-lowcode-form__drag-shell">
+            <ngx-lowcode-node-renderer
+              [node]="child"
+              [parentId]="node().id"
+              [slot]="null"
+              [siblingIndex]="index"
+              [parentOrientation]="'vertical'"
+              [disableSiblingHotspots]="true"
+              [runtime]="runtime()"
+            >
+            </ngx-lowcode-node-renderer>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</form>

@@ -1,0 +1,84 @@
+.ngx-lowcode-page {
+  display: block;
+  background: #f7fafc;
+  border-radius: 16px;
+  padding: 24px;
+  min-height: 100%;
+}
+
+.ngx-lowcode-page__header {
+  margin-bottom: 20px;
+}
+
+.ngx-lowcode-page__body {
+  min-height: 240px;
+}
+
+.ngx-lowcode-page__design-surface {
+  min-height: inherit;
+}
+
+.ngx-lowcode-page__grid,
+.ngx-lowcode-page__row,
+.ngx-lowcode-page__flex {
+  width: 100%;
+}
+
+.ngx-lowcode-page__item {
+  min-width: 0;
+}
+
+.ngx-lowcode-page__drag-shell {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.ngx-lowcode-page__item.cdk-drag-animating {
+  transition: transform 180ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.ngx-lowcode-page__drag-preview {
+  min-width: 120px;
+  max-width: 220px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0.01em;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.24);
+}
+
+.ngx-lowcode-page__header h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.ngx-lowcode-page__header p {
+  margin: 8px 0 0;
+  color: #667085;
+}
+
+.cdk-drop-list-dragging .ngx-lowcode-page__item:not(.cdk-drag-placeholder) {
+  transition: transform 180ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.ngx-lowcode-page__item.cdk-drag-placeholder {
+  opacity: 1;
+  position: relative;
+}
+
+.ngx-lowcode-page__item.cdk-drag-placeholder > * {
+  visibility: hidden;
+}
+
+.ngx-lowcode-page__item.cdk-drag-placeholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px dashed #14b8a6;
+  border-radius: 16px;
+  background: rgba(204, 251, 241, 0.35);
+  visibility: visible;
+}

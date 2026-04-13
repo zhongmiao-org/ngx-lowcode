@@ -1,0 +1,36 @@
+<div
+  class="ngx-lowcode-node-shell"
+  [attr.data-node-id]="node().id"
+  [class.ngx-lowcode-node-shell--design]="isDesignMode()"
+  [class.ngx-lowcode-node-shell--selected]="isSelected()"
+  [class.ngx-lowcode-node-shell--dragging]="isDraggingNode()"
+  (click)="selectNode($event)"
+>
+  @if (isDesignMode() && !disableSiblingHotspots()) {
+    <div
+      class="ngx-lowcode-node-shell__edge ngx-lowcode-node-shell__edge--before"
+      [class.ngx-lowcode-node-shell__edge--vertical]="parentOrientation() === 'vertical'"
+      [class.ngx-lowcode-node-shell__edge--horizontal]="parentOrientation() === 'horizontal'"
+      (mousemove)="handleBeforePointerMove($event)"
+    ></div>
+  }
+  @if (isDesignMode() && !disableSiblingHotspots()) {
+    <div
+      class="ngx-lowcode-node-shell__edge ngx-lowcode-node-shell__edge--after"
+      [class.ngx-lowcode-node-shell__edge--vertical]="parentOrientation() === 'vertical'"
+      [class.ngx-lowcode-node-shell__edge--horizontal]="parentOrientation() === 'horizontal'"
+      (mousemove)="handleAfterPointerMove($event)"
+    ></div>
+  }
+  @if (definition(); as material) {
+    <ng-container *ngComponentOutlet="material.component; inputs: { node: node(), runtime: runtime() }"> </ng-container>
+  } @else {
+    <div class="ngx-lowcode-node-missing">Unknown material: {{ node().componentType }}</div>
+  }
+  @if (isSelected()) {
+    <div class="ngx-lowcode-node-shell__badge">{{ node().componentType }}</div>
+    @if (runtime().mode === 'design') {
+      <button type="button" class="ngx-lowcode-node-shell__delete" (click)="requestDelete($event)">×</button>
+    }
+  }
+</div>

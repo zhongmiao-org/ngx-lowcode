@@ -1,0 +1,13 @@
+@if (href()) {
+  <a
+    class="ngx-lowcode-text ngx-lowcode-text--link"
+    [ngStyle]="node().style ?? null"
+    [href]="href()"
+    [attr.target]="target()"
+    [attr.rel]="target() === '_blank' ? 'noreferrer noopener' : null"
+  >
+    {{ content() }}
+  </a>
+} @else {
+  <div class="ngx-lowcode-text" [ngStyle]="node().style ?? null">{{ content() }}</div>
+}

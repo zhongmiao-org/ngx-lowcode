@@ -1,0 +1,86 @@
+<div class="ngx-lowcode-designer" cdkDropListGroup [style.grid-template-columns]="layoutColumns()">
+  <ngx-lowcode-designer-sidebar
+    [collapsed]="leftSidebarCollapsed()"
+    [locale]="locale()"
+    [t]="t()"
+    [availableMaterials]="availableMaterials()"
+    [editorSchema]="editorSchema()"
+    [selectedNodeId]="selectedNodeId()"
+    [paletteDropListId]="paletteDropListId"
+    [stageDropListId]="stageDropListId"
+    (toggleCollapse)="toggleLeftSidebar()"
+    (materialAdd)="addMaterial($event)"
+    (paletteDragStateChange)="handlePaletteDragStateChange($event)"
+    (nodeSelect)="selectNode($event)"
+    (nodeRename)="updateNodeName($event.nodeId, $event.name)"
+  >
+  </ngx-lowcode-designer-sidebar>
+
+  <div class="ngx-lowcode-designer__resizer" (pointerdown)="startResize($event, 'left')"></div>
+
+  <main class="ngx-lowcode-designer__canvas">
+    <header class="ngx-lowcode-toolbar">
+      <div>
+        <strong>{{ effectiveConfig().title || editorSchema().pageMeta.title }}</strong>
+      </div>
+      <div class="ngx-lowcode-toolbar__actions">
+        <button [thyButton]="buttonKinds.default" (click)="undo()">{{ t().undo }}</button>
+        <button [thyButton]="buttonKinds.default" (click)="redo()">{{ t().redo }}</button>
+        <button [thyButton]="buttonKinds.primaryOutline" (click)="emitPreview()">{{ t().preview }}</button>
+        <button [thyButton]="buttonKinds.primaryOutline" (click)="emitSave()">{{ t().save }}</button>
+        <button [thyButton]="buttonKinds.primary" (click)="emitPublish()">{{ t().publish }}</button>
+      </div>
+    </header>
+
+    <section
+      class="ngx-lowcode-stage"
+      [class.ngx-lowcode-stage--root-drop-target]="(isPaletteDragging || draggingNodeId) && !activeDropTarget()"
+      cdkDropList
+      [id]="stageDropListId"
+      [cdkDropListData]="editorSchema().layoutTree"
+      [cdkDropListSortingDisabled]="true"
+      (cdkDropListDropped)="handleMaterialDrop($event)"
+      (dragover)="handleStageDragOver($event)"
+      (drop)="handleStageDrop($event)"
+    >
+      <ngx-lowcode-renderer
+        [schema]="editorSchema()"
+        [mode]="'design'"
+        [selectedNodeId]="selectedNodeId()"
+        [paletteDragging]="isPaletteDragging"
+        [draggingNodeId]="draggingNodeId"
+        [hoveredDropTarget]="activeDropTarget()"
+        [context]="{}"
+        (selectionChange)="handleRendererSelectionChange($event)"
+        (dropTargetChange)="handleRendererDropTargetChange($event)"
+        (nodeAddRequest)="handleNodeAdd($event)"
+        (nodeMoveRequest)="handleNodeMove($event)"
+        (nodeDeleteRequest)="handleNodeDelete($event)"
+      >
+      </ngx-lowcode-renderer>
+    </section>
+  </main>
+
+  <div class="ngx-lowcode-designer__resizer" (pointerdown)="startResize($event, 'right')"></div>
+
+  <ngx-lowcode-designer-props
+    [collapsed]="rightSidebarCollapsed()"
+    [locale]="locale()"
+    [t]="t()"
+    [editorSchema]="editorSchema()"
+    [selectedNodeId]="selectedNodeId()"
+    [styleUnits]="styleUnits"
+    [styleDimensions]="styleDimensions()"
+    (toggleCollapse)="toggleRightSidebar()"
+    (pageMetaChange)="updatePageMeta($event.key, $event.value)"
+    (nodeNameChange)="updateNodeName($event.nodeId, $event.value)"
+    (nodePropChange)="updateNodeProp($event.nodeId, $event.key, $event.value)"
+    (nodeStyleChange)="updateNodeStyle($event.nodeId, $event.key, $event.value)"
+    (duplicate)="duplicateSelected()"
+    (delete)="deleteSelected()"
+    (stateReplace)="replaceState($event)"
+    (datasourcesReplace)="replaceDatasources($event)"
+    (actionsReplace)="replaceActions($event)"
+  >
+  </ngx-lowcode-designer-props>
+</div>
