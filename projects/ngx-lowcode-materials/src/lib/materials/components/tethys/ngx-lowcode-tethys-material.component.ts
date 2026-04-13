@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
 import { getMaterialsI18n } from 'ngx-lowcode-i18n';
@@ -30,36 +29,36 @@ import { ThyFileSelectEvent, ThyUploadModule } from 'ngx-tethys/upload';
 const defaultMaterialsI18n = getMaterialsI18n('zh-CN');
 
 @Component({
-    selector: 'ngx-lowcode-tethys-material',
-    imports: [
-        CommonModule,
-        FormsModule,
-        ThyAlertModule,
-        ThyAnchorModule,
-        ThyAvatarModule,
-        ThyBreadcrumbModule,
-        ThyButtonModule,
-        ThyCardModule,
-        ThyCheckboxModule,
-        ThyDatePickerModule,
-        ThyDividerModule,
-        ThyFormModule,
-        ThyIconModule,
-        ThyImageModule,
-        ThyInputNumberModule,
-        ThyListModule,
-        ThyMenuModule,
-        ThyProgressModule,
-        ThyRadioModule,
-        ThySpaceModule,
-        ThyStatisticModule,
-        ThySwitchModule,
-        ThyTabsModule,
-        ThyTagModule,
-        ThyUploadModule
-    ],
-    templateUrl: './ngx-lowcode-tethys-material.component.html',
-    styleUrl: './ngx-lowcode-tethys-material.component.scss'
+  selector: 'ngx-lowcode-tethys-material',
+  imports: [
+    FormsModule,
+    ThyAlertModule,
+    ThyAnchorModule,
+    ThyAvatarModule,
+    ThyBreadcrumbModule,
+    ThyButtonModule,
+    ThyCardModule,
+    ThyCheckboxModule,
+    ThyDatePickerModule,
+    ThyDividerModule,
+    ThyFormModule,
+    ThyIconModule,
+    ThyImageModule,
+    ThyInputNumberModule,
+    ThyListModule,
+    ThyMenuModule,
+    ThyProgressModule,
+    ThyRadioModule,
+    ThySpaceModule,
+    ThyStatisticModule,
+    ThySwitchModule,
+    ThyTabsModule,
+    ThyTagModule,
+    ThyUploadModule
+  ],
+  templateUrl: './ngx-lowcode-tethys-material.component.html',
+  styleUrl: './ngx-lowcode-tethys-material.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxLowcodeTethysMaterialComponent {
   readonly node = input.required<NgxLowcodeNodeSchema>();
@@ -133,14 +132,13 @@ export class NgxLowcodeTethysMaterialComponent {
   }
 
   uploadFiles(event: ThyFileSelectEvent | File[] | FileList | Event): void {
-    const files =
-      Array.isArray(event)
-        ? event
-        : event instanceof FileList
-          ? Array.from(event)
-          : 'files' in event && Array.isArray(event.files)
-            ? event.files
-            : [];
+    const files = Array.isArray(event)
+      ? event
+      : event instanceof FileList
+        ? Array.from(event)
+        : 'files' in event && Array.isArray(event.files)
+          ? event.files
+          : [];
     if (!this.stateKey()) {
       return;
     }

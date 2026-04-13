@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { CdkDragDrop, CdkDragEnter, CdkDragExit, DragDropModule } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
 import { NgxLowcodeDropTarget, NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
@@ -31,11 +30,11 @@ type ThyFlexAlignSelf = 'auto' | 'stretch' | 'center' | 'baseline' | 'flex-start
 type DropListOrientation = 'horizontal' | 'vertical' | 'mixed';
 
 @Component({
-    selector: 'ngx-lowcode-page-material',
-    imports: [CommonModule, DragDropModule, NgxLowcodeNodeRendererComponent, ThyGridModule],
-    templateUrl: './ngx-lowcode-page-material.component.html',
-    styleUrl: './ngx-lowcode-page-material.component.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'ngx-lowcode-page-material',
+  imports: [DragDropModule, NgxLowcodeNodeRendererComponent, ThyGridModule],
+  templateUrl: './ngx-lowcode-page-material.component.html',
+  styleUrl: './ngx-lowcode-page-material.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxLowcodePageMaterialComponent {
   readonly suppressedDragNodeId = signal<string | null>(null);

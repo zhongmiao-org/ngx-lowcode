@@ -1,14 +1,14 @@
-import { CommonModule, NgComponentOutlet } from '@angular/common';
+import { NgComponentOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { NgxLowcodeMaterialRegistry } from 'ngx-lowcode-core';
 import { NgxLowcodeDropTarget, NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
 
 @Component({
-    selector: 'ngx-lowcode-node-renderer',
-    imports: [CommonModule, NgComponentOutlet],
-    templateUrl: './ngx-lowcode-node-renderer.component.html',
-    styleUrl: './ngx-lowcode-node-renderer.component.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'ngx-lowcode-node-renderer',
+  imports: [NgComponentOutlet],
+  templateUrl: './ngx-lowcode-node-renderer.component.html',
+  styleUrl: './ngx-lowcode-node-renderer.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxLowcodeNodeRendererComponent {
   private readonly registry = inject(NgxLowcodeMaterialRegistry);

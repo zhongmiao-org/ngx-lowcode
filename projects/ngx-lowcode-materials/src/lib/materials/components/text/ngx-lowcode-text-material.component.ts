@@ -1,13 +1,12 @@
-import { CommonModule } from '@angular/common';
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
 import { interpolateTemplate } from '../../utils/template.util';
 
 @Component({
-    selector: 'ngx-lowcode-text-material',
-    imports: [CommonModule],
-    templateUrl: './ngx-lowcode-text-material.component.html',
-    styleUrl: './ngx-lowcode-text-material.component.scss'
+  selector: 'ngx-lowcode-text-material',
+  templateUrl: './ngx-lowcode-text-material.component.html',
+  styleUrl: './ngx-lowcode-text-material.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxLowcodeTextMaterialComponent {
   readonly node = input.required<NgxLowcodeNodeSchema>();

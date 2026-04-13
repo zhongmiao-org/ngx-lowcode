@@ -1,4 +1,13 @@
-import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  linkedSignal,
+  output,
+  signal
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { findNodeById, findParentNode } from 'ngx-lowcode-core-utils';
 import { NgxLowcodeMaterialRegistry } from 'ngx-lowcode-core';
@@ -36,7 +45,8 @@ import { ThySwitchModule } from 'ngx-tethys/switch';
     ThySwitchModule
   ],
   templateUrl: './ngx-lowcode-designer-props.component.html',
-  styleUrl: './ngx-lowcode-designer-props.component.scss'
+  styleUrl: './ngx-lowcode-designer-props.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxLowcodeDesignerPropsComponent {
   private readonly registry = inject(NgxLowcodeMaterialRegistry);
@@ -108,6 +118,9 @@ export class NgxLowcodeDesignerPropsComponent {
     this.filterSetters(this.selectedParentDefinition()?.itemSetterSchema, 'layout', this.selectedParentLayoutMode())
   );
   readonly showLayoutPanel = computed(() => this.layoutSetters().length > 0 || this.itemLayoutSetters().length > 0);
+  private readonly serializedState = computed(() => JSON.stringify(this.editorSchema().state, null, 2));
+  private readonly serializedDatasources = computed(() => JSON.stringify(this.editorSchema().datasources, null, 2));
+  private readonly serializedActions = computed(() => JSON.stringify(this.editorSchema().actions, null, 2));
 
   readonly toggleCollapse = output<void>();
   readonly pageMetaChange = output<{ key: 'title' | 'description'; value: string }>();
@@ -121,9 +134,9 @@ export class NgxLowcodeDesignerPropsComponent {
   readonly actionsReplace = output<any[]>();
 
   readonly activeModelTab = signal<'state' | 'datasources' | 'actions'>('state');
-  readonly stateDraft = signal('{}');
-  readonly datasourcesDraft = signal('[]');
-  readonly actionsDraft = signal('[]');
+  readonly stateDraft = linkedSignal(() => this.serializedState());
+  readonly datasourcesDraft = linkedSignal(() => this.serializedDatasources());
+  readonly actionsDraft = linkedSignal(() => this.serializedActions());
   readonly stateDraftError = signal('');
   readonly datasourcesDraftError = signal('');
   readonly actionsDraftError = signal('');
@@ -136,21 +149,6 @@ export class NgxLowcodeDesignerPropsComponent {
     primaryOutline: 'primary-outline',
     dangerOutline: 'danger-outline'
   };
-
-  constructor() {
-    effect(
-      () => {
-        const schema = this.editorSchema();
-        this.stateDraft.set(JSON.stringify(schema.state, null, 2));
-        this.datasourcesDraft.set(JSON.stringify(schema.datasources, null, 2));
-        this.actionsDraft.set(JSON.stringify(schema.actions, null, 2));
-        this.stateDraftError.set('');
-        this.datasourcesDraftError.set('');
-        this.actionsDraftError.set('');
-      },
-      { allowSignalWrites: true }
-    );
-  }
 
   stringProp(node: NgxLowcodeNodeSchema, key: string): string {
     return String(node.props[key] ?? '');

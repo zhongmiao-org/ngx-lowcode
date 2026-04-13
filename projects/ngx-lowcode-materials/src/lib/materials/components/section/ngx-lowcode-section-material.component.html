@@ -1,6 +1,6 @@
-<section class="ngx-lowcode-section" [ngStyle]="sectionStyle()">
+<section class="ngx-lowcode-section" [style]="sectionStyle()">
   <header class="ngx-lowcode-section__header">{{ title() }}</header>
-  <div class="ngx-lowcode-section__body" [ngStyle]="bodyStyle()">
+  <div class="ngx-lowcode-section__body" [style]="bodyStyle()">
     @if (isDesignMode()) {
       <div
         class="ngx-lowcode-section__design-surface"
@@ -10,7 +10,7 @@
         [thyJustifyContent]="thyJustifyContent()"
         [thyAlignItems]="thyAlignItems()"
         [thyGap]="+(thyGap() || 0)"
-        [ngStyle]="designContainerStyle()"
+        [style]="designContainerStyle()"
         cdkDropList
         [cdkDropListData]="dropListData()"
         [cdkDropListDisabled]="false"
@@ -27,7 +27,7 @@
               [thyGrow]="resolveFlexItem(child).grow"
               [thyShrink]="resolveFlexItem(child).shrink"
               [thyBasis]="resolveFlexItem(child).basis"
-              [ngStyle]="designItemStyle(child)"
+              [style]="designItemStyle(child)"
               cdkDrag
               [cdkDragData]="child"
               [cdkDragDisabled]="isDragSuppressed(child.id)"
@@ -60,7 +60,7 @@
               [thyGrow]="resolveFlexItem(child).grow"
               [thyShrink]="resolveFlexItem(child).shrink"
               [thyBasis]="resolveFlexItem(child).basis"
-              [ngStyle]="designItemStyle(child)"
+              [style]="designItemStyle(child)"
             >
               <div class="ngx-lowcode-section__drag-shell">
                 <ngx-lowcode-node-renderer
