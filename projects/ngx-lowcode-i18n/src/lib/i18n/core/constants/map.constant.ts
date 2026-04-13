@@ -1,4 +1,4 @@
-import type { NgxLowcodeCoreI18n,NgxLowcodeLocale } from '../../../core';
+import type { NgxLowcodeCoreI18n, NgxLowcodeLocale } from '../../../core';
 
 export const coreI18nMap: Record<NgxLowcodeLocale, NgxLowcodeCoreI18n> = {
   'zh-CN': {

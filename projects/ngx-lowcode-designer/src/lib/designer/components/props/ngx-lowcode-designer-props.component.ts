@@ -141,15 +141,18 @@ export class NgxLowcodeDesignerPropsComponent {
   };
 
   constructor() {
-    effect(() => {
-      const schema = this.editorSchema();
-      this.stateDraft.set(JSON.stringify(schema.state, null, 2));
-      this.datasourcesDraft.set(JSON.stringify(schema.datasources, null, 2));
-      this.actionsDraft.set(JSON.stringify(schema.actions, null, 2));
-      this.stateDraftError.set('');
-      this.datasourcesDraftError.set('');
-      this.actionsDraftError.set('');
-    }, { allowSignalWrites: true });
+    effect(
+      () => {
+        const schema = this.editorSchema();
+        this.stateDraft.set(JSON.stringify(schema.state, null, 2));
+        this.datasourcesDraft.set(JSON.stringify(schema.datasources, null, 2));
+        this.actionsDraft.set(JSON.stringify(schema.actions, null, 2));
+        this.stateDraftError.set('');
+        this.datasourcesDraftError.set('');
+        this.actionsDraftError.set('');
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   stringProp(node: NgxLowcodeNodeSchema, key: string): string {
@@ -329,7 +332,7 @@ export class NgxLowcodeDesignerPropsComponent {
   }
 
   private resolveLayoutMode(): NgxLowcodeLayoutMode {
-    return 'flex'
+    return 'flex';
   }
 
   private resolveEffectiveLayoutMode(node: NgxLowcodeNodeSchema | null | undefined): NgxLowcodeLayoutMode | null {

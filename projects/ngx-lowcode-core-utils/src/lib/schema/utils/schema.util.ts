@@ -187,7 +187,9 @@ function insertIntoSiblings(
   }
 
   const absoluteIndex =
-    boundedIndex >= slottedIndices.length ? slottedIndices[slottedIndices.length - 1] + 1 : slottedIndices[boundedIndex];
+    boundedIndex >= slottedIndices.length
+      ? slottedIndices[slottedIndices.length - 1] + 1
+      : slottedIndices[boundedIndex];
   const nextSiblings = [...siblings];
   nextSiblings.splice(absoluteIndex, 0, nextNode);
   return nextSiblings;
@@ -324,7 +326,10 @@ export function upsertDatasource(
   return datasources.map((item) => (item.id === datasource.id ? datasource : item));
 }
 
-export function upsertAction(actions: NgxLowcodeActionDefinition[], action: NgxLowcodeActionDefinition): NgxLowcodeActionDefinition[] {
+export function upsertAction(
+  actions: NgxLowcodeActionDefinition[],
+  action: NgxLowcodeActionDefinition
+): NgxLowcodeActionDefinition[] {
   const exists = actions.some((item) => item.id === action.id);
   if (!exists) {
     return [...actions, action];

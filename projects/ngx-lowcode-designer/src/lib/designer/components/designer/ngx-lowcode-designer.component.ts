@@ -2,7 +2,13 @@ import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { Component, OnChanges, OnDestroy, SimpleChanges, computed, inject, input, output, signal } from '@angular/core';
 import { NgxLowcodeEditorStore, NgxLowcodeMaterialRegistry } from 'ngx-lowcode-core';
-import { cloneSchema, createDefaultPageSchema, createNodeId, findNodeById, resolveDropTargetInsertion } from 'ngx-lowcode-core-utils';
+import {
+  cloneSchema,
+  createDefaultPageSchema,
+  createNodeId,
+  findNodeById,
+  resolveDropTargetInsertion
+} from 'ngx-lowcode-core-utils';
 import {
   NgxLowcodeActionDefinition,
   NgxLowcodeComponentDefinition,
@@ -28,7 +34,7 @@ import { ThyButtonModule } from 'ngx-tethys/button';
     NgxLowcodeRendererComponent,
     NgxLowcodeDesignerSidebarComponent,
     NgxLowcodeDesignerPropsComponent,
-    ThyButtonModule,
+    ThyButtonModule
   ],
   providers: [NgxLowcodeEditorStore],
   templateUrl: './ngx-lowcode-designer.component.html',
@@ -216,7 +222,11 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
       return;
     }
     event.preventDefault();
-    this.activeDropTarget.set({ parentId: this.editorSchema().layoutTree[0]?.id ?? null, slot: null, position: 'inside' });
+    this.activeDropTarget.set({
+      parentId: this.editorSchema().layoutTree[0]?.id ?? null,
+      slot: null,
+      position: 'inside'
+    });
   }
 
   handleStageDrop(event: DragEvent): void {
@@ -224,7 +234,11 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
       return;
     }
     event.preventDefault();
-    const target = this.activeDropTarget() ?? { parentId: this.editorSchema().layoutTree[0]?.id ?? null, slot: null, position: 'inside' as const };
+    const target = this.activeDropTarget() ?? {
+      parentId: this.editorSchema().layoutTree[0]?.id ?? null,
+      slot: null,
+      position: 'inside' as const
+    };
     this.handleNodeMove({ nodeId: this.draggingNodeId, target });
   }
 
@@ -391,7 +405,11 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
     return { parentId: this.editorSchema().layoutTree[0]?.id ?? null, slot: null, position: 'inside' };
   }
 
-  private resolveCommandTarget(target: NgxLowcodeDropTarget): { parentId: string | null; slot: string | null; insertionIndex: number | null } {
+  private resolveCommandTarget(target: NgxLowcodeDropTarget): {
+    parentId: string | null;
+    slot: string | null;
+    insertionIndex: number | null;
+  } {
     return resolveDropTargetInsertion(this.editorSchema().layoutTree, target);
   }
 
@@ -401,7 +419,7 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
 
   private emitSelectionChange(): void {
     const nodeId = this.selectedNodeId();
-    this.selectionChange.emit(nodeId ? findNodeById(this.editorSchema().layoutTree, nodeId) ?? null : null);
+    this.selectionChange.emit(nodeId ? (findNodeById(this.editorSchema().layoutTree, nodeId) ?? null) : null);
   }
 
   private normalizeIncomingSchema(schema: NgxLowcodePageSchema): NgxLowcodePageSchema {

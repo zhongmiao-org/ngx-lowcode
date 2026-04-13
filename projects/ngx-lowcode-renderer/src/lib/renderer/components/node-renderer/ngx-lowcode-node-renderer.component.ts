@@ -71,7 +71,12 @@ export class NgxLowcodeNodeRendererComponent {
   }
 
   private isDraggingActive(): boolean {
-    return this.isDesignMode() && (this.paletteDragging() || Boolean(this.runtime().paletteDragging?.()) || Boolean(this.runtime().draggingNode?.()));
+    return (
+      this.isDesignMode() &&
+      (this.paletteDragging() ||
+        Boolean(this.runtime().paletteDragging?.()) ||
+        Boolean(this.runtime().draggingNode?.()))
+    );
   }
 
   private emitDropTarget(target: NgxLowcodeDropTarget): void {

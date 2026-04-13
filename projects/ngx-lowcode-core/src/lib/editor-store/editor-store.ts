@@ -10,7 +10,12 @@ import {
   removeNodeById,
   updateNodeById
 } from 'ngx-lowcode-core-utils';
-import { NgxLowcodeEditorCommand, NgxLowcodeEditorState, NgxLowcodeNodeSchema, NgxLowcodePageSchema } from 'ngx-lowcode-core-types';
+import {
+  NgxLowcodeEditorCommand,
+  NgxLowcodeEditorState,
+  NgxLowcodeNodeSchema,
+  NgxLowcodePageSchema
+} from 'ngx-lowcode-core-types';
 import { NgxLowcodeMaterialRegistry } from '../material-registry';
 
 function createInitialEditorState(schema: NgxLowcodePageSchema = createDefaultPageSchema()): NgxLowcodeEditorState {
@@ -51,7 +56,12 @@ export class NgxLowcodeEditorStore {
         this.updateSelection(command.nodeId);
         return;
       case 'add-node':
-        this.addNode(command.componentType, command.parentId ?? null, command.slot ?? null, command.insertionIndex ?? null);
+        this.addNode(
+          command.componentType,
+          command.parentId ?? null,
+          command.slot ?? null,
+          command.insertionIndex ?? null
+        );
         return;
       case 'move-node':
         this.moveNode(command.nodeId, command.parentId ?? null, command.slot ?? null, command.insertionIndex ?? null);
@@ -119,7 +129,12 @@ export class NgxLowcodeEditorStore {
     });
   }
 
-  private addNode(componentType: string, parentId: string | null, slot: string | null, insertionIndex: number | null): void {
+  private addNode(
+    componentType: string,
+    parentId: string | null,
+    slot: string | null,
+    insertionIndex: number | null
+  ): void {
     const definition = this.registry.get(componentType);
     if (!definition) {
       return;
@@ -286,7 +301,11 @@ export class NgxLowcodeEditorStore {
     });
   }
 
-  private commitSchema(nextSchema: NgxLowcodePageSchema, nextSelectedNodeId: string | null, trackHistory: boolean): void {
+  private commitSchema(
+    nextSchema: NgxLowcodePageSchema,
+    nextSelectedNodeId: string | null,
+    trackHistory: boolean
+  ): void {
     const currentState = this.stateSignal();
     this.stateSignal.set({
       schema: nextSchema,

@@ -2,7 +2,8 @@
   type="button"
   class="ngx-lowcode-panel-toggle"
   [attr.aria-label]="collapsed() ? t().expandLeft : t().collapseLeft"
-  (click)="toggleCollapse.emit()">
+  (click)="toggleCollapse.emit()"
+>
   {{ collapsed() ? '›' : '‹' }}
 </button>
 
@@ -14,7 +15,8 @@
       cdkDropList
       [id]="paletteDropListId()"
       [cdkDropListData]="availableMaterials()"
-      [cdkDropListSortingDisabled]="true">
+      [cdkDropListSortingDisabled]="true"
+    >
       @for (group of groupedMaterials(); track group.category) {
         <div class="ngx-lowcode-materials__group">
           <div class="ngx-lowcode-materials__group-title">{{ group.category }}</div>
@@ -25,19 +27,22 @@
                 cdkDrag
                 [cdkDragData]="material.type"
                 (cdkDragStarted)="handlePaletteDragStarted($event)"
-                (cdkDragEnded)="handlePaletteDragEnded($event)">
+                (cdkDragEnded)="handlePaletteDragEnded($event)"
+              >
                 <button
                   type="button"
                   class="ngx-lowcode-materials__handle"
                   cdkDragHandle
-                  [attr.aria-label]="t().dragMaterial + ' ' + material.title">
+                  [attr.aria-label]="t().dragMaterial + ' ' + material.title"
+                >
                   <i [class]="materialIcon(material)" aria-hidden="true"></i>
                 </button>
                 <button
                   type="button"
                   class="ngx-lowcode-materials__content"
                   [attr.title]="materialDescription(material)"
-                  (click)="handleMaterialClick(material.type)">
+                  (click)="handleMaterialClick(material.type)"
+                >
                   <span class="ngx-lowcode-materials__name">{{ material.title }}</span>
                 </button>
               </div>
@@ -60,7 +65,8 @@
         [thyTitleTruncate]="true"
         (thyOnClick)="handleOutlineClick($event)"
         (thyDblClick)="handleOutlineDoubleClick($event)"
-        (thyOnExpandChange)="handleOutlineExpandChange($event)">
+        (thyOnExpandChange)="handleOutlineExpandChange($event)"
+      >
         <ng-template #treeNodeTemplate let-origin="origin">
           <div class="ngx-lowcode-outline__node">
             <i class="ngx-lowcode-outline__icon" [class]="nodeTypeIcon(origin.origin)" aria-hidden="true"></i>
@@ -75,7 +81,8 @@
                 (ngModelChange)="outlineNameDraft.set($event)"
                 (blur)="commitOutlineRename(origin.origin.id)"
                 (keydown.enter)="commitOutlineRename(origin.origin.id)"
-                (keydown.escape)="cancelOutlineRename()" />
+                (keydown.escape)="cancelOutlineRename()"
+              />
             } @else {
               <span class="ngx-lowcode-outline__label">{{ nodeDisplayName(origin.origin) }}</span>
             }

@@ -30,9 +30,15 @@ import { ThyIconRegistry } from 'ngx-tethys/icon';
 
       <section class="demo-shell__designer">
         <div class="demo-shell__controls">
-          <button type="button" class="demo-shell__control" (click)="loadPreset('orders')">{{ copy().ordersPreset }}</button>
-          <button type="button" class="demo-shell__control" (click)="loadPreset('landing')">{{ copy().landingPreset }}</button>
-          <button type="button" class="demo-shell__control" (click)="loadPreset('blank')">{{ copy().blankPreset }}</button>
+          <button type="button" class="demo-shell__control" (click)="loadPreset('orders')">
+            {{ copy().ordersPreset }}
+          </button>
+          <button type="button" class="demo-shell__control" (click)="loadPreset('landing')">
+            {{ copy().landingPreset }}
+          </button>
+          <button type="button" class="demo-shell__control" (click)="loadPreset('blank')">
+            {{ copy().blankPreset }}
+          </button>
         </div>
 
         <ngx-lowcode-designer
@@ -42,7 +48,8 @@ import { ThyIconRegistry } from 'ngx-tethys/icon';
           (schemaChange)="schema.set($event)"
           (save)="lastCommand.set('save emitted')"
           (previewRequest)="lastCommand.set('preview emitted')"
-          (publishRequest)="lastCommand.set('publish emitted')">
+          (publishRequest)="lastCommand.set('publish emitted')"
+        >
         </ngx-lowcode-designer>
       </section>
 
@@ -194,7 +201,9 @@ export class AppComponent {
   readonly copy = computed(() => demoCopy[this.locale() as keyof typeof demoCopy]);
 
   constructor() {
-    this.iconRegistry.addSvgIconSet(this.sanitizer.bypassSecurityTrustResourceUrl('assets/icons/defs/svg/sprite.defs.svg'));
+    this.iconRegistry.addSvgIconSet(
+      this.sanitizer.bypassSecurityTrustResourceUrl('assets/icons/defs/svg/sprite.defs.svg')
+    );
   }
 
   loadPreset(preset: 'orders' | 'landing' | 'blank'): void {
@@ -247,7 +256,8 @@ const demoCopy = {
   },
   'en-US': {
     heroTitle: 'Library-first page builder for Angular hosts',
-    heroDescription: 'The top area embeds the designer library. The bottom area renders the same schema using only the renderer package for fast host-level smoke testing.',
+    heroDescription:
+      'The top area embeds the designer library. The bottom area renders the same schema using only the renderer package for fast host-level smoke testing.',
     ordersPreset: 'Load Orders Demo',
     landingPreset: 'Load Landing Demo',
     blankPreset: 'Load Blank Schema',

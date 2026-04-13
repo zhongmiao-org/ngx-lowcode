@@ -1,4 +1,7 @@
-import { NgxLowcodeComponentDefinition as MaterialDefinition, NgxLowcodeMaterialCreateNodeOptions } from 'ngx-lowcode-core-types';
+import {
+  NgxLowcodeComponentDefinition as MaterialDefinition,
+  NgxLowcodeMaterialCreateNodeOptions
+} from 'ngx-lowcode-core-types';
 import { getMaterialsI18n, NgxLowcodeLocale } from 'ngx-lowcode-i18n';
 import { NgxLowcodeButtonMaterialComponent } from '../components/button/ngx-lowcode-button-material.component';
 import { NgxLowcodeFormMaterialComponent } from '../components/form/ngx-lowcode-form-material.component';
@@ -57,7 +60,10 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       category: t.categories.layout,
       canHaveChildren: true,
       component: NgxLowcodeSectionMaterialComponent,
-      setterSchema: [{ key: 'title', label: t.setters.title, type: 'text', group: 'properties' }, ...getSectionLayoutSetters(locale)],
+      setterSchema: [
+        { key: 'title', label: t.setters.title, type: 'text', group: 'properties' },
+        ...getSectionLayoutSetters(locale)
+      ],
       itemSetterSchema: [...getPageItemLayoutSetters(locale)],
       createNode: (options: NgxLowcodeMaterialCreateNodeOptions) => ({
         id: options.id,
@@ -82,7 +88,10 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       category: t.categories.layout,
       canHaveChildren: true,
       component: NgxLowcodeFormMaterialComponent,
-      setterSchema: [{ key: 'title', label: t.setters.title, type: 'text', group: 'properties' }, ...getFormLayoutSetters(locale)],
+      setterSchema: [
+        { key: 'title', label: t.setters.title, type: 'text', group: 'properties' },
+        ...getFormLayoutSetters(locale)
+      ],
       createNode: (options: NgxLowcodeMaterialCreateNodeOptions) => ({
         id: options.id,
         componentType: 'form',
@@ -251,7 +260,11 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       category: t.categories.navigation,
       component: NgxLowcodeTethysMaterialComponent,
       setterSchema: [{ key: 'items', label: t.setters.items, type: 'textarea' }],
-      createNode: (options) => ({ id: options.id, componentType: 'breadcrumb', props: { items: t.defaults.breadcrumbItems } })
+      createNode: (options) => ({
+        id: options.id,
+        componentType: 'breadcrumb',
+        props: { items: t.defaults.breadcrumbItems }
+      })
     },
     {
       type: 'tabs',
@@ -259,7 +272,11 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       category: t.categories.navigation,
       component: NgxLowcodeTethysMaterialComponent,
       setterSchema: [{ key: 'items', label: t.setters.items, type: 'textarea' }],
-      createNode: (options) => ({ id: options.id, componentType: 'tabs', props: { items: t.defaults.tabItems, thyBasis: '100%' } })
+      createNode: (options) => ({
+        id: options.id,
+        componentType: 'tabs',
+        props: { items: t.defaults.tabItems, thyBasis: '100%' }
+      })
     },
     {
       type: 'menu',

@@ -12,7 +12,8 @@
     (materialAdd)="addMaterial($event)"
     (paletteDragStateChange)="handlePaletteDragStateChange($event)"
     (nodeSelect)="selectNode($event)"
-    (nodeRename)="updateNodeName($event.nodeId, $event.name)">
+    (nodeRename)="updateNodeName($event.nodeId, $event.name)"
+  >
   </ngx-lowcode-designer-sidebar>
 
   <div class="ngx-lowcode-designer__resizer" (pointerdown)="startResize($event, 'left')"></div>
@@ -40,7 +41,8 @@
       [cdkDropListSortingDisabled]="true"
       (cdkDropListDropped)="handleMaterialDrop($event)"
       (dragover)="handleStageDragOver($event)"
-      (drop)="handleStageDrop($event)">
+      (drop)="handleStageDrop($event)"
+    >
       <ngx-lowcode-renderer
         [schema]="editorSchema()"
         [mode]="'design'"
@@ -53,7 +55,8 @@
         (dropTargetChange)="handleRendererDropTargetChange($event)"
         (nodeAddRequest)="handleNodeAdd($event)"
         (nodeMoveRequest)="handleNodeMove($event)"
-        (nodeDeleteRequest)="handleNodeDelete($event)">
+        (nodeDeleteRequest)="handleNodeDelete($event)"
+      >
       </ngx-lowcode-renderer>
     </section>
   </main>
@@ -77,6 +80,7 @@
     (delete)="deleteSelected()"
     (stateReplace)="replaceState($event)"
     (datasourcesReplace)="replaceDatasources($event)"
-    (actionsReplace)="replaceActions($event)">
+    (actionsReplace)="replaceActions($event)"
+  >
   </ngx-lowcode-designer-props>
 </div>

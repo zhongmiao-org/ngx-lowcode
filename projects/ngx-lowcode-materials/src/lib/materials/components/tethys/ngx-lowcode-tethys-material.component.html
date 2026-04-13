@@ -10,13 +10,29 @@
       <thy-divider [thyText]="title() || defaultMaterialsI18n.defaults.dividerTitle"></thy-divider>
     }
     @case ('image') {
-      <img thyImage class="ngx-lowcode-tethys__image" [thySrc]="imageSrc()" [thyDisablePreview]="true" [alt]="title() || defaultMaterialsI18n.defaults.imageAlt" />
+      <img
+        thyImage
+        class="ngx-lowcode-tethys__image"
+        [thySrc]="imageSrc()"
+        [thyDisablePreview]="true"
+        [alt]="title() || defaultMaterialsI18n.defaults.imageAlt"
+      />
     }
     @case ('space') {
       <thy-space [thySize]="12">
-        <ng-template thySpaceItem><button [thyButton]="'outline-default'">{{ defaultMaterialsI18n.defaults.spaceButtons[0] }}</button></ng-template>
-        <ng-template thySpaceItem><button [thyButton]="'outline-primary'">{{ defaultMaterialsI18n.defaults.spaceButtons[1] }}</button></ng-template>
-        <ng-template thySpaceItem><button [thyButton]="'primary'">{{ defaultMaterialsI18n.defaults.spaceButtons[2] }}</button></ng-template>
+        <ng-template thySpaceItem
+          ><button [thyButton]="'outline-default'">
+            {{ defaultMaterialsI18n.defaults.spaceButtons[0] }}
+          </button></ng-template
+        >
+        <ng-template thySpaceItem
+          ><button [thyButton]="'outline-primary'">
+            {{ defaultMaterialsI18n.defaults.spaceButtons[1] }}
+          </button></ng-template
+        >
+        <ng-template thySpaceItem
+          ><button [thyButton]="'primary'">{{ defaultMaterialsI18n.defaults.spaceButtons[2] }}</button></ng-template
+        >
       </thy-space>
     }
     @case ('anchor') {
@@ -37,7 +53,9 @@
       <thy-tabs>
         @for (item of tabItems(); track item; let index = $index) {
           <thy-tab [thyTitle]="item">
-            <div class="ngx-lowcode-tethys__panel">{{ defaultMaterialsI18n.defaults.tabPanelPrefix }} {{ index + 1 }} · {{ item }}</div>
+            <div class="ngx-lowcode-tethys__panel">
+              {{ defaultMaterialsI18n.defaults.tabPanelPrefix }} {{ index + 1 }} · {{ item }}
+            </div>
           </thy-tab>
         }
       </thy-tabs>
@@ -50,25 +68,39 @@
       </thy-menu>
     }
     @case ('input-number') {
-      <thy-form-group class="ngx-lowcode-form-field" [thyLabelText]="fieldLabel() || defaultMaterialsI18n.defaults.inputNumberLabel">
+      <thy-form-group
+        class="ngx-lowcode-form-field"
+        [thyLabelText]="fieldLabel() || defaultMaterialsI18n.defaults.inputNumberLabel"
+      >
         <thy-input-number
           class="ngx-lowcode-tethys__control"
           [ngModel]="numberValue()"
           [thyPlaceholder]="fieldLabel() || defaultMaterialsI18n.placeholders.enterNumber"
-          (ngModelChange)="updateState($event)">
+          (ngModelChange)="updateState($event)"
+        >
         </thy-input-number>
       </thy-form-group>
     }
     @case ('checkbox') {
-      <thy-form-group class="ngx-lowcode-form-field" [thyLabelText]="fieldLabel() || defaultMaterialsI18n.materials.checkbox">
+      <thy-form-group
+        class="ngx-lowcode-form-field"
+        [thyLabelText]="fieldLabel() || defaultMaterialsI18n.materials.checkbox"
+      >
         <div class="ngx-lowcode-tethys__choice-row">
           <thy-checkbox [ngModel]="checkboxValue()" (ngModelChange)="updateState($event)"></thy-checkbox>
         </div>
       </thy-form-group>
     }
     @case ('radio') {
-      <thy-form-group class="ngx-lowcode-form-field" [thyLabelText]="fieldLabel() || defaultMaterialsI18n.materials.radio">
-        <thy-radio-group class="ngx-lowcode-tethys__radio-group" [ngModel]="selectValue()" (ngModelChange)="updateState($event)">
+      <thy-form-group
+        class="ngx-lowcode-form-field"
+        [thyLabelText]="fieldLabel() || defaultMaterialsI18n.materials.radio"
+      >
+        <thy-radio-group
+          class="ngx-lowcode-tethys__radio-group"
+          [ngModel]="selectValue()"
+          (ngModelChange)="updateState($event)"
+        >
           @for (item of radioItems(); track item) {
             <label thy-radio [thyValue]="item">{{ item }}</label>
           }
@@ -76,24 +108,37 @@
       </thy-form-group>
     }
     @case ('switch') {
-      <thy-form-group class="ngx-lowcode-form-field" [thyLabelText]="fieldLabel() || defaultMaterialsI18n.materials.switch">
+      <thy-form-group
+        class="ngx-lowcode-form-field"
+        [thyLabelText]="fieldLabel() || defaultMaterialsI18n.materials.switch"
+      >
         <div class="ngx-lowcode-tethys__switch">
           <thy-switch [ngModel]="switchValue()" (ngModelChange)="updateState($event)"></thy-switch>
         </div>
       </thy-form-group>
     }
     @case ('date-picker') {
-      <thy-form-group class="ngx-lowcode-form-field" [thyLabelText]="fieldLabel() || defaultMaterialsI18n.materials['date-picker']">
-        <thy-date-picker class="ngx-lowcode-tethys__control" [ngModel]="dateValue()" (ngModelChange)="updateState($event)"></thy-date-picker>
+      <thy-form-group
+        class="ngx-lowcode-form-field"
+        [thyLabelText]="fieldLabel() || defaultMaterialsI18n.materials['date-picker']"
+      >
+        <thy-date-picker
+          class="ngx-lowcode-tethys__control"
+          [ngModel]="dateValue()"
+          (ngModelChange)="updateState($event)"
+        ></thy-date-picker>
       </thy-form-group>
     }
     @case ('upload') {
-      <thy-form-group class="ngx-lowcode-form-field" [thyLabelText]="fieldLabel() || defaultMaterialsI18n.materials.upload">
+      <thy-form-group
+        class="ngx-lowcode-form-field"
+        [thyLabelText]="fieldLabel() || defaultMaterialsI18n.materials.upload"
+      >
         <div class="ngx-lowcode-tethys__upload">
-          <thy-file-select
-            [thyMultiple]="true"
-            (thyOnFileSelect)="uploadFiles($event)">
-            <button [thyButton]="'outline-default'" type="button">{{ defaultMaterialsI18n.defaults.uploadButton }}</button>
+          <thy-file-select [thyMultiple]="true" (thyOnFileSelect)="uploadFiles($event)">
+            <button [thyButton]="'outline-default'" type="button">
+              {{ defaultMaterialsI18n.defaults.uploadButton }}
+            </button>
           </thy-file-select>
           @if (uploadedFiles().length) {
             <span class="ngx-lowcode-tethys__upload-value">{{ uploadedFiles().join(' , ') }}</span>
@@ -103,7 +148,10 @@
     }
     @case ('card') {
       <thy-card [thyDivided]="true" [thyBordered]="true">
-        <thy-card-header [thyTitle]="title() || defaultMaterialsI18n.defaults.cardTitle" [thyDescription]="subtitle() || defaultMaterialsI18n.defaults.cardDescription"></thy-card-header>
+        <thy-card-header
+          [thyTitle]="title() || defaultMaterialsI18n.defaults.cardTitle"
+          [thyDescription]="subtitle() || defaultMaterialsI18n.defaults.cardDescription"
+        ></thy-card-header>
         <thy-card-content>{{ text() || defaultMaterialsI18n.defaults.cardText }}</thy-card-content>
       </thy-card>
     }
@@ -115,7 +163,9 @@
       </thy-list>
     }
     @case ('tag') {
-      <thy-tag [thyColor]="tagColor()" [thyTheme]="tagTheme()">{{ title() || defaultMaterialsI18n.defaults.tagTitle }}</thy-tag>
+      <thy-tag [thyColor]="tagColor()" [thyTheme]="tagTheme()">{{
+        title() || defaultMaterialsI18n.defaults.tagTitle
+      }}</thy-tag>
     }
     @case ('avatar') {
       <thy-avatar [thyName]="title() || defaultMaterialsI18n.defaults.avatarTitle" [thyShowName]="true"></thy-avatar>
@@ -124,7 +174,11 @@
       <thy-progress [thyValue]="progressValue()" [thyMax]="100" thyType="primary"></thy-progress>
     }
     @case ('statistic') {
-      <thy-statistic [thyValue]="statisticValue()" [thyTitle]="title() || defaultMaterialsI18n.defaults.statisticFallback" thyColor="primary"></thy-statistic>
+      <thy-statistic
+        [thyValue]="statisticValue()"
+        [thyTitle]="title() || defaultMaterialsI18n.defaults.statisticFallback"
+        thyColor="primary"
+      ></thy-statistic>
     }
     @case ('alert') {
       <thy-alert [thyType]="alertType()">{{ title() || defaultMaterialsI18n.defaults.alertTitle }}</thy-alert>

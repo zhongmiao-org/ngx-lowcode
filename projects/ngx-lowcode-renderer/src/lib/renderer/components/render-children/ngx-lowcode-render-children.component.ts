@@ -28,7 +28,9 @@ export class NgxLowcodeRenderChildrenComponent {
     slot: this.slot(),
     nodes: this.nodes()
   }));
-  handleDrop(event: CdkDragDrop<{ parentId: string | null; slot: string | null; nodes: NgxLowcodeNodeSchema[] }>): void {
+  handleDrop(
+    event: CdkDragDrop<{ parentId: string | null; slot: string | null; nodes: NgxLowcodeNodeSchema[] }>
+  ): void {
     const target = this.createDropTarget(event.currentIndex);
     const data = event.item.data;
     console.debug('[lowcode:dnd:children:drop]', {

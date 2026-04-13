@@ -2,7 +2,12 @@ import { CommonModule } from '@angular/common';
 import { CdkDragDrop, CdkDragEnter, CdkDragExit, DragDropModule } from '@angular/cdk/drag-drop';
 import { Component, computed, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgxLowcodeDropTarget, NgxLowcodeFormLayout, NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
+import {
+  NgxLowcodeDropTarget,
+  NgxLowcodeFormLayout,
+  NgxLowcodeNodeSchema,
+  NgxLowcodeRuntimeContext
+} from 'ngx-lowcode-core-types';
 import { getMaterialsI18n } from 'ngx-lowcode-i18n';
 import { ThyFormModule } from 'ngx-tethys/form';
 import { ThyGridModule } from 'ngx-tethys/grid';
@@ -38,7 +43,9 @@ export class NgxLowcodeFormMaterialComponent {
     nodes: this.node().children ?? []
   }));
   readonly dropListOrientation = computed<DropListOrientation>(() => 'vertical');
-  handleDrop(event: CdkDragDrop<{ parentId: string | null; slot: string | null; nodes: NgxLowcodeNodeSchema[] }, any, any>): void {
+  handleDrop(
+    event: CdkDragDrop<{ parentId: string | null; slot: string | null; nodes: NgxLowcodeNodeSchema[] }, any, any>
+  ): void {
     const target = this.createDropTarget(event.currentIndex);
     const data = event.item.data;
     console.debug('[lowcode:dnd:form:drop]', {
@@ -86,7 +93,9 @@ export class NgxLowcodeFormMaterialComponent {
     this.runtime().requestNodeMove?.(nodeId, target);
   }
 
-  logDropListEntered(event: CdkDragEnter<{ parentId: string | null; slot: string | null; nodes: NgxLowcodeNodeSchema[] }>): void {
+  logDropListEntered(
+    event: CdkDragEnter<{ parentId: string | null; slot: string | null; nodes: NgxLowcodeNodeSchema[] }>
+  ): void {
     console.debug('[lowcode:dnd:form:entered]', {
       formId: this.node().id,
       dragData: event.item.data,
@@ -94,7 +103,9 @@ export class NgxLowcodeFormMaterialComponent {
     });
   }
 
-  logDropListExited(event: CdkDragExit<{ parentId: string | null; slot: string | null; nodes: NgxLowcodeNodeSchema[] }>): void {
+  logDropListExited(
+    event: CdkDragExit<{ parentId: string | null; slot: string | null; nodes: NgxLowcodeNodeSchema[] }>
+  ): void {
     console.debug('[lowcode:dnd:form:exited]', {
       formId: this.node().id,
       dragData: event.item.data,

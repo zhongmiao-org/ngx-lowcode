@@ -1,8 +1,6 @@
 <section class="ngx-lowcode-section" [ngStyle]="sectionStyle()">
   <header class="ngx-lowcode-section__header">{{ title() }}</header>
-  <div
-    class="ngx-lowcode-section__body"
-    [ngStyle]="bodyStyle()">
+  <div class="ngx-lowcode-section__body" [ngStyle]="bodyStyle()">
     @if (isDesignMode()) {
       <div
         class="ngx-lowcode-section__design-surface"
@@ -19,7 +17,8 @@
         [cdkDropListOrientation]="designDropListOrientation()"
         (cdkDropListEntered)="logDropListEntered($any($event))"
         (cdkDropListExited)="logDropListExited($any($event))"
-        (cdkDropListDropped)="handleDrop($any($event))">
+        (cdkDropListDropped)="handleDrop($any($event))"
+      >
         @for (child of node().children ?? []; track child.id; let index = $index) {
           @if (canDragChild(child)) {
             <div
@@ -36,7 +35,8 @@
               (pointerup)="clearPreparedDrag(child.id)"
               (pointercancel)="clearPreparedDrag(child.id)"
               (cdkDragStarted)="handleDragStart(child.id)"
-              (cdkDragEnded)="handleDragEnd()">
+              (cdkDragEnded)="handleDragEnd()"
+            >
               <div *cdkDragPreview class="ngx-lowcode-section__drag-preview">
                 {{ dragPreviewLabel(child) }}
               </div>
@@ -48,7 +48,8 @@
                   [siblingIndex]="index"
                   [parentOrientation]="childFlowOrientation()"
                   [disableSiblingHotspots]="true"
-                  [runtime]="runtime()">
+                  [runtime]="runtime()"
+                >
                 </ngx-lowcode-node-renderer>
               </div>
             </div>
@@ -59,7 +60,8 @@
               [thyGrow]="resolveFlexItem(child).grow"
               [thyShrink]="resolveFlexItem(child).shrink"
               [thyBasis]="resolveFlexItem(child).basis"
-              [ngStyle]="designItemStyle(child)">
+              [ngStyle]="designItemStyle(child)"
+            >
               <div class="ngx-lowcode-section__drag-shell">
                 <ngx-lowcode-node-renderer
                   [node]="child"
@@ -68,7 +70,8 @@
                   [siblingIndex]="index"
                   [parentOrientation]="childFlowOrientation()"
                   [disableSiblingHotspots]="true"
-                  [runtime]="runtime()">
+                  [runtime]="runtime()"
+                >
                 </ngx-lowcode-node-renderer>
               </div>
             </div>
@@ -82,7 +85,8 @@
         [thyWrap]="thyWrap()"
         [thyJustifyContent]="thyJustifyContent()"
         [thyAlignItems]="thyAlignItems()"
-        [thyGap]="+(thyGap() || 0)">
+        [thyGap]="+(thyGap() || 0)"
+      >
         @for (child of node().children ?? []; track child.id) {
           <thy-flex-item
             class="ngx-lowcode-section__item ngx-lowcode-section__item--flex"
@@ -90,14 +94,16 @@
             [thyShrink]="resolveFlexItem(child).shrink"
             [thyBasis]="resolveFlexItem(child).basis"
             [style.order]="resolveFlexItem(child).order"
-            [style.align-self]="resolveFlexItem(child).alignSelf">
+            [style.align-self]="resolveFlexItem(child).alignSelf"
+          >
             <ngx-lowcode-node-renderer
               [node]="child"
               [parentId]="node().id"
               [slot]="null"
               [siblingIndex]="$index"
               [parentOrientation]="childFlowOrientation()"
-              [runtime]="runtime()">
+              [runtime]="runtime()"
+            >
             </ngx-lowcode-node-renderer>
           </thy-flex-item>
         }

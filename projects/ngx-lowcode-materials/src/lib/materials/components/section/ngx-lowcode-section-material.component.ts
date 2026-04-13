@@ -6,8 +6,26 @@ import { NgxLowcodeNodeRendererComponent } from 'ngx-lowcode-renderer';
 import { ThyGridModule } from 'ngx-tethys/grid';
 type ThyFlexDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 type ThyFlexWrap = 'nowrap' | 'wrap' | 'wrap-reverse';
-type ThyFlexJustifyContent = 'start' | 'end' | 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'initial' | 'inherit';
-type ThyFlexAlignItems = 'start' | 'end' | 'stretch' | 'center' | 'flex-start' | 'flex-end' | 'baseline' | 'initial' | 'inherit';
+type ThyFlexJustifyContent =
+  | 'start'
+  | 'end'
+  | 'flex-start'
+  | 'flex-end'
+  | 'center'
+  | 'space-between'
+  | 'space-around'
+  | 'initial'
+  | 'inherit';
+type ThyFlexAlignItems =
+  | 'start'
+  | 'end'
+  | 'stretch'
+  | 'center'
+  | 'flex-start'
+  | 'flex-end'
+  | 'baseline'
+  | 'initial'
+  | 'inherit';
 type ThyFlexAlignSelf = 'auto' | 'stretch' | 'center' | 'baseline' | 'flex-start' | 'flex-end';
 type DropListOrientation = 'horizontal' | 'vertical' | 'mixed';
 
@@ -38,13 +56,25 @@ export class NgxLowcodeSectionMaterialComponent {
   });
   readonly thyJustifyContent = computed<ThyFlexJustifyContent>(() => {
     const value = String(this.node().props['thyJustifyContent'] ?? 'start');
-    return ['start', 'end', 'flex-start', 'flex-end', 'center', 'space-between', 'space-around', 'initial', 'inherit'].includes(value)
+    return [
+      'start',
+      'end',
+      'flex-start',
+      'flex-end',
+      'center',
+      'space-between',
+      'space-around',
+      'initial',
+      'inherit'
+    ].includes(value)
       ? (value as ThyFlexJustifyContent)
       : 'start';
   });
   readonly thyAlignItems = computed<ThyFlexAlignItems>(() => {
     const value = String(this.node().props['thyAlignItems'] ?? 'stretch');
-    return ['start', 'end', 'stretch', 'center', 'flex-start', 'flex-end', 'baseline', 'initial', 'inherit'].includes(value)
+    return ['start', 'end', 'stretch', 'center', 'flex-start', 'flex-end', 'baseline', 'initial', 'inherit'].includes(
+      value
+    )
       ? (value as ThyFlexAlignItems)
       : 'stretch';
   });
@@ -63,7 +93,9 @@ export class NgxLowcodeSectionMaterialComponent {
     overflow: 'visible'
   }));
   readonly bodyStyle = computed<Record<string, string | number>>(() => ({
-    minHeight: this.resolvedHeight() ? '0px' : `${Math.max(this.extractPixelValue(this.resolvedMinHeight(), this.minHeight()) - 64, 80)}px`,
+    minHeight: this.resolvedHeight()
+      ? '0px'
+      : `${Math.max(this.extractPixelValue(this.resolvedMinHeight(), this.minHeight()) - 64, 80)}px`,
     overflow: 'visible'
   }));
   readonly designContainerStyle = computed<Record<string, string | number>>(() => {
@@ -84,7 +116,9 @@ export class NgxLowcodeSectionMaterialComponent {
   readonly designDropListOrientation = computed<DropListOrientation>(() => {
     return this.thyDirection() === 'column' || this.thyDirection() === 'column-reverse' ? 'vertical' : 'mixed';
   });
-  handleDrop(event: CdkDragDrop<{ parentId: string | null; slot: string | null; nodes: NgxLowcodeNodeSchema[] }, any, any>): void {
+  handleDrop(
+    event: CdkDragDrop<{ parentId: string | null; slot: string | null; nodes: NgxLowcodeNodeSchema[] }, any, any>
+  ): void {
     const target = this.createDropTarget(event.currentIndex);
     const data = event.item.data;
     console.debug('[lowcode:dnd:section:drop]', {
@@ -114,7 +148,9 @@ export class NgxLowcodeSectionMaterialComponent {
     this.runtime().requestNodeMove?.(nodeId, target);
   }
 
-  logDropListEntered(event: CdkDragEnter<{ parentId: string | null; slot: string | null; nodes: NgxLowcodeNodeSchema[] }>): void {
+  logDropListEntered(
+    event: CdkDragEnter<{ parentId: string | null; slot: string | null; nodes: NgxLowcodeNodeSchema[] }>
+  ): void {
     console.debug('[lowcode:dnd:section:entered]', {
       sectionId: this.node().id,
       dragData: event.item.data,
@@ -122,7 +158,9 @@ export class NgxLowcodeSectionMaterialComponent {
     });
   }
 
-  logDropListExited(event: CdkDragExit<{ parentId: string | null; slot: string | null; nodes: NgxLowcodeNodeSchema[] }>): void {
+  logDropListExited(
+    event: CdkDragExit<{ parentId: string | null; slot: string | null; nodes: NgxLowcodeNodeSchema[] }>
+  ): void {
     console.debug('[lowcode:dnd:section:exited]', {
       sectionId: this.node().id,
       dragData: event.item.data,
@@ -233,9 +271,13 @@ export class NgxLowcodeSectionMaterialComponent {
     };
   }
 
-  resolveFlexItem(
-    node: NgxLowcodeNodeSchema
-  ): { grow: 0 | 1; shrink: 0 | 1; basis: string; order: number; alignSelf: ThyFlexAlignSelf } {
+  resolveFlexItem(node: NgxLowcodeNodeSchema): {
+    grow: 0 | 1;
+    shrink: 0 | 1;
+    basis: string;
+    order: number;
+    alignSelf: ThyFlexAlignSelf;
+  } {
     if (this.isSectionNode(node)) {
       return {
         grow: 0,
@@ -251,7 +293,9 @@ export class NgxLowcodeSectionMaterialComponent {
     const orderValue = node.props['thyOrder'];
     const order = typeof orderValue === 'number' ? orderValue : Number(orderValue ?? 0);
     const alignSelfValue = String(node.props['thyAlignSelf'] ?? 'auto');
-    const alignSelf: ThyFlexAlignSelf = ['auto', 'stretch', 'center', 'baseline', 'flex-start', 'flex-end'].includes(alignSelfValue)
+    const alignSelf: ThyFlexAlignSelf = ['auto', 'stretch', 'center', 'baseline', 'flex-start', 'flex-end'].includes(
+      alignSelfValue
+    )
       ? (alignSelfValue as ThyFlexAlignSelf)
       : 'auto';
 

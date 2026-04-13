@@ -89,7 +89,9 @@ export class NgxLowcodeTethysMaterialComponent {
   readonly selectValue = computed(() => this.runtime().state()[this.stateKey()] ?? null);
   readonly checkboxValue = computed(() => Boolean(this.runtime().state()[this.stateKey()] ?? false));
   readonly switchValue = computed(() => Boolean(this.runtime().state()[this.stateKey()] ?? false));
-  readonly numberValue = computed(() => Number(this.runtime().state()[this.stateKey()] ?? this.node().props['value'] ?? 0));
+  readonly numberValue = computed(() =>
+    Number(this.runtime().state()[this.stateKey()] ?? this.node().props['value'] ?? 0)
+  );
   readonly dateValue = computed(() => this.runtime().state()[this.stateKey()] ?? null);
   readonly progressValue = computed(() => Number(this.node().props['value'] ?? 68));
   readonly statisticValue = computed<string | number>(() => {
@@ -105,12 +107,24 @@ export class NgxLowcodeTethysMaterialComponent {
     return value === 'fill' || value === 'outline' ? value : 'weak-fill';
   });
   readonly tagColor = computed(() => String(this.node().props['color'] ?? 'primary'));
-  readonly menuItems = computed(() => this.parseItems(this.node().props['items'], defaultMaterialsI18n.defaults.menuFallback));
-  readonly breadcrumbItems = computed(() => this.parseItems(this.node().props['items'], defaultMaterialsI18n.defaults.breadcrumbFallback));
-  readonly tabItems = computed(() => this.parseItems(this.node().props['items'], defaultMaterialsI18n.defaults.tabFallback));
-  readonly listItems = computed(() => this.parseItems(this.node().props['items'], defaultMaterialsI18n.defaults.listFallback));
-  readonly anchorItems = computed(() => this.parseItems(this.node().props['items'], defaultMaterialsI18n.defaults.anchorFallback));
-  readonly radioItems = computed(() => this.parseItems(this.node().props['items'], defaultMaterialsI18n.defaults.radioFallback));
+  readonly menuItems = computed(() =>
+    this.parseItems(this.node().props['items'], defaultMaterialsI18n.defaults.menuFallback)
+  );
+  readonly breadcrumbItems = computed(() =>
+    this.parseItems(this.node().props['items'], defaultMaterialsI18n.defaults.breadcrumbFallback)
+  );
+  readonly tabItems = computed(() =>
+    this.parseItems(this.node().props['items'], defaultMaterialsI18n.defaults.tabFallback)
+  );
+  readonly listItems = computed(() =>
+    this.parseItems(this.node().props['items'], defaultMaterialsI18n.defaults.listFallback)
+  );
+  readonly anchorItems = computed(() =>
+    this.parseItems(this.node().props['items'], defaultMaterialsI18n.defaults.anchorFallback)
+  );
+  readonly radioItems = computed(() =>
+    this.parseItems(this.node().props['items'], defaultMaterialsI18n.defaults.radioFallback)
+  );
 
   updateState(value: unknown): void {
     if (!this.stateKey()) {
@@ -120,11 +134,7 @@ export class NgxLowcodeTethysMaterialComponent {
   }
 
   uploadFiles(event: File[] | FileList | Event): void {
-    const files = Array.isArray(event)
-      ? event
-      : event instanceof FileList
-        ? Array.from(event)
-        : [];
+    const files = Array.isArray(event) ? event : event instanceof FileList ? Array.from(event) : [];
     if (!this.stateKey()) {
       return;
     }

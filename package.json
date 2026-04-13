@@ -6,6 +6,8 @@
     "start": "ng serve demo",
     "build": "ng build ngx-lowcode-core-types && ng build ngx-lowcode-i18n && ng build ngx-lowcode-core-utils && ng build ngx-lowcode-core && ng build ngx-lowcode-renderer && ng build ngx-lowcode-materials && ng build ngx-lowcode-designer && ng build ngx-lowcode-testing && ng build ngx-lowcode-puzzle-adapter && ng build demo",
     "build:libs": "ng build ngx-lowcode-core-types && ng build ngx-lowcode-i18n && ng build ngx-lowcode-core-utils && ng build ngx-lowcode-core && ng build ngx-lowcode-renderer && ng build ngx-lowcode-materials && ng build ngx-lowcode-designer && ng build ngx-lowcode-testing && ng build ngx-lowcode-puzzle-adapter",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "watch": "ng build ngx-lowcode-core-types && ng build ngx-lowcode-i18n && ng build ngx-lowcode-core-utils && ng build demo --watch --configuration development",
     "test": "ng test ngx-lowcode-core --watch=false && ng test ngx-lowcode-renderer --watch=false && ng test ngx-lowcode-materials --watch=false && ng test ngx-lowcode-designer --watch=false && ng test ngx-lowcode-puzzle-adapter --watch=false"
   },
@@ -38,6 +40,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "ng-packagr": "^18.2.0",
+    "prettier": "^3.8.2",
     "typescript": "~5.5.2"
   }
 }

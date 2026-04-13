@@ -8,4 +8,3 @@ export const builtInMaterials: NgxLowcodeComponentDefinition[] = getBuiltInMater
 export function provideNgxLowcodeMaterials(locale: NgxLowcodeLocale = 'zh-CN') {
   return registerLowcodeMaterials(getBuiltInMaterials(locale));
 }
-

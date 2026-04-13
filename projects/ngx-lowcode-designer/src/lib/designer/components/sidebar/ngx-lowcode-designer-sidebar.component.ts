@@ -37,7 +37,9 @@ export class NgxLowcodeDesignerSidebarComponent {
   readonly expandedOutlineNodeIds = signal<string[]>([]);
   readonly knownOutlineNodeIds = signal<string[]>([]);
   readonly groupedMaterials = signal<Array<{ category: string; items: NgxLowcodeComponentDefinition[] }>>([]);
-  readonly outlineTreeNodes = computed<ThyTreeNodeData[]>(() => this.editorSchema().layoutTree.map((node) => this.mapOutlineNode(node)));
+  readonly outlineTreeNodes = computed<ThyTreeNodeData[]>(() =>
+    this.editorSchema().layoutTree.map((node) => this.mapOutlineNode(node))
+  );
   readonly selectedOutlineKeys = computed(() => {
     const nodeId = this.selectedNodeId();
     return nodeId ? [nodeId] : [];

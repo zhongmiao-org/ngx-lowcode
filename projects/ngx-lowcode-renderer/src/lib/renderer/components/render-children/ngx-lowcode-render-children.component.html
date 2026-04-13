@@ -4,7 +4,7 @@
   [cdkDropListData]="dropListData()"
   [cdkDropListDisabled]="runtime().mode !== 'design'"
   (cdkDropListDropped)="handleDrop($event)"
-  >
+>
   @for (node of nodes(); track node.id; let index = $index) {
     @if (canDragNode(node)) {
       <div
@@ -16,7 +16,8 @@
         (pointerup)="clearPreparedDrag(node.id)"
         (pointercancel)="clearPreparedDrag(node.id)"
         (cdkDragStarted)="handleDragStart(node.id)"
-        (cdkDragEnded)="handleDragEnd()">
+        (cdkDragEnded)="handleDragEnd()"
+      >
         <div *cdkDragPreview class="ngx-lowcode-drag-preview">
           {{ dragPreviewLabel(node) }}
         </div>
@@ -30,7 +31,8 @@
           [runtime]="runtime()"
           [paletteDragging]="paletteDragging()"
           [hoveredDropTarget]="hoveredDropTarget()"
-          (dropTargetChange)="dropTargetChange.emit($event)">
+          (dropTargetChange)="dropTargetChange.emit($event)"
+        >
         </ngx-lowcode-node-renderer>
       </div>
     } @else {
@@ -45,7 +47,8 @@
           [runtime]="runtime()"
           [paletteDragging]="paletteDragging()"
           [hoveredDropTarget]="hoveredDropTarget()"
-          (dropTargetChange)="dropTargetChange.emit($event)">
+          (dropTargetChange)="dropTargetChange.emit($event)"
+        >
         </ngx-lowcode-node-renderer>
       </div>
     }

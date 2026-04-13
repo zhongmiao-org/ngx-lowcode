@@ -114,4 +114,3 @@ export function getFormLayoutSetters(locale: NgxLowcodeLocale): NgxLowcodeSetter
     }
   ];
 }
-

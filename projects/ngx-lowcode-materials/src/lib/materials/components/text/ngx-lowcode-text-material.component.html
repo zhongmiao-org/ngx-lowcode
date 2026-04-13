@@ -4,7 +4,8 @@
     [ngStyle]="node().style ?? null"
     [href]="href()"
     [attr.target]="target()"
-    [attr.rel]="target() === '_blank' ? 'noreferrer noopener' : null">
+    [attr.rel]="target() === '_blank' ? 'noreferrer noopener' : null"
+  >
     {{ content() }}
   </a>
 } @else {

@@ -2,7 +2,8 @@
   type="button"
   class="ngx-lowcode-panel-toggle ngx-lowcode-panel-toggle--right"
   [attr.aria-label]="collapsed() ? t().expandRight : t().collapseRight"
-  (click)="toggleCollapse.emit()">
+  (click)="toggleCollapse.emit()"
+>
   {{ collapsed() ? '‹' : '›' }}
 </button>
 
@@ -15,7 +16,8 @@
       <input
         thyInput
         [ngModel]="editorSchema().pageMeta.title"
-        (ngModelChange)="pageMetaChange.emit({ key: 'title', value: $event })" />
+        (ngModelChange)="pageMetaChange.emit({ key: 'title', value: $event })"
+      />
     </div>
 
     <div class="ngx-lowcode-prop-row">
@@ -23,7 +25,8 @@
       <textarea
         [ngModel]="editorSchema().pageMeta.description ?? ''"
         (ngModelChange)="pageMetaChange.emit({ key: 'description', value: $event })"
-        rows="3"></textarea>
+        rows="3"
+      ></textarea>
     </div>
 
     <div class="ngx-lowcode-page-meta">
@@ -44,7 +47,8 @@
         <thy-collapse-item
           [thyTitle]="t().properties"
           [thyActive]="basicPanelExpanded()"
-          (thyActiveChange)="basicPanelExpanded.set($event.active)">
+          (thyActiveChange)="basicPanelExpanded.set($event.active)"
+        >
           <div class="ngx-lowcode-props-grid">
             <div class="ngx-lowcode-prop-row">
               <span>{{ t().nodeName }}</span>
@@ -52,7 +56,8 @@
                 thyInput
                 [ngModel]="node.name ?? ''"
                 [placeholder]="t().nodeNamePlaceholder"
-                (ngModelChange)="nodeNameChange.emit({ nodeId: node.id, value: $event })" />
+                (ngModelChange)="nodeNameChange.emit({ nodeId: node.id, value: $event })"
+              />
             </div>
 
             @for (setter of propertySetters(); track setter.key) {
@@ -64,25 +69,29 @@
                     <textarea
                       [ngModel]="setterModelValue(node, setter)"
                       (ngModelChange)="emitSetterChange(node.id, setter, $event)"
-                      rows="4"></textarea>
+                      rows="4"
+                    ></textarea>
                   }
                   @case ('number') {
                     <thy-input-number
                       [ngModel]="setterModelValue(node, setter)"
                       [thySuffix]="inputNumberSuffix(setter.suffix)"
-                      (ngModelChange)="emitSetterChange(node.id, setter, $event)">
+                      (ngModelChange)="emitSetterChange(node.id, setter, $event)"
+                    >
                     </thy-input-number>
                   }
                   @case ('switch') {
                     <thy-switch
                       [ngModel]="setterModelValue(node, setter)"
-                      (ngModelChange)="emitSetterChange(node.id, setter, $event)">
+                      (ngModelChange)="emitSetterChange(node.id, setter, $event)"
+                    >
                     </thy-switch>
                   }
                   @case ('select') {
                     <thy-select
                       [ngModel]="setterModelValue(node, setter)"
-                      (ngModelChange)="emitSetterChange(node.id, setter, $event)">
+                      (ngModelChange)="emitSetterChange(node.id, setter, $event)"
+                    >
                       @for (option of setter.options ?? []; track option.value) {
                         <thy-option [thyValue]="option.value" [thyLabelText]="option.label"></thy-option>
                       }
@@ -93,7 +102,8 @@
                       thyInput
                       [ngModel]="setterModelValue(node, setter)"
                       [placeholder]="setter.placeholder ?? ''"
-                      (ngModelChange)="emitSetterChange(node.id, setter, $event)" />
+                      (ngModelChange)="emitSetterChange(node.id, setter, $event)"
+                    />
                   }
                 }
               </div>
@@ -105,7 +115,8 @@
           <thy-collapse-item
             [thyTitle]="t().layout"
             [thyActive]="layoutPanelExpanded()"
-            (thyActiveChange)="layoutPanelExpanded.set($event.active)">
+            (thyActiveChange)="layoutPanelExpanded.set($event.active)"
+          >
             <div class="ngx-lowcode-props-grid">
               @for (setter of layoutSetters(); track setter.key) {
                 <div class="ngx-lowcode-prop-row" [class.ngx-lowcode-prop-row--full]="renderSetterAsFullWidth(setter)">
@@ -116,25 +127,29 @@
                       <textarea
                         [ngModel]="setterModelValue(node, setter)"
                         (ngModelChange)="emitSetterChange(node.id, setter, $event)"
-                        rows="4"></textarea>
+                        rows="4"
+                      ></textarea>
                     }
                     @case ('number') {
                       <thy-input-number
                         [ngModel]="setterModelValue(node, setter)"
                         [thySuffix]="inputNumberSuffix(setter.suffix)"
-                        (ngModelChange)="emitSetterChange(node.id, setter, $event)">
+                        (ngModelChange)="emitSetterChange(node.id, setter, $event)"
+                      >
                       </thy-input-number>
                     }
                     @case ('switch') {
                       <thy-switch
                         [ngModel]="setterModelValue(node, setter)"
-                        (ngModelChange)="emitSetterChange(node.id, setter, $event)">
+                        (ngModelChange)="emitSetterChange(node.id, setter, $event)"
+                      >
                       </thy-switch>
                     }
                     @case ('select') {
                       <thy-select
                         [ngModel]="setterModelValue(node, setter)"
-                        (ngModelChange)="emitSetterChange(node.id, setter, $event)">
+                        (ngModelChange)="emitSetterChange(node.id, setter, $event)"
+                      >
                         @for (option of setter.options ?? []; track option.value) {
                           <thy-option [thyValue]="option.value" [thyLabelText]="option.label"></thy-option>
                         }
@@ -145,7 +160,8 @@
                         thyInput
                         [ngModel]="setterModelValue(node, setter)"
                         [placeholder]="setter.placeholder ?? ''"
-                        (ngModelChange)="emitSetterChange(node.id, setter, $event)" />
+                        (ngModelChange)="emitSetterChange(node.id, setter, $event)"
+                      />
                     }
                   }
                 </div>
@@ -160,25 +176,29 @@
                       <textarea
                         [ngModel]="setterModelValue(node, setter)"
                         (ngModelChange)="emitSetterChange(node.id, setter, $event)"
-                        rows="4"></textarea>
+                        rows="4"
+                      ></textarea>
                     }
                     @case ('number') {
                       <thy-input-number
                         [ngModel]="setterModelValue(node, setter)"
                         [thySuffix]="inputNumberSuffix(setter.suffix)"
-                        (ngModelChange)="emitSetterChange(node.id, setter, $event)">
+                        (ngModelChange)="emitSetterChange(node.id, setter, $event)"
+                      >
                       </thy-input-number>
                     }
                     @case ('switch') {
                       <thy-switch
                         [ngModel]="setterModelValue(node, setter)"
-                        (ngModelChange)="emitSetterChange(node.id, setter, $event)">
+                        (ngModelChange)="emitSetterChange(node.id, setter, $event)"
+                      >
                       </thy-switch>
                     }
                     @case ('select') {
                       <thy-select
                         [ngModel]="setterModelValue(node, setter)"
-                        (ngModelChange)="emitSetterChange(node.id, setter, $event)">
+                        (ngModelChange)="emitSetterChange(node.id, setter, $event)"
+                      >
                         @for (option of setter.options ?? []; track option.value) {
                           <thy-option [thyValue]="option.value" [thyLabelText]="option.label"></thy-option>
                         }
@@ -189,7 +209,8 @@
                         thyInput
                         [ngModel]="setterModelValue(node, setter)"
                         [placeholder]="setter.placeholder ?? ''"
-                        (ngModelChange)="emitSetterChange(node.id, setter, $event)" />
+                        (ngModelChange)="emitSetterChange(node.id, setter, $event)"
+                      />
                     }
                   }
                 </div>
@@ -201,7 +222,8 @@
         <thy-collapse-item
           [thyTitle]="t().style"
           [thyActive]="stylePanelExpanded()"
-          (thyActiveChange)="stylePanelExpanded.set($event.active)">
+          (thyActiveChange)="stylePanelExpanded.set($event.active)"
+        >
           <div class="ngx-lowcode-props-grid">
             <div class="ngx-lowcode-prop-row ngx-lowcode-prop-row--full">
               <span>{{ t().textColor }}</span>
@@ -212,12 +234,13 @@
                   thyColorPicker
                   [ngModel]="styleProp(node, 'color')"
                   [style.background]="styleProp(node, 'color') || '#ffffff'"
-                  (ngModelChange)="nodeStyleChange.emit({ nodeId: node.id, key: 'color', value: $event })">
-                </button>
+                  (ngModelChange)="nodeStyleChange.emit({ nodeId: node.id, key: 'color', value: $event })"
+                ></button>
                 <input
                   thyInput
                   [ngModel]="styleProp(node, 'color')"
-                  (ngModelChange)="nodeStyleChange.emit({ nodeId: node.id, key: 'color', value: $event })" />
+                  (ngModelChange)="nodeStyleChange.emit({ nodeId: node.id, key: 'color', value: $event })"
+                />
               </div>
             </div>
 
@@ -230,12 +253,13 @@
                   thyColorPicker
                   [ngModel]="styleProp(node, 'background')"
                   [style.background]="styleProp(node, 'background') || '#ffffff'"
-                  (ngModelChange)="nodeStyleChange.emit({ nodeId: node.id, key: 'background', value: $event })">
-                </button>
+                  (ngModelChange)="nodeStyleChange.emit({ nodeId: node.id, key: 'background', value: $event })"
+                ></button>
                 <input
                   thyInput
                   [ngModel]="styleProp(node, 'background')"
-                  (ngModelChange)="nodeStyleChange.emit({ nodeId: node.id, key: 'background', value: $event })" />
+                  (ngModelChange)="nodeStyleChange.emit({ nodeId: node.id, key: 'background', value: $event })"
+                />
               </div>
             </div>
 
@@ -245,11 +269,13 @@
                 <div class="ngx-lowcode-size-editor">
                   <thy-input-number
                     [ngModel]="styleDimension(node, dimension.key).value"
-                    (ngModelChange)="updateStyleDimensionValue(node.id, dimension.key, $event)">
+                    (ngModelChange)="updateStyleDimensionValue(node.id, dimension.key, $event)"
+                  >
                   </thy-input-number>
                   <thy-select
                     [ngModel]="styleDimension(node, dimension.key).unit"
-                    (ngModelChange)="updateStyleDimensionUnit(node.id, dimension.key, $event)">
+                    (ngModelChange)="updateStyleDimensionUnit(node.id, dimension.key, $event)"
+                  >
                     @for (unit of styleUnits(); track unit) {
                       <thy-option [thyValue]="unit" [thyLabelText]="unit"></thy-option>
                     }
@@ -264,7 +290,8 @@
                 <thy-input-number
                   [ngModel]="fixedUnitStyleValue(node, fixedStyle.key)"
                   [thySuffix]="fixedStyle.unit"
-                  (ngModelChange)="updateFixedUnitStyle(node.id, fixedStyle.key, fixedStyle.unit, $event)">
+                  (ngModelChange)="updateFixedUnitStyle(node.id, fixedStyle.key, fixedStyle.unit, $event)"
+                >
                 </thy-input-number>
               </div>
             }
@@ -280,7 +307,7 @@
       @if (selectedNodeId()) {
         <p class="ngx-lowcode-error">Selected node could not be resolved: {{ selectedNodeId() }}</p>
       } @else {
-      <p class="ngx-lowcode-empty">{{ t().selectNodeHint }}</p>
+        <p class="ngx-lowcode-empty">{{ t().selectNodeHint }}</p>
       }
     }
   </div>
@@ -293,21 +320,24 @@
         type="button"
         class="ngx-lowcode-tabset__item"
         [class.is-active]="activeModelTab() === 'state'"
-        (click)="activeModelTab.set('state')">
+        (click)="activeModelTab.set('state')"
+      >
         {{ t().state }}
       </button>
       <button
         type="button"
         class="ngx-lowcode-tabset__item"
         [class.is-active]="activeModelTab() === 'datasources'"
-        (click)="activeModelTab.set('datasources')">
+        (click)="activeModelTab.set('datasources')"
+      >
         {{ t().datasources }}
       </button>
       <button
         type="button"
         class="ngx-lowcode-tabset__item"
         [class.is-active]="activeModelTab() === 'actions'"
-        (click)="activeModelTab.set('actions')">
+        (click)="activeModelTab.set('actions')"
+      >
         {{ t().actions }}
       </button>
     </div>
@@ -317,7 +347,8 @@
         class="ngx-lowcode-code-editor"
         [ngModel]="stateDraft()"
         (ngModelChange)="stateDraft.set($event)"
-        rows="12"></textarea>
+        rows="12"
+      ></textarea>
       @if (stateDraftError(); as error) {
         <p class="ngx-lowcode-error">{{ error }}</p>
       }
@@ -329,11 +360,14 @@
         class="ngx-lowcode-code-editor"
         [ngModel]="datasourcesDraft()"
         (ngModelChange)="datasourcesDraft.set($event)"
-        rows="12"></textarea>
+        rows="12"
+      ></textarea>
       @if (datasourcesDraftError(); as error) {
         <p class="ngx-lowcode-error">{{ error }}</p>
       }
-      <button [thyButton]="buttonKinds.primaryOutline" (click)="applyDatasourcesDraft()">{{ t().applyDatasources }}</button>
+      <button [thyButton]="buttonKinds.primaryOutline" (click)="applyDatasourcesDraft()">
+        {{ t().applyDatasources }}
+      </button>
     }
 
     @if (activeModelTab() === 'actions') {
@@ -341,7 +375,8 @@
         class="ngx-lowcode-code-editor"
         [ngModel]="actionsDraft()"
         (ngModelChange)="actionsDraft.set($event)"
-        rows="12"></textarea>
+        rows="12"
+      ></textarea>
       @if (actionsDraftError(); as error) {
         <p class="ngx-lowcode-error">{{ error }}</p>
       }
