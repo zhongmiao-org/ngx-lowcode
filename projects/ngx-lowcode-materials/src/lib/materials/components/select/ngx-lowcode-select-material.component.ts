@@ -19,16 +19,23 @@ export class NgxLowcodeSelectMaterialComponent {
   readonly label = computed(() => String(this.node().props['label'] ?? 'Select'));
   readonly placeholder = computed(() => String(this.node().props['placeholder'] ?? 'Select'));
   readonly stateKey = computed(() => String(this.node().props['stateKey'] ?? ''));
+  readonly changeActionId = computed(() => String(this.node().props['changeActionId'] ?? ''));
   readonly value = computed(() => this.runtime().state()[this.stateKey()] ?? null);
   readonly options = computed(() => {
     const options = this.node().props['options'];
     return Array.isArray(options) ? options.map((option) => option as { label: string; value: unknown }) : [];
   });
 
-  updateValue(value: unknown): void {
+  async updateValue(value: unknown): Promise<void> {
     if (!this.stateKey()) {
       return;
     }
     this.runtime().setState({ [this.stateKey()]: value });
+    await this.runtime().executeActionById(this.changeActionId(), {
+      eventName: 'change',
+      nodeId: this.node().id,
+      stateKey: this.stateKey(),
+      value
+    });
   }
 }

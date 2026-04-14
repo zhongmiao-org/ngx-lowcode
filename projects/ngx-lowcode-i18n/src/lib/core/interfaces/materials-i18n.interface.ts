@@ -31,6 +31,9 @@ export interface NgxLowcodeMaterialsI18n {
     label: string;
     type: string;
     actionId: string;
+    changeActionId: string;
+    submitActionId: string;
+    rowClickActionId: string;
     placeholder: string;
     stateKey: string;
     dataKey: string;

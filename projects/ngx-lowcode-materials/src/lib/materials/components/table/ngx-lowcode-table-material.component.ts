@@ -16,6 +16,7 @@ export class NgxLowcodeTableMaterialComponent {
   }));
   readonly title = computed(() => String(this.node().props['title'] ?? 'Results'));
   readonly dataKey = computed(() => String(this.node().props['dataKey'] ?? ''));
+  readonly rowClickActionId = computed(() => String(this.node().props['rowClickActionId'] ?? ''));
   readonly rows = computed<Record<string, unknown>[]>(() => {
     const value = this.runtime().state()[this.dataKey()];
     return Array.isArray(value) ? (value as Record<string, unknown>[]) : [];
@@ -24,4 +25,13 @@ export class NgxLowcodeTableMaterialComponent {
     const rows = this.rows();
     return rows.length ? Object.keys(rows[0]) : [];
   });
+
+  async handleRowClick(row: Record<string, unknown>, rowIndex: number): Promise<void> {
+    await this.runtime().executeActionById(this.rowClickActionId(), {
+      eventName: 'rowClick',
+      nodeId: this.node().id,
+      row,
+      rowIndex
+    });
+  }
 }

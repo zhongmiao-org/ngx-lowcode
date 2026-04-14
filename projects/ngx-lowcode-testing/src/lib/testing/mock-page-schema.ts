@@ -27,7 +27,17 @@ export const mockPageSchema: NgxLowcodePageSchema = {
   datasources: [
     {
       id: 'orders-datasource',
-      type: 'mock',
+      type: 'middleware-command',
+      command: {
+        transport: 'websocket',
+        name: 'searchOrders',
+        target: 'orders.search',
+        payloadTemplate: {
+          keyword: '{{state.keyword}}',
+          status: '{{state.status}}'
+        },
+        timeoutMs: 10000
+      },
       responseMapping: {
         stateKey: 'tableData'
       },

@@ -71,4 +71,52 @@ describe('NgxLowcodeRendererComponent', () => {
 
     expect(runtime.selection()).toBe('input-keyword');
   });
+
+  it('executes datasource-backed actions and writes datasource results into runtime state', async () => {
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    const schema = structuredClone(mockPageSchema);
+    const datasourceExecutor = jasmine.createSpy('datasourceExecutor').and.callFake(async ({ state }) => [
+      {
+        id: 'SO-3001',
+        owner: state['owner'],
+        channel: state['channel'],
+        status: state['status']
+      }
+    ]);
+
+    fixture.componentRef.setInput('schema', schema);
+    fixture.componentRef.setInput('datasourceExecutor', datasourceExecutor);
+    fixture.componentRef.setInput('context', {
+      owner: 'Carol',
+      channel: 'partner',
+      status: 'active'
+    });
+    await fixture.whenStable();
+
+    const runtime = fixture.componentInstance.runtime();
+    await runtime.executeActionById('search-action');
+
+    expect(datasourceExecutor).toHaveBeenCalled();
+    expect(runtime.state()['tableData']).toEqual([
+      {
+        id: 'SO-3001',
+        owner: 'Carol',
+        channel: 'partner',
+        status: 'active'
+      }
+    ]);
+  });
+
+  it('falls back to datasource mockData when no datasource executor is provided', async () => {
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    const schema = structuredClone(mockPageSchema);
+
+    fixture.componentRef.setInput('schema', schema);
+    await fixture.whenStable();
+
+    const runtime = fixture.componentInstance.runtime();
+    const datasourceResult = await runtime.executeDatasourceById('orders-datasource');
+
+    expect(datasourceResult).toEqual(schema.datasources[0]?.mockData);
+  });
 });

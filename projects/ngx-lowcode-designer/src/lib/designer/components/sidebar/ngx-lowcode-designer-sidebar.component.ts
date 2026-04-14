@@ -6,12 +6,13 @@ import { NgxLowcodeComponentDefinition, NgxLowcodeNodeSchema, NgxLowcodePageSche
 import { getMaterialsI18n, NgxLowcodeDesignerI18n, NgxLowcodeLocale } from 'ngx-lowcode-i18n';
 import { ThyButtonModule } from 'ngx-tethys/button';
 import { ThyInputModule } from 'ngx-tethys/input';
+import { ThyTabsModule } from 'ngx-tethys/tabs';
 import { ThyTreeEmitEvent, ThyTreeModule, ThyTreeNodeData } from 'ngx-tethys/tree';
 import { resolveLowcodeMaterialIcon } from '../../../core';
 
 @Component({
   selector: 'ngx-lowcode-designer-sidebar',
-  imports: [DragDropModule, FormsModule, ThyButtonModule, ThyInputModule, ThyTreeModule],
+  imports: [DragDropModule, FormsModule, ThyButtonModule, ThyInputModule, ThyTabsModule, ThyTreeModule],
   templateUrl: './ngx-lowcode-designer-sidebar.component.html',
   styleUrl: './ngx-lowcode-designer-sidebar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -36,6 +37,7 @@ export class NgxLowcodeDesignerSidebarComponent implements OnChanges {
   readonly outlineNameDraft = signal('');
   readonly expandedOutlineNodeIds = signal<string[]>([]);
   readonly knownOutlineNodeIds = signal<string[]>([]);
+  readonly activeTab = signal<'materials' | 'outline'>('materials');
   readonly groupedMaterials = computed<Array<{ category: string; items: NgxLowcodeComponentDefinition[] }>>(() =>
     this.groupMaterials(this.availableMaterials())
   );

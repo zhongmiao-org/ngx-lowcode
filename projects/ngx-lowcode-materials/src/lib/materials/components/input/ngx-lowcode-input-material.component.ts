@@ -18,12 +18,19 @@ export class NgxLowcodeInputMaterialComponent {
   readonly label = computed(() => String(this.node().props['label'] ?? 'Input'));
   readonly placeholder = computed(() => String(this.node().props['placeholder'] ?? ''));
   readonly stateKey = computed(() => String(this.node().props['stateKey'] ?? ''));
+  readonly changeActionId = computed(() => String(this.node().props['changeActionId'] ?? ''));
   readonly value = computed(() => String(this.runtime().state()[this.stateKey()] ?? ''));
 
-  updateValue(value: string): void {
+  async updateValue(value: string): Promise<void> {
     if (!this.stateKey()) {
       return;
     }
     this.runtime().setState({ [this.stateKey()]: value });
+    await this.runtime().executeActionById(this.changeActionId(), {
+      eventName: 'change',
+      nodeId: this.node().id,
+      stateKey: this.stateKey(),
+      value
+    });
   }
 }

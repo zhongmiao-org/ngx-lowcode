@@ -77,6 +77,7 @@ export class NgxLowcodeTethysMaterialComponent {
   readonly iconName = computed(() => String(this.node().props['iconName'] ?? 'mail'));
   readonly imageSrc = computed(() => String(this.node().props['src'] ?? defaultMaterialsI18n.defaults.imageSrc));
   readonly stateKey = computed(() => String(this.node().props['stateKey'] ?? ''));
+  readonly changeActionId = computed(() => String(this.node().props['changeActionId'] ?? ''));
   readonly uploadedFiles = computed<string[]>(() => {
     const value = this.runtime().state()[this.stateKey()];
     if (Array.isArray(value)) {
@@ -124,14 +125,20 @@ export class NgxLowcodeTethysMaterialComponent {
     this.parseItems(this.node().props['items'], defaultMaterialsI18n.defaults.radioFallback)
   );
 
-  updateState(value: unknown): void {
+  async updateState(value: unknown): Promise<void> {
     if (!this.stateKey()) {
       return;
     }
     this.runtime().setState({ [this.stateKey()]: value });
+    await this.runtime().executeActionById(this.changeActionId(), {
+      eventName: 'change',
+      nodeId: this.node().id,
+      stateKey: this.stateKey(),
+      value
+    });
   }
 
-  uploadFiles(event: ThyFileSelectEvent | File[] | FileList | Event): void {
+  async uploadFiles(event: ThyFileSelectEvent | File[] | FileList | Event): Promise<void> {
     const files = Array.isArray(event)
       ? event
       : event instanceof FileList
@@ -142,8 +149,15 @@ export class NgxLowcodeTethysMaterialComponent {
     if (!this.stateKey()) {
       return;
     }
+    const value = files.map((file) => file.name);
     this.runtime().setState({
-      [this.stateKey()]: files.map((file) => file.name)
+      [this.stateKey()]: value
+    });
+    await this.runtime().executeActionById(this.changeActionId(), {
+      eventName: 'change',
+      nodeId: this.node().id,
+      stateKey: this.stateKey(),
+      value
     });
   }
 

@@ -46,8 +46,8 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
   private resizeCleanup: (() => void) | null = null;
 
   readonly activeDropTarget = signal<NgxLowcodeDropTarget | null>(null);
-  readonly leftSidebarWidth = signal(280);
-  readonly rightSidebarWidth = signal(320);
+  readonly leftSidebarWidth = signal(340);
+  readonly rightSidebarWidth = signal(420);
   readonly leftSidebarCollapsed = signal(false);
   readonly rightSidebarCollapsed = signal(false);
   readonly styleUnits = ['px', '%', 'rem', 'vh', 'vw', 'em'] as const;
@@ -333,10 +333,10 @@ export class NgxLowcodeDesignerComponent implements OnChanges, OnDestroy {
 
     const moveHandler = (moveEvent: PointerEvent) => {
       if (side === 'left') {
-        this.leftSidebarWidth.set(Math.min(Math.max(moveEvent.clientX, 220), 420));
+        this.leftSidebarWidth.set(Math.min(Math.max(moveEvent.clientX, 260), 520));
         return;
       }
-      this.rightSidebarWidth.set(Math.min(Math.max(window.innerWidth - moveEvent.clientX, 260), 460));
+      this.rightSidebarWidth.set(Math.min(Math.max(window.innerWidth - moveEvent.clientX, 320), 620));
     };
 
     const upHandler = () => {

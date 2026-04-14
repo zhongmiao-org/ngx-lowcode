@@ -54,7 +54,14 @@ export interface NgxLowcodeDropTarget {
 
 export interface NgxLowcodeDatasourceDefinition {
   id: string;
-  type: 'mock' | 'rest' | string;
+  type: 'mock' | 'rest' | 'middleware-command' | string;
+  command?: {
+    transport?: 'websocket' | 'http' | string;
+    name?: string;
+    target?: string;
+    payloadTemplate?: Record<string, unknown>;
+    timeoutMs?: number;
+  };
   request?: {
     method?: string;
     url?: string;
@@ -68,11 +75,14 @@ export interface NgxLowcodeDatasourceDefinition {
 }
 
 export interface NgxLowcodeActionStep {
-  type: 'setState' | 'message' | 'callDatasource' | string;
+  type: 'setState' | 'message' | 'callDatasource' | 'openModal' | 'startWorkflow' | string;
   patch?: Record<string, unknown>;
   message?: string;
   datasourceId?: string;
   stateKey?: string;
+  modalId?: string;
+  workflowName?: string;
+  payloadTemplate?: Record<string, unknown>;
 }
 
 export interface NgxLowcodeActionDefinition {
