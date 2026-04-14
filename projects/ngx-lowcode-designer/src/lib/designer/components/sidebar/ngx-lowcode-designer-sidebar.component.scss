@@ -39,6 +39,11 @@
   container-name: materials-panel;
 }
 
+.ngx-lowcode-panel--tabs {
+  height: calc(100vh - 32px);
+  margin-bottom: 0;
+}
+
 .ngx-lowcode-panel__title {
   font-size: 14px;
   font-weight: 700;
@@ -48,6 +53,7 @@
 .ngx-lowcode-materials {
   display: grid;
   gap: 14px;
+  padding-top: 8px;
 }
 
 .ngx-lowcode-materials__group {
@@ -167,6 +173,22 @@
 
 .ngx-lowcode-outline {
   min-width: 0;
+  padding-top: 8px;
+}
+
+:host ::ng-deep .ngx-lowcode-panel--tabs .thy-tabs {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+}
+
+:host ::ng-deep .ngx-lowcode-panel--tabs .thy-nav {
+  margin-bottom: 12px;
+}
+
+:host ::ng-deep .ngx-lowcode-panel--tabs .thy-tabs-content {
+  min-height: 0;
+  overflow: auto;
 }
 
 .ngx-lowcode-outline__node {

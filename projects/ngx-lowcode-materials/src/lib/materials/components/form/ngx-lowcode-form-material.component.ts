@@ -29,6 +29,7 @@ export class NgxLowcodeFormMaterialComponent {
   readonly runtime = input.required<NgxLowcodeRuntimeContext>();
 
   readonly title = computed(() => String(this.node().props['title'] ?? defaultMaterialsI18n.defaults.formTitle));
+  readonly submitActionId = computed(() => String(this.node().props['submitActionId'] ?? ''));
   readonly formStyle = computed<Record<string, string | number>>(() => ({
     ...(this.node().style ?? {})
   }));
@@ -147,6 +148,14 @@ export class NgxLowcodeFormMaterialComponent {
 
   canDragChild(_node: NgxLowcodeNodeSchema): boolean {
     return true;
+  }
+
+  async handleSubmit(): Promise<void> {
+    await this.runtime().executeActionById(this.submitActionId(), {
+      eventName: 'submit',
+      nodeId: this.node().id,
+      datasourceId: String(this.node().props['datasourceId'] ?? '')
+    });
   }
 
   dragPreviewLabel(node: NgxLowcodeNodeSchema): string {

@@ -30,10 +30,13 @@
   min-width: 0;
 }
 
-.ngx-lowcode-panel__title {
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 12px;
+.ngx-lowcode-panel--tabs {
+  height: calc(100vh - 32px);
+  margin-bottom: 0;
+}
+
+.ngx-lowcode-panel__content {
+  padding-top: 8px;
 }
 
 .ngx-lowcode-panel--debug {
@@ -103,6 +106,69 @@
   gap: 8px;
 }
 
+.ngx-lowcode-config-list {
+  display: grid;
+  gap: 12px;
+}
+
+.ngx-lowcode-config-card {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #eaecf0;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.ngx-lowcode-config-card--nested {
+  background: #ffffff;
+}
+
+.ngx-lowcode-config-card__actions,
+.ngx-lowcode-config-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ngx-lowcode-config-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 12px;
+}
+
+.ngx-lowcode-config-grid--state {
+  align-items: start;
+}
+
+.ngx-lowcode-config-subtitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #344054;
+}
+
+.ngx-lowcode-config-meta {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ngx-lowcode-config-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ngx-lowcode-config-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3538cd;
+  font-size: 12px;
+}
+
 .ngx-lowcode-page-meta {
   display: grid;
   gap: 4px;
@@ -110,30 +176,14 @@
   font-size: 13px;
 }
 
-.ngx-lowcode-tabset {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-
-.ngx-lowcode-tabset__item {
-  border: 1px solid #d0d5dd;
-  background: #f8fafc;
-  color: #344054;
-  border-radius: 999px;
-  padding: 6px 12px;
+.ngx-lowcode-code-editor {
+  min-height: 220px;
+  font-family: 'SFMono-Regular', 'Menlo', monospace;
   font-size: 12px;
 }
 
-.ngx-lowcode-tabset__item.is-active {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #1d4ed8;
-}
-
-.ngx-lowcode-code-editor {
-  min-height: 220px;
+.ngx-lowcode-code-input {
+  min-height: 120px;
   font-family: 'SFMono-Regular', 'Menlo', monospace;
   font-size: 12px;
 }
@@ -191,8 +241,31 @@ thy-collapse-item + thy-collapse-item {
   width: 100%;
 }
 
+:host ::ng-deep .ngx-lowcode-panel--tabs > .thy-tabs {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+}
+
+:host ::ng-deep .ngx-lowcode-panel--tabs > .thy-tabs > .thy-nav {
+  margin-bottom: 12px;
+}
+
+:host ::ng-deep .ngx-lowcode-panel--tabs > .thy-tabs > .thy-tabs-content {
+  min-height: 0;
+  overflow: auto;
+}
+
+:host ::ng-deep .ngx-lowcode-panel__content .thy-tabs > .thy-nav {
+  margin-bottom: 12px;
+}
+
 @media (max-width: 1200px) {
   .ngx-lowcode-props-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ngx-lowcode-config-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 

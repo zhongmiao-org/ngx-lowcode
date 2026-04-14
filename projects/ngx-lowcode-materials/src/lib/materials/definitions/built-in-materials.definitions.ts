@@ -88,8 +88,11 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       category: t.categories.layout,
       canHaveChildren: true,
       component: NgxLowcodeFormMaterialComponent,
+      events: [{ name: 'submit', label: t.options.click }],
       setterSchema: [
         { key: 'title', label: t.setters.title, type: 'text', group: 'properties' },
+        { key: 'datasourceId', label: 'Datasource ID', type: 'text', group: 'properties' },
+        { key: 'submitActionId', label: t.setters.submitActionId, type: 'text', group: 'properties' },
         ...getFormLayoutSetters(locale)
       ],
       createNode: (options: NgxLowcodeMaterialCreateNodeOptions) => ({
@@ -97,6 +100,8 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
         componentType: 'form',
         props: {
           title: t.defaults.formTitle,
+          datasourceId: '',
+          submitActionId: '',
           thyLayout: 'horizontal',
           thyBasis: '100%',
           thySpan: 24,
@@ -152,15 +157,22 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       title: t.materials.input,
       category: t.categories.dataEntry,
       component: NgxLowcodeInputMaterialComponent,
+      events: [{ name: 'change', label: t.options.click }],
       setterSchema: [
         { key: 'label', label: t.setters.label, type: 'text' },
         { key: 'placeholder', label: t.setters.placeholder, type: 'text' },
-        { key: 'stateKey', label: t.setters.stateKey, type: 'text' }
+        { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
+        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
       ],
       createNode: (options: NgxLowcodeMaterialCreateNodeOptions) => ({
         id: options.id,
         componentType: 'input',
-        props: { label: t.defaults.inputLabel, placeholder: t.placeholders.inputKeyword, stateKey: 'keyword' }
+        props: {
+          label: t.defaults.inputLabel,
+          placeholder: t.placeholders.inputKeyword,
+          stateKey: 'keyword',
+          changeActionId: ''
+        }
       })
     },
     {
@@ -168,10 +180,12 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       title: t.materials.select,
       category: t.categories.dataEntry,
       component: NgxLowcodeSelectMaterialComponent,
+      events: [{ name: 'change', label: t.options.click }],
       setterSchema: [
         { key: 'label', label: t.setters.label, type: 'text' },
         { key: 'placeholder', label: t.setters.placeholder, type: 'text' },
-        { key: 'stateKey', label: t.setters.stateKey, type: 'text' }
+        { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
+        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
       ],
       createNode: (options: NgxLowcodeMaterialCreateNodeOptions) => ({
         id: options.id,
@@ -180,6 +194,7 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
           label: t.defaults.selectLabel,
           placeholder: t.placeholders.selectStatus,
           stateKey: 'status',
+          changeActionId: '',
           options: [
             selectOption(t.options.all, 'all'),
             selectOption(t.options.active, 'active'),
@@ -193,14 +208,25 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       title: t.materials.table,
       category: t.categories.dataDisplay,
       component: NgxLowcodeTableMaterialComponent,
+      events: [{ name: 'rowClick', label: t.options.click }],
       setterSchema: [
         { key: 'title', label: t.setters.title, type: 'text' },
-        { key: 'dataKey', label: t.setters.dataKey, type: 'text' }
+        { key: 'datasourceId', label: 'Datasource ID', type: 'text' },
+        { key: 'dataKey', label: t.setters.dataKey, type: 'text' },
+        { key: 'rowClickActionId', label: t.setters.rowClickActionId, type: 'text' }
       ],
       createNode: (options: NgxLowcodeMaterialCreateNodeOptions) => ({
         id: options.id,
         componentType: 'table',
-        props: { title: t.defaults.tableTitle, dataKey: 'tableData', thyBasis: '100%', thySpan: 24, thyOffset: 0 }
+        props: {
+          title: t.defaults.tableTitle,
+          datasourceId: '',
+          dataKey: 'tableData',
+          rowClickActionId: '',
+          thyBasis: '100%',
+          thySpan: 24,
+          thyOffset: 0
+        }
       })
     },
     {
@@ -294,12 +320,13 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       setterSchema: [
         { key: 'label', label: t.setters.label, type: 'text' },
         { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
-        { key: 'value', label: t.setters.value, type: 'number' }
+        { key: 'value', label: t.setters.value, type: 'number' },
+        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
       ],
       createNode: (options) => ({
         id: options.id,
         componentType: 'input-number',
-        props: { label: t.defaults.inputNumberLabel, stateKey: 'amount', value: 0 }
+        props: { label: t.defaults.inputNumberLabel, stateKey: 'amount', value: 0, changeActionId: '' }
       })
     },
     {
@@ -307,14 +334,16 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       title: t.materials.checkbox,
       category: t.categories.dataEntry,
       component: NgxLowcodeTethysMaterialComponent,
+      events: [{ name: 'change', label: t.options.click }],
       setterSchema: [
         { key: 'label', label: t.setters.label, type: 'text' },
-        { key: 'stateKey', label: t.setters.stateKey, type: 'text' }
+        { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
+        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
       ],
       createNode: (options) => ({
         id: options.id,
         componentType: 'checkbox',
-        props: { label: t.defaults.checkboxLabel, stateKey: 'enabled' }
+        props: { label: t.defaults.checkboxLabel, stateKey: 'enabled', changeActionId: '' }
       })
     },
     {
@@ -322,15 +351,23 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       title: t.materials.radio,
       category: t.categories.dataEntry,
       component: NgxLowcodeTethysMaterialComponent,
+      events: [{ name: 'change', label: t.options.click }],
       setterSchema: [
         { key: 'label', label: t.setters.label, type: 'text' },
         { key: 'items', label: t.setters.items, type: 'textarea' },
-        { key: 'stateKey', label: t.setters.stateKey, type: 'text' }
+        { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
+        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
       ],
       createNode: (options) => ({
         id: options.id,
         componentType: 'radio',
-        props: { label: t.defaults.radioLabel, items: t.defaults.radioItems, stateKey: 'radioValue', thyBasis: '100%' }
+        props: {
+          label: t.defaults.radioLabel,
+          items: t.defaults.radioItems,
+          stateKey: 'radioValue',
+          changeActionId: '',
+          thyBasis: '100%'
+        }
       })
     },
     {
@@ -338,14 +375,16 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       title: t.materials.switch,
       category: t.categories.dataEntry,
       component: NgxLowcodeTethysMaterialComponent,
+      events: [{ name: 'change', label: t.options.click }],
       setterSchema: [
         { key: 'label', label: t.setters.label, type: 'text' },
-        { key: 'stateKey', label: t.setters.stateKey, type: 'text' }
+        { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
+        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
       ],
       createNode: (options) => ({
         id: options.id,
         componentType: 'switch',
-        props: { label: t.defaults.switchLabel, stateKey: 'switchValue' }
+        props: { label: t.defaults.switchLabel, stateKey: 'switchValue', changeActionId: '' }
       })
     },
     {
@@ -353,14 +392,16 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       title: t.materials['date-picker'],
       category: t.categories.dataEntry,
       component: NgxLowcodeTethysMaterialComponent,
+      events: [{ name: 'change', label: t.options.click }],
       setterSchema: [
         { key: 'label', label: t.setters.label, type: 'text' },
-        { key: 'stateKey', label: t.setters.stateKey, type: 'text' }
+        { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
+        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
       ],
       createNode: (options) => ({
         id: options.id,
         componentType: 'date-picker',
-        props: { label: t.defaults.datePickerLabel, stateKey: 'selectedDate' }
+        props: { label: t.defaults.datePickerLabel, stateKey: 'selectedDate', changeActionId: '' }
       })
     },
     {
@@ -368,14 +409,16 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       title: t.materials.upload,
       category: t.categories.dataEntry,
       component: NgxLowcodeTethysMaterialComponent,
+      events: [{ name: 'change', label: t.options.click }],
       setterSchema: [
         { key: 'label', label: t.setters.label, type: 'text' },
-        { key: 'stateKey', label: t.setters.stateKey, type: 'text' }
+        { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
+        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
       ],
       createNode: (options) => ({
         id: options.id,
         componentType: 'upload',
-        props: { label: t.defaults.uploadLabel, stateKey: 'uploadedFiles', thyBasis: '100%' }
+        props: { label: t.defaults.uploadLabel, stateKey: 'uploadedFiles', changeActionId: '', thyBasis: '100%' }
       })
     },
     {

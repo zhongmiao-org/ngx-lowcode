@@ -12,7 +12,7 @@
         </thead>
         <tbody>
           @for (row of rows(); track $index) {
-            <tr>
+            <tr (click)="handleRowClick(row, $index)">
               @for (column of columns(); track column) {
                 <td>{{ row[column] }}</td>
               }
