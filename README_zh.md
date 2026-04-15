@@ -77,7 +77,16 @@ npm start
 1. 启动 `meta-lc-bff` 与 PostgreSQL/Redis。
 2. 打开 demo，在 `Tenant A` 与 `Tenant B` 间切换。
 3. 通过 action 按钮触发订单查询。
-4. 验证 table 回填结果按租户隔离，且仅在 BFF 不可用时才回落 mock 数据。
+4. 在预览区记录 `request-id`，并验证 table 回填结果按租户隔离。
+5. 仅在 BFF 不可用（如 `status=0/502/503/504`）时回落 mock 数据；其他错误保持错误语义。
+6. 使用以下 SQL 对照审计落盘：
+
+```sql
+SELECT request_id, tenant_id, status, row_count, error_message, created_at
+FROM bff_query_audit_logs
+WHERE request_id = '<demo-request-id>'
+ORDER BY id DESC;
+```
 
 ## 构建目标
 
