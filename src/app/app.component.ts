@@ -7,6 +7,7 @@ import { NgxLowcodeDesignerLocale } from 'ngx-lowcode-i18n';
 import { NgxLowcodeRendererComponent } from 'ngx-lowcode-renderer';
 import { mockPageSchema } from 'ngx-lowcode-testing';
 import { ThyIconRegistry } from 'ngx-tethys/icon';
+import { DemoBffDatasourceExecutorService } from './demo-bff-datasource-executor.service';
 
 @Component({
   selector: 'app-root',
@@ -101,6 +102,28 @@ import { ThyIconRegistry } from 'ngx-tethys/icon';
           <div>
             <strong>{{ tenantId() }}</strong>
             <span>{{ copy().activeTenant }}</span>
+          </div>
+        </div>
+        <div class="demo-shell__query-status">
+          <div>
+            <strong>{{ queryStatus().requestId }}</strong>
+            <span>{{ copy().requestId }}</span>
+          </div>
+          <div>
+            <strong>{{ queryStatus().source }}</strong>
+            <span>{{ copy().querySource }}</span>
+          </div>
+          <div>
+            <strong>{{ queryStatus().status }}</strong>
+            <span>{{ copy().queryStatus }}</span>
+          </div>
+          <div>
+            <strong>{{ queryStatus().rowCount }}</strong>
+            <span>{{ copy().queryRows }}</span>
+          </div>
+          <div>
+            <strong>{{ queryStatus().message }}</strong>
+            <span>{{ copy().queryMessage }}</span>
           </div>
         </div>
 
@@ -225,12 +248,35 @@ import { ThyIconRegistry } from 'ngx-tethys/icon';
         color: #475467;
         font-size: 13px;
       }
+      .demo-shell__query-status {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+        margin: 0 0 16px;
+      }
+      .demo-shell__query-status div {
+        display: grid;
+        gap: 4px;
+        padding: 12px 14px;
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 14px;
+      }
+      .demo-shell__query-status strong {
+        font-size: 14px;
+        line-break: anywhere;
+      }
+      .demo-shell__query-status span {
+        color: #854d0e;
+        font-size: 12px;
+      }
     `
   ]
 })
 export class AppComponent {
   private readonly iconRegistry = inject(ThyIconRegistry);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly demoExecutor = inject(DemoBffDatasourceExecutorService);
   protected readonly tenantId = signal<'tenant-a' | 'tenant-b'>('tenant-a');
   protected readonly schema = signal<NgxLowcodePageSchema>(
     prepareSchemaForBff(structuredClone(mockPageSchema), this.tenantId())
@@ -238,6 +284,7 @@ export class AppComponent {
   protected readonly lastCommand = signal('ready');
   protected readonly locale = signal<NgxLowcodeDesignerLocale>('zh-CN');
   protected readonly nodeCount = computed(() => this.countNodes(this.schema().layoutTree));
+  protected readonly queryStatus = this.demoExecutor.lastExecution.asReadonly();
   protected readonly copy = computed(() => demoCopy[this.locale() as keyof typeof demoCopy]);
 
   constructor() {
@@ -303,6 +350,11 @@ const demoCopy = {
     datasources: '数据源',
     actions: '动作',
     activeTenant: '当前租户',
+    requestId: '请求 ID（对照审计）',
+    querySource: '数据来源',
+    queryStatus: '查询状态',
+    queryRows: '返回行数',
+    queryMessage: '状态说明',
     tenantSwitched: '已切换租户',
     ordersLoaded: '已加载订单示例',
     landingLoaded: '已加载落地页示例',
@@ -323,6 +375,11 @@ const demoCopy = {
     datasources: 'datasources',
     actions: 'actions',
     activeTenant: 'active tenant',
+    requestId: 'request id (audit match)',
+    querySource: 'data source',
+    queryStatus: 'query status',
+    queryRows: 'row count',
+    queryMessage: 'status message',
     tenantSwitched: 'tenant switched',
     ordersLoaded: 'orders demo loaded',
     landingLoaded: 'landing demo loaded',
