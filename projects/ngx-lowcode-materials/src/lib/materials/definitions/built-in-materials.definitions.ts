@@ -22,6 +22,10 @@ import {
 
 export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): MaterialDefinition[] {
   const t = getMaterialsI18n(locale);
+  const setterLabel = (key: string, fallback: string): string => {
+    const value = (t.setters as Record<string, unknown>)[key];
+    return typeof value === 'string' && value.trim() ? value : fallback;
+  };
 
   return [
     {
@@ -92,7 +96,12 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       setterSchema: [
         { key: 'title', label: t.setters.title, type: 'text', group: 'properties' },
         { key: 'datasourceId', label: 'Datasource ID', type: 'text', group: 'properties' },
-        { key: 'submitActionId', label: t.setters.submitActionId, type: 'text', group: 'properties' },
+        {
+          key: 'submitActionId',
+          label: setterLabel('submitActionId', 'Submit Action ID'),
+          type: 'text',
+          group: 'properties'
+        },
         ...getFormLayoutSetters(locale)
       ],
       createNode: (options: NgxLowcodeMaterialCreateNodeOptions) => ({
@@ -162,7 +171,7 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
         { key: 'label', label: t.setters.label, type: 'text' },
         { key: 'placeholder', label: t.setters.placeholder, type: 'text' },
         { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
-        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
+        { key: 'changeActionId', label: setterLabel('changeActionId', 'Change Action ID'), type: 'text' }
       ],
       createNode: (options: NgxLowcodeMaterialCreateNodeOptions) => ({
         id: options.id,
@@ -185,7 +194,7 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
         { key: 'label', label: t.setters.label, type: 'text' },
         { key: 'placeholder', label: t.setters.placeholder, type: 'text' },
         { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
-        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
+        { key: 'changeActionId', label: setterLabel('changeActionId', 'Change Action ID'), type: 'text' }
       ],
       createNode: (options: NgxLowcodeMaterialCreateNodeOptions) => ({
         id: options.id,
@@ -213,7 +222,7 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
         { key: 'title', label: t.setters.title, type: 'text' },
         { key: 'datasourceId', label: 'Datasource ID', type: 'text' },
         { key: 'dataKey', label: t.setters.dataKey, type: 'text' },
-        { key: 'rowClickActionId', label: t.setters.rowClickActionId, type: 'text' }
+        { key: 'rowClickActionId', label: setterLabel('rowClickActionId', 'Row Click Action ID'), type: 'text' }
       ],
       createNode: (options: NgxLowcodeMaterialCreateNodeOptions) => ({
         id: options.id,
@@ -321,7 +330,7 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
         { key: 'label', label: t.setters.label, type: 'text' },
         { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
         { key: 'value', label: t.setters.value, type: 'number' },
-        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
+        { key: 'changeActionId', label: setterLabel('changeActionId', 'Change Action ID'), type: 'text' }
       ],
       createNode: (options) => ({
         id: options.id,
@@ -338,7 +347,7 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       setterSchema: [
         { key: 'label', label: t.setters.label, type: 'text' },
         { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
-        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
+        { key: 'changeActionId', label: setterLabel('changeActionId', 'Change Action ID'), type: 'text' }
       ],
       createNode: (options) => ({
         id: options.id,
@@ -356,7 +365,7 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
         { key: 'label', label: t.setters.label, type: 'text' },
         { key: 'items', label: t.setters.items, type: 'textarea' },
         { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
-        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
+        { key: 'changeActionId', label: setterLabel('changeActionId', 'Change Action ID'), type: 'text' }
       ],
       createNode: (options) => ({
         id: options.id,
@@ -379,7 +388,7 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       setterSchema: [
         { key: 'label', label: t.setters.label, type: 'text' },
         { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
-        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
+        { key: 'changeActionId', label: setterLabel('changeActionId', 'Change Action ID'), type: 'text' }
       ],
       createNode: (options) => ({
         id: options.id,
@@ -396,7 +405,7 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       setterSchema: [
         { key: 'label', label: t.setters.label, type: 'text' },
         { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
-        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
+        { key: 'changeActionId', label: setterLabel('changeActionId', 'Change Action ID'), type: 'text' }
       ],
       createNode: (options) => ({
         id: options.id,
@@ -413,7 +422,7 @@ export function getBuiltInMaterials(locale: NgxLowcodeLocale = 'zh-CN'): Materia
       setterSchema: [
         { key: 'label', label: t.setters.label, type: 'text' },
         { key: 'stateKey', label: t.setters.stateKey, type: 'text' },
-        { key: 'changeActionId', label: t.setters.changeActionId, type: 'text' }
+        { key: 'changeActionId', label: setterLabel('changeActionId', 'Change Action ID'), type: 'text' }
       ],
       createNode: (options) => ({
         id: options.id,

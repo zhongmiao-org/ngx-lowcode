@@ -1,10 +1,10 @@
 /* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
 /* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
-  "extends": "../../tsconfig.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../out-tsc/spec",
-    "types": ["jasmine"],
+    "outDir": "./out-tsc/app",
+    "types": [],
     "paths": {
       "ngx-lowcode-core-types": ["projects/ngx-lowcode-core-types/src/public-api.ts"],
       "ngx-lowcode-core-utils": ["projects/ngx-lowcode-core-utils/src/public-api.ts"],
@@ -16,5 +16,8 @@
       "ngx-lowcode-testing": ["projects/ngx-lowcode-testing/src/public-api.ts"]
     }
   },
-  "include": ["src/**/*.spec.ts", "src/**/*.d.ts"]
+  "files": [
+    "src/main.ts"
+  ],
+  "include": ["src/**/*.d.ts"]
 }
