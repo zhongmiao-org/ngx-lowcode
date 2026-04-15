@@ -21,6 +21,21 @@ interface DemoQueryResponse {
   rows: unknown[];
 }
 
+interface DemoMutationRequest {
+  table: string;
+  operation: 'create' | 'update' | 'delete';
+  tenantId: string;
+  userId: string;
+  roles: string[];
+  key?: Record<string, string>;
+  data?: Record<string, string>;
+}
+
+interface DemoMutationResponse {
+  rowCount: number;
+  row: unknown | null;
+}
+
 interface DemoOrderRow {
   id: string;
   owner: string;
@@ -66,11 +81,11 @@ export class DemoBffDatasourceExecutorService {
   }: NgxLowcodeDatasourceRequest) => {
     switch (datasource.id) {
       case 'orders-create-datasource':
-        return this.createOrder(state);
+        return this.mutateOrder(datasource, state, 'create');
       case 'orders-update-datasource':
-        return this.updateOrder(state);
+        return this.mutateOrder(datasource, state, 'update');
       case 'orders-delete-datasource':
-        return this.deleteOrder(state);
+        return this.mutateOrder(datasource, state, 'delete');
       case 'extract-row-id-datasource':
         return extractPayloadField(payload, 'id');
       case 'extract-row-owner-datasource':
@@ -104,10 +119,8 @@ export class DemoBffDatasourceExecutorService {
         })
       );
       const rows = normalizeRows(response.rows, payload.tenantId);
-      if (rows.length > 0) {
-        this.tenantStores.set(payload.tenantId, rows);
-      }
-      const filteredRows = filterRows(this.tenantStores.get(payload.tenantId) ?? rows, state, payload.tenantId);
+      this.tenantStores.set(payload.tenantId, rows);
+      const filteredRows = filterRows(rows, state, payload.tenantId);
       this.recordExecution({
         requestId,
         source: 'bff',
@@ -144,73 +157,61 @@ export class DemoBffDatasourceExecutorService {
     }
   }
 
-  private createOrder(state: Record<string, unknown>): DemoOrderRow[] {
-    const tenantId = String(state['tenantId'] ?? 'tenant-a');
-    const store = [...this.getTenantStore(tenantId)];
-    const row = toEditorRow(state, tenantId);
-    if (!row) {
-      return filterRows(store, state, tenantId);
-    }
+  private async mutateOrder(
+    datasource: NgxLowcodeDatasourceDefinition,
+    state: Record<string, unknown>,
+    operation: DemoMutationRequest['operation']
+  ): Promise<DemoOrderRow[]> {
+    const endpoint = resolveMutationEndpoint(datasource);
+    const payload = toMutationPayload(state, operation);
+    const requestId = crypto.randomUUID();
 
-    const next = store.filter((item) => item.id !== row.id);
-    next.unshift(row);
-    this.tenantStores.set(tenantId, next);
-    this.recordExecution({
-      requestId: 'local-create',
-      source: 'fallback',
-      status: 'success',
-      tenantId,
-      rowCount: next.length,
-      message: `created ${row.id}`
-    });
-    return filterRows(next, state, tenantId);
+    try {
+      const response = await firstValueFrom(
+        this.http.post<DemoMutationResponse>(endpoint, payload, {
+          headers: {
+            'x-request-id': requestId
+          }
+        })
+      );
+      if (response.rowCount < 1) {
+        throw new Error(`${operation} affected no rows`);
+      }
+      return this.refreshOrders(state, payload.tenantId);
+    } catch (error) {
+      this.recordExecution({
+        requestId,
+        source: 'bff',
+        status: 'error',
+        tenantId: payload.tenantId,
+        rowCount: 0,
+        message: resolveErrorMessage(error)
+      });
+      throw error;
+    }
   }
 
-  private updateOrder(state: Record<string, unknown>): DemoOrderRow[] {
-    const tenantId = String(state['tenantId'] ?? 'tenant-a');
-    const store = [...this.getTenantStore(tenantId)];
-    const row = toEditorRow(state, tenantId);
-    if (!row) {
-      return filterRows(store, state, tenantId);
-    }
+  private async refreshOrders(
+    state: Record<string, unknown>,
+    tenantId: string
+  ): Promise<DemoOrderRow[]> {
+    const datasource: NgxLowcodeDatasourceDefinition = {
+      id: 'orders-query-datasource',
+      type: 'rest',
+      request: {
+        method: 'POST',
+        url: '/query',
+        params: {
+          table: 'orders',
+          fields: ['id', 'owner', 'channel', 'priority', 'status', 'tenant_id']
+        }
+      }
+    };
 
-    const index = store.findIndex((item) => item.id === row.id);
-    if (index >= 0) {
-      store[index] = row;
-    } else {
-      store.unshift(row);
-    }
-    this.tenantStores.set(tenantId, store);
-    this.recordExecution({
-      requestId: 'local-update',
-      source: 'fallback',
-      status: 'success',
-      tenantId,
-      rowCount: store.length,
-      message: `updated ${row.id}`
+    return this.queryOrders(datasource, {
+      ...state,
+      tenantId
     });
-    return filterRows(store, state, tenantId);
-  }
-
-  private deleteOrder(state: Record<string, unknown>): DemoOrderRow[] {
-    const tenantId = String(state['tenantId'] ?? 'tenant-a');
-    const targetId = String(state['formOrderId'] ?? state['selectedOrderId'] ?? '').trim();
-    const store = [...this.getTenantStore(tenantId)];
-    if (!targetId) {
-      return filterRows(store, state, tenantId);
-    }
-
-    const next = store.filter((item) => item.id !== targetId);
-    this.tenantStores.set(tenantId, next);
-    this.recordExecution({
-      requestId: 'local-delete',
-      source: 'fallback',
-      status: 'success',
-      tenantId,
-      rowCount: next.length,
-      message: `deleted ${targetId}`
-    });
-    return filterRows(next, state, tenantId);
   }
 
   private getTenantStore(tenantId: string, datasource?: NgxLowcodeDatasourceDefinition): DemoOrderRow[] {
@@ -254,6 +255,17 @@ function resolveBaseUrl(): string {
   return 'http://localhost:3000';
 }
 
+function resolveMutationEndpoint(datasource: NgxLowcodeDatasourceDefinition): string {
+  const configured = String(datasource.request?.url ?? '').trim();
+  if (configured) {
+    if (/^https?:\/\//.test(configured)) {
+      return configured;
+    }
+    return `${resolveBaseUrl()}${configured.startsWith('/') ? '' : '/'}${configured}`;
+  }
+  return `${resolveBaseUrl()}/mutation`;
+}
+
 function toQueryPayload(
   datasource: NgxLowcodeDatasourceDefinition,
   state: Record<string, unknown>
@@ -274,6 +286,36 @@ function toQueryPayload(
     userId,
     roles,
     limit: 100
+  };
+}
+
+function toMutationPayload(
+  state: Record<string, unknown>,
+  operation: DemoMutationRequest['operation']
+): DemoMutationRequest {
+  const tenantId = String(state['tenantId'] ?? 'tenant-a');
+  const userId = String(state['userId'] ?? `${tenantId}-user`);
+  const roles = normalizeRoles(state['roles']);
+  const id = String(state['formOrderId'] ?? state['selectedOrderId'] ?? '').trim();
+
+  return {
+    table: 'orders',
+    operation,
+    tenantId,
+    userId,
+    roles,
+    key: {
+      id
+    },
+    data: operation === 'delete'
+      ? undefined
+      : {
+          id,
+          owner: String(state['formOwner'] ?? '').trim(),
+          channel: String(state['formChannel'] ?? 'web'),
+          priority: String(state['formPriority'] ?? 'medium'),
+          status: String(state['formStatus'] ?? 'active')
+        }
   };
 }
 

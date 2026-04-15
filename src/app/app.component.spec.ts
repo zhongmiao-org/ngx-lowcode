@@ -145,7 +145,30 @@ describe('src demo mainline regression', () => {
     );
 
     runtime.setState({ formOwner: 'Alicia' });
-    await runtime.executeActionById('update-order-action');
+    const updatePromise = runtime.executeActionById('update-order-action');
+    const updateMutation = httpController.expectOne('http://localhost:3000/mutation');
+    expect(updateMutation.request.body).toEqual(
+      jasmine.objectContaining({
+        operation: 'update',
+        table: 'orders',
+        tenantId: 'tenant-a',
+        key: { id: 'SO-A1001' },
+        data: jasmine.objectContaining({
+          id: 'SO-A1001',
+          owner: 'Alicia'
+        })
+      })
+    );
+    updateMutation.flush({
+      rowCount: 1,
+      row: { ...selectedRow, owner: 'Alicia' }
+    });
+    await fixture.whenStable();
+    const updateQuery = httpController.expectOne('http://localhost:3000/query');
+    updateQuery.flush({
+      rows: [{ ...selectedRow, owner: 'Alicia' }, { id: 'SO-A1002', owner: 'Aria', channel: 'store', priority: 'medium', status: 'paused', tenant_id: 'tenant-a' }]
+    });
+    await updatePromise;
     expect(runtime.state()['formMode']).toBe('updated');
     expect(runtime.state()['tableData']).toEqual(
       jasmine.arrayContaining([jasmine.objectContaining({ id: 'SO-A1001', owner: 'Alicia' })])
@@ -158,7 +181,50 @@ describe('src demo mainline regression', () => {
       formPriority: 'low',
       formStatus: 'active'
     });
-    await runtime.executeActionById('create-order-action');
+    const createPromise = runtime.executeActionById('create-order-action');
+    const createMutation = httpController.expectOne('http://localhost:3000/mutation');
+    expect(createMutation.request.body).toEqual(
+      jasmine.objectContaining({
+        operation: 'create',
+        table: 'orders',
+        tenantId: 'tenant-a',
+        key: { id: 'SO-A2001' },
+        data: {
+          id: 'SO-A2001',
+          owner: 'Aaron',
+          channel: 'partner',
+          priority: 'low',
+          status: 'active'
+        }
+      })
+    );
+    createMutation.flush({
+      rowCount: 1,
+      row: {
+        id: 'SO-A2001',
+        owner: 'Aaron',
+        channel: 'partner',
+        priority: 'low',
+        status: 'active',
+        tenant_id: 'tenant-a'
+      }
+    });
+    await fixture.whenStable();
+    const createQuery = httpController.expectOne('http://localhost:3000/query');
+    createQuery.flush({
+      rows: [
+        {
+          id: 'SO-A2001',
+          owner: 'Aaron',
+          channel: 'partner',
+          priority: 'low',
+          status: 'active',
+          tenant_id: 'tenant-a'
+        },
+        { id: 'SO-A1001', owner: 'Alicia', channel: 'web', priority: 'high', status: 'active', tenant_id: 'tenant-a' }
+      ]
+    });
+    await createPromise;
     expect(runtime.state()['formMode']).toBe('created');
     expect((runtime.state()['tableData'] as Array<Record<string, unknown>>)[0]).toEqual(
       jasmine.objectContaining({
@@ -168,7 +234,33 @@ describe('src demo mainline regression', () => {
       })
     );
 
-    await runtime.executeActionById('delete-order-action');
+    const deletePromise = runtime.executeActionById('delete-order-action');
+    const deleteMutation = httpController.expectOne('http://localhost:3000/mutation');
+    expect(deleteMutation.request.body).toEqual(
+      jasmine.objectContaining({
+        operation: 'delete',
+        table: 'orders',
+        tenantId: 'tenant-a',
+        key: { id: 'SO-A2001' }
+      })
+    );
+    deleteMutation.flush({
+      rowCount: 1,
+      row: {
+        id: 'SO-A2001',
+        owner: 'Aaron',
+        channel: 'partner',
+        priority: 'low',
+        status: 'active',
+        tenant_id: 'tenant-a'
+      }
+    });
+    await fixture.whenStable();
+    const deleteQuery = httpController.expectOne('http://localhost:3000/query');
+    deleteQuery.flush({
+      rows: [{ id: 'SO-A1001', owner: 'Alicia', channel: 'web', priority: 'high', status: 'active', tenant_id: 'tenant-a' }]
+    });
+    await deletePromise;
     expect(runtime.state()['formMode']).toBe('deleted');
     expect(runtime.state()['tableData']).not.toEqual(
       jasmine.arrayContaining([jasmine.objectContaining({ id: 'SO-A2001' })])
@@ -202,7 +294,33 @@ describe('src demo mainline regression', () => {
       formPriority: 'medium',
       formStatus: 'active'
     });
-    await runtime.executeActionById('create-order-action');
+    const createPromise = runtime.executeActionById('create-order-action');
+    httpController.expectOne('http://localhost:3000/mutation').flush({
+      rowCount: 1,
+      row: {
+        id: 'SO-A3001',
+        owner: 'Avery',
+        channel: 'store',
+        priority: 'medium',
+        status: 'active',
+        tenant_id: 'tenant-a'
+      }
+    });
+    await fixture.whenStable();
+    httpController.expectOne('http://localhost:3000/query').flush({
+      rows: [
+        {
+          id: 'SO-A3001',
+          owner: 'Avery',
+          channel: 'store',
+          priority: 'medium',
+          status: 'active',
+          tenant_id: 'tenant-a'
+        },
+        { id: 'SO-A1001', owner: 'Alice', channel: 'web', priority: 'high', status: 'active', tenant_id: 'tenant-a' }
+      ]
+    });
+    await createPromise;
     expect(runtime.state()['tableData']).toEqual(
       jasmine.arrayContaining([jasmine.objectContaining({ id: 'SO-A3001', tenant_id: 'tenant-a' })])
     );
