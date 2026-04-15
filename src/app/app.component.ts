@@ -450,7 +450,7 @@ function createLandingSchema(): NgxLowcodePageSchema {
   };
 }
 
-function createOrdersDemoSchema(tenantId: string): NgxLowcodePageSchema {
+export function createOrdersDemoSchema(tenantId: string): NgxLowcodePageSchema {
   return {
     schemaVersion: '1.0.0',
     pageMeta: {

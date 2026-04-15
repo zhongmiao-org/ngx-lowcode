@@ -9,7 +9,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "watch": "ng build ngx-lowcode-core-types && ng build ngx-lowcode-i18n && ng build ngx-lowcode-core-utils && ng build demo --watch --configuration development",
-    "test": "ng test ngx-lowcode-core --watch=false && ng test ngx-lowcode-renderer --watch=false && ng test ngx-lowcode-materials --watch=false && ng test ngx-lowcode-designer --watch=false && ng test ngx-lowcode-puzzle-adapter --watch=false"
+    "test": "ng test ngx-lowcode-core --watch=false && ng test ngx-lowcode-renderer --watch=false && ng test ngx-lowcode-materials --watch=false && ng test ngx-lowcode-designer --watch=false && ng test ngx-lowcode-puzzle-adapter --watch=false && ng test demo --watch=false"
   },
   "private": true,
   "dependencies": {
