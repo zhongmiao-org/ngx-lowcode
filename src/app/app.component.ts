@@ -1,11 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { createDefaultPageSchema } from 'ngx-lowcode-core-utils';
-import { NgxLowcodeDatasourceDefinition, NgxLowcodePageSchema, NgxLowcodeNodeSchema } from 'ngx-lowcode-core-types';
+import {
+  NgxLowcodeActionDefinition,
+  NgxLowcodeDatasourceDefinition,
+  NgxLowcodePageSchema,
+  NgxLowcodeNodeSchema
+} from 'ngx-lowcode-core-types';
 import { NgxLowcodeDesignerComponent } from 'ngx-lowcode-designer';
 import { NgxLowcodeDesignerLocale } from 'ngx-lowcode-i18n';
 import { NgxLowcodeRendererComponent } from 'ngx-lowcode-renderer';
-import { mockPageSchema } from 'ngx-lowcode-testing';
 import { ThyIconRegistry } from 'ngx-tethys/icon';
 import { DemoBffDatasourceExecutorService } from './demo-bff-datasource-executor.service';
 
@@ -278,9 +282,7 @@ export class AppComponent {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly demoExecutor = inject(DemoBffDatasourceExecutorService);
   protected readonly tenantId = signal<'tenant-a' | 'tenant-b'>('tenant-a');
-  protected readonly schema = signal<NgxLowcodePageSchema>(
-    prepareSchemaForBff(structuredClone(mockPageSchema), this.tenantId())
-  );
+  protected readonly schema = signal<NgxLowcodePageSchema>(createOrdersDemoSchema(this.tenantId()));
   protected readonly lastCommand = signal('ready');
   protected readonly locale = signal<NgxLowcodeDesignerLocale>('zh-CN');
   protected readonly nodeCount = computed(() => this.countNodes(this.schema().layoutTree));
@@ -295,7 +297,7 @@ export class AppComponent {
 
   protected loadPreset(preset: 'orders' | 'landing' | 'blank'): void {
     if (preset === 'orders') {
-      this.schema.set(prepareSchemaForBff(structuredClone(mockPageSchema), this.tenantId()));
+      this.schema.set(createOrdersDemoSchema(this.tenantId()));
       this.lastCommand.set(this.copy().ordersLoaded);
       return;
     }
@@ -448,14 +450,19 @@ function createLandingSchema(): NgxLowcodePageSchema {
   };
 }
 
-function prepareSchemaForBff(schema: NgxLowcodePageSchema, tenantId: string): NgxLowcodePageSchema {
-  const nextSchema = structuredClone(schema);
-  nextSchema.state = withTenantState(nextSchema.state, tenantId);
-  nextSchema.datasources = nextSchema.datasources.map((datasource) =>
-    datasource.id === 'orders-datasource' ? toBffDatasource(datasource) : datasource
-  );
-  nextSchema.state['tableData'] = createTenantMockRows(tenantId);
-  return nextSchema;
+function createOrdersDemoSchema(tenantId: string): NgxLowcodePageSchema {
+  return {
+    schemaVersion: '1.0.0',
+    pageMeta: {
+      id: 'orders-crud-demo',
+      title: 'Orders CRUD Demo',
+      description: 'Queryable list with create/update/delete and cross-widget linkage.'
+    },
+    state: withTenantState({}, tenantId),
+    datasources: createOrdersDatasources(),
+    actions: createOrdersActions(),
+    layoutTree: createOrdersLayoutTree()
+  };
 }
 
 function withTenantState(
@@ -464,29 +471,508 @@ function withTenantState(
 ): Record<string, unknown> {
   return {
     ...state,
+    keyword: '',
+    owner: '',
+    channel: 'all',
+    status: 'all',
+    priority: 'all',
+    selectedOrderId: '',
+    formOrderId: '',
+    formOwner: '',
+    formChannel: 'web',
+    formPriority: 'medium',
+    formStatus: 'active',
+    formMode: 'idle',
+    tableData: createTenantMockRows(tenantId),
     tenantId,
     userId: `demo-${tenantId}-user`,
     roles: ['USER']
   };
 }
 
-function toBffDatasource(datasource: NgxLowcodeDatasourceDefinition): NgxLowcodeDatasourceDefinition {
-  return {
-    ...datasource,
-    type: 'rest',
-    request: {
-      method: 'POST',
-      url: '/query',
-      params: {
-        table: 'orders',
-        fields: ['id', 'owner', 'channel', 'priority', 'status']
-      }
+function createOrdersDatasources(): NgxLowcodeDatasourceDefinition[] {
+  return [
+    {
+      id: 'orders-query-datasource',
+      type: 'rest',
+      request: {
+        method: 'POST',
+        url: '/query',
+        params: {
+          table: 'orders',
+          fields: ['id', 'owner', 'channel', 'priority', 'status', 'tenant_id']
+        }
+      },
+      responseMapping: {
+        stateKey: 'tableData'
+      },
+      mockData: [...createTenantMockRows('tenant-a'), ...createTenantMockRows('tenant-b')]
     },
-    mockData: [
-      ...createTenantMockRows('tenant-a'),
-      ...createTenantMockRows('tenant-b')
-    ]
-  };
+    {
+      id: 'orders-create-datasource',
+      type: 'local-crud'
+    },
+    {
+      id: 'orders-update-datasource',
+      type: 'local-crud'
+    },
+    {
+      id: 'orders-delete-datasource',
+      type: 'local-crud'
+    },
+    {
+      id: 'extract-row-id-datasource',
+      type: 'local-payload'
+    },
+    {
+      id: 'extract-row-owner-datasource',
+      type: 'local-payload'
+    },
+    {
+      id: 'extract-row-channel-datasource',
+      type: 'local-payload'
+    },
+    {
+      id: 'extract-row-priority-datasource',
+      type: 'local-payload'
+    },
+    {
+      id: 'extract-row-status-datasource',
+      type: 'local-payload'
+    }
+  ];
+}
+
+function createOrdersActions(): NgxLowcodeActionDefinition[] {
+  return [
+    {
+      id: 'search-action',
+      steps: [
+        {
+          type: 'callDatasource',
+          datasourceId: 'orders-query-datasource',
+          stateKey: 'tableData'
+        }
+      ]
+    },
+    {
+      id: 'reset-filters-action',
+      steps: [
+        {
+          type: 'setState',
+          patch: {
+            keyword: '',
+            owner: '',
+            channel: 'all',
+            priority: 'all',
+            status: 'all'
+          }
+        },
+        {
+          type: 'callDatasource',
+          datasourceId: 'orders-query-datasource',
+          stateKey: 'tableData'
+        }
+      ]
+    },
+    {
+      id: 'create-order-action',
+      steps: [
+        {
+          type: 'callDatasource',
+          datasourceId: 'orders-create-datasource',
+          stateKey: 'tableData'
+        },
+        {
+          type: 'setState',
+          patch: {
+            formMode: 'created'
+          }
+        }
+      ]
+    },
+    {
+      id: 'update-order-action',
+      steps: [
+        {
+          type: 'callDatasource',
+          datasourceId: 'orders-update-datasource',
+          stateKey: 'tableData'
+        },
+        {
+          type: 'setState',
+          patch: {
+            formMode: 'updated'
+          }
+        }
+      ]
+    },
+    {
+      id: 'delete-order-action',
+      steps: [
+        {
+          type: 'callDatasource',
+          datasourceId: 'orders-delete-datasource',
+          stateKey: 'tableData'
+        },
+        {
+          type: 'setState',
+          patch: {
+            formMode: 'deleted'
+          }
+        }
+      ]
+    },
+    {
+      id: 'select-row-action',
+      steps: [
+        {
+          type: 'callDatasource',
+          datasourceId: 'extract-row-id-datasource',
+          stateKey: 'selectedOrderId'
+        },
+        {
+          type: 'callDatasource',
+          datasourceId: 'extract-row-id-datasource',
+          stateKey: 'formOrderId'
+        },
+        {
+          type: 'callDatasource',
+          datasourceId: 'extract-row-owner-datasource',
+          stateKey: 'formOwner'
+        },
+        {
+          type: 'callDatasource',
+          datasourceId: 'extract-row-channel-datasource',
+          stateKey: 'formChannel'
+        },
+        {
+          type: 'callDatasource',
+          datasourceId: 'extract-row-priority-datasource',
+          stateKey: 'formPriority'
+        },
+        {
+          type: 'callDatasource',
+          datasourceId: 'extract-row-status-datasource',
+          stateKey: 'formStatus'
+        },
+        {
+          type: 'setState',
+          patch: {
+            formMode: 'editing'
+          }
+        }
+      ]
+    },
+    {
+      id: 'clear-editor-action',
+      steps: [
+        {
+          type: 'setState',
+          patch: {
+            selectedOrderId: '',
+            formOrderId: '',
+            formOwner: '',
+            formChannel: 'web',
+            formPriority: 'medium',
+            formStatus: 'active',
+            formMode: 'idle'
+          }
+        }
+      ]
+    }
+  ];
+}
+
+function createOrdersLayoutTree(): NgxLowcodeNodeSchema[] {
+  return [
+    {
+      id: 'orders-page-root',
+      componentType: 'page',
+      props: {
+        title: 'Orders CRUD Demo',
+        description: 'Search + create/update/delete + row click linkage',
+        thyDirection: 'column',
+        thyWrap: 'nowrap',
+        thyGap: 20,
+        thyJustifyContent: 'start',
+        thyAlignItems: 'stretch'
+      },
+      children: [
+        {
+          id: 'query-form',
+          componentType: 'form',
+          props: {
+            title: 'Query Filters',
+            thyLayout: 'horizontal'
+          },
+          children: [
+            {
+              id: 'query-layout',
+              componentType: 'section',
+              props: {
+                title: 'Filter Inputs',
+                thyDirection: 'row',
+                thyWrap: 'wrap',
+                thyGap: 16,
+                thyBasis: '100%'
+              },
+              children: [
+                {
+                  id: 'keyword-input',
+                  componentType: 'input',
+                  props: {
+                    label: 'Keyword',
+                    placeholder: 'Search id or owner',
+                    stateKey: 'keyword',
+                    thyBasis: 'calc(25% - 12px)'
+                  }
+                },
+                {
+                  id: 'owner-input',
+                  componentType: 'input',
+                  props: {
+                    label: 'Owner',
+                    placeholder: 'Owner name',
+                    stateKey: 'owner',
+                    thyBasis: 'calc(25% - 12px)'
+                  }
+                },
+                {
+                  id: 'status-select',
+                  componentType: 'select',
+                  props: {
+                    label: 'Status',
+                    stateKey: 'status',
+                    changeActionId: 'search-action',
+                    thyBasis: 'calc(25% - 12px)',
+                    options: [
+                      { label: 'All', value: 'all' },
+                      { label: 'Active', value: 'active' },
+                      { label: 'Paused', value: 'paused' }
+                    ]
+                  }
+                },
+                {
+                  id: 'channel-select',
+                  componentType: 'select',
+                  props: {
+                    label: 'Channel',
+                    stateKey: 'channel',
+                    changeActionId: 'search-action',
+                    thyBasis: 'calc(25% - 12px)',
+                    options: [
+                      { label: 'All', value: 'all' },
+                      { label: 'Web', value: 'web' },
+                      { label: 'Store', value: 'store' },
+                      { label: 'Partner', value: 'partner' }
+                    ]
+                  }
+                },
+                {
+                  id: 'priority-select',
+                  componentType: 'select',
+                  props: {
+                    label: 'Priority',
+                    stateKey: 'priority',
+                    changeActionId: 'search-action',
+                    thyBasis: 'calc(25% - 12px)',
+                    options: [
+                      { label: 'All', value: 'all' },
+                      { label: 'High', value: 'high' },
+                      { label: 'Medium', value: 'medium' },
+                      { label: 'Low', value: 'low' }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              id: 'query-actions',
+              componentType: 'section',
+              props: {
+                title: 'Query Actions',
+                thyDirection: 'row',
+                thyWrap: 'wrap',
+                thyGap: 12,
+                thyBasis: '100%'
+              },
+              children: [
+                {
+                  id: 'button-search',
+                  componentType: 'button',
+                  props: {
+                    label: 'Search',
+                    buttonType: 'primary',
+                    actionId: 'search-action'
+                  }
+                },
+                {
+                  id: 'button-reset',
+                  componentType: 'button',
+                  props: {
+                    label: 'Reset Filters',
+                    buttonType: 'default',
+                    actionId: 'reset-filters-action'
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'crud-form',
+          componentType: 'form',
+          props: {
+            title: 'Order CRUD Editor',
+            thyLayout: 'horizontal'
+          },
+          children: [
+            {
+              id: 'crud-hint',
+              componentType: 'text',
+              props: {
+                text: 'Selected order: {{ state.selectedOrderId || "none" }} | Mode: {{ state.formMode }}'
+              }
+            },
+            {
+              id: 'crud-input-layout',
+              componentType: 'section',
+              props: {
+                title: 'Editor Fields',
+                thyDirection: 'row',
+                thyWrap: 'wrap',
+                thyGap: 16,
+                thyBasis: '100%'
+              },
+              children: [
+                {
+                  id: 'crud-order-id',
+                  componentType: 'input',
+                  props: {
+                    label: 'Order ID',
+                    stateKey: 'formOrderId',
+                    placeholder: 'SO-A2001',
+                    thyBasis: 'calc(20% - 13px)'
+                  }
+                },
+                {
+                  id: 'crud-owner',
+                  componentType: 'input',
+                  props: {
+                    label: 'Owner',
+                    stateKey: 'formOwner',
+                    placeholder: 'Owner name',
+                    thyBasis: 'calc(20% - 13px)'
+                  }
+                },
+                {
+                  id: 'crud-channel',
+                  componentType: 'select',
+                  props: {
+                    label: 'Channel',
+                    stateKey: 'formChannel',
+                    thyBasis: 'calc(20% - 13px)',
+                    options: [
+                      { label: 'Web', value: 'web' },
+                      { label: 'Store', value: 'store' },
+                      { label: 'Partner', value: 'partner' }
+                    ]
+                  }
+                },
+                {
+                  id: 'crud-priority',
+                  componentType: 'select',
+                  props: {
+                    label: 'Priority',
+                    stateKey: 'formPriority',
+                    thyBasis: 'calc(20% - 13px)',
+                    options: [
+                      { label: 'High', value: 'high' },
+                      { label: 'Medium', value: 'medium' },
+                      { label: 'Low', value: 'low' }
+                    ]
+                  }
+                },
+                {
+                  id: 'crud-status',
+                  componentType: 'select',
+                  props: {
+                    label: 'Status',
+                    stateKey: 'formStatus',
+                    thyBasis: 'calc(20% - 13px)',
+                    options: [
+                      { label: 'Active', value: 'active' },
+                      { label: 'Paused', value: 'paused' }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              id: 'crud-actions',
+              componentType: 'section',
+              props: {
+                title: 'CRUD Actions',
+                thyDirection: 'row',
+                thyWrap: 'wrap',
+                thyGap: 12,
+                thyBasis: '100%'
+              },
+              children: [
+                {
+                  id: 'button-create',
+                  componentType: 'button',
+                  props: {
+                    label: 'Create',
+                    buttonType: 'primary',
+                    actionId: 'create-order-action'
+                  }
+                },
+                {
+                  id: 'button-update',
+                  componentType: 'button',
+                  props: {
+                    label: 'Update',
+                    buttonType: 'default',
+                    actionId: 'update-order-action'
+                  }
+                },
+                {
+                  id: 'button-delete',
+                  componentType: 'button',
+                  props: {
+                    label: 'Delete',
+                    buttonType: 'danger',
+                    actionId: 'delete-order-action'
+                  }
+                },
+                {
+                  id: 'button-clear',
+                  componentType: 'button',
+                  props: {
+                    label: 'Clear Editor',
+                    buttonType: 'default',
+                    actionId: 'clear-editor-action'
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'results-table',
+          componentType: 'table',
+          props: {
+            title: 'Order Results (Row click to edit)',
+            dataKey: 'tableData',
+            rowClickActionId: 'select-row-action',
+            thyBasis: '100%'
+          }
+        }
+      ]
+    }
+  ];
 }
 
 function createTenantMockRows(tenantId: string): Array<Record<string, string>> {

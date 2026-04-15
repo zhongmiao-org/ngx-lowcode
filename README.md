@@ -122,10 +122,17 @@ Demo verification path:
 
 1. Start `meta-lc-bff` with PostgreSQL/Redis.
 2. Open demo and switch `Tenant A` / `Tenant B`.
-3. Trigger orders query via action button.
-4. Capture the preview `request-id`, then confirm table rows are tenant-isolated.
-5. Fallback to mock rows only when BFF is unavailable (`status=0/502/503/504`).
-6. Verify audit row by request id:
+3. In `Query Filters`, trigger query via `Search` button or linked `status/channel/priority` changes.
+4. In `Order CRUD Editor`, run full CRUD flow:
+   - Create: fill `formOrderId/formOwner/formChannel/formPriority/formStatus`, then click `Create`
+   - Update: click a table row to populate editor, change fields, then click `Update`
+   - Delete: select a row or input `formOrderId`, then click `Delete`
+5. Verify widget linkage:
+   - row click populates `selectedOrderId` and editor state fields
+   - `status/channel/priority` changes auto-trigger query refresh
+6. Capture preview `request-id`, then confirm tenant isolation and CRUD result in table.
+7. Fallback to mock rows only when BFF is unavailable (`status=0/502/503/504`).
+8. Verify audit row by request id:
 
 ```sql
 SELECT request_id, tenant_id, status, row_count, error_message, created_at
