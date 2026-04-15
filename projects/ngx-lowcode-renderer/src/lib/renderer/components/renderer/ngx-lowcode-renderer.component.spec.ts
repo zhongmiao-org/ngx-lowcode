@@ -107,6 +107,76 @@ describe('NgxLowcodeRendererComponent', () => {
     ]);
   });
 
+  it('writes empty datasource result into runtime state without throwing', async () => {
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    const schema = structuredClone(mockPageSchema);
+    const datasourceExecutor = jasmine.createSpy('datasourceExecutor').and.resolveTo([]);
+
+    fixture.componentRef.setInput('schema', schema);
+    fixture.componentRef.setInput('datasourceExecutor', datasourceExecutor);
+    await fixture.whenStable();
+
+    const runtime = fixture.componentInstance.runtime();
+    await expectAsync(runtime.executeActionById('search-action')).toBeResolved();
+
+    expect(datasourceExecutor).toHaveBeenCalled();
+    expect(runtime.state()['tableData']).toEqual([]);
+  });
+
+  it('overwrites datasource state on consecutive queries instead of accumulating stale rows', async () => {
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    const schema = structuredClone(mockPageSchema);
+    const datasourceExecutor = jasmine.createSpy('datasourceExecutor').and.callFake(async ({ state }) => {
+      const status = String(state['status'] ?? 'all');
+      if (status === 'paused') {
+        return [{ id: 'SO-4002', owner: 'Bob', status: 'paused' }];
+      }
+      return [{ id: 'SO-4001', owner: 'Alice', status: 'active' }];
+    });
+
+    fixture.componentRef.setInput('schema', schema);
+    fixture.componentRef.setInput('datasourceExecutor', datasourceExecutor);
+    await fixture.whenStable();
+
+    const runtime = fixture.componentInstance.runtime();
+    runtime.setState({ status: 'active' });
+    await runtime.executeActionById('search-action');
+    expect(runtime.state()['tableData']).toEqual([{ id: 'SO-4001', owner: 'Alice', status: 'active' }]);
+
+    runtime.setState({ status: 'paused' });
+    await runtime.executeActionById('search-action');
+    expect(runtime.state()['tableData']).toEqual([{ id: 'SO-4002', owner: 'Bob', status: 'paused' }]);
+    expect(datasourceExecutor).toHaveBeenCalledTimes(2);
+  });
+
+  it('captures datasource errors into runtime state and allows next query to recover', async () => {
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    const schema = structuredClone(mockPageSchema);
+    const datasourceExecutor = jasmine.createSpy('datasourceExecutor').and.callFake(async ({ state }) => {
+      if (String(state['keyword'] ?? '') === 'fail') {
+        throw new Error('datasource unavailable');
+      }
+      return [{ id: 'SO-5001', owner: 'Recovery', status: 'active' }];
+    });
+
+    fixture.componentRef.setInput('schema', schema);
+    fixture.componentRef.setInput('datasourceExecutor', datasourceExecutor);
+    fixture.componentRef.setInput('context', { keyword: 'fail' });
+    await fixture.whenStable();
+
+    const runtime = fixture.componentInstance.runtime();
+    await expectAsync(runtime.executeActionById('search-action')).toBeResolved();
+    expect(runtime.state()['tableData']).toEqual(schema.state['tableData']);
+    expect(runtime.state()['__runtimeDatasourceErrors']).toEqual({
+      'orders-datasource': 'datasource unavailable'
+    });
+
+    runtime.setState({ keyword: '' });
+    await expectAsync(runtime.executeActionById('search-action')).toBeResolved();
+    expect(runtime.state()['tableData']).toEqual([{ id: 'SO-5001', owner: 'Recovery', status: 'active' }]);
+    expect(runtime.state()['__runtimeDatasourceErrors']).toEqual({});
+  });
+
   it('falls back to datasource mockData when no datasource executor is provided', async () => {
     const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
     const schema = structuredClone(mockPageSchema);

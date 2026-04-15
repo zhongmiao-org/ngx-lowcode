@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { createDefaultPageSchema } from 'ngx-lowcode-core-utils';
-import { NgxLowcodePageSchema, NgxLowcodeNodeSchema } from 'ngx-lowcode-core-types';
+import { NgxLowcodeDatasourceDefinition, NgxLowcodePageSchema, NgxLowcodeNodeSchema } from 'ngx-lowcode-core-types';
 import { NgxLowcodeDesignerComponent } from 'ngx-lowcode-designer';
 import { NgxLowcodeDesignerLocale } from 'ngx-lowcode-i18n';
 import { NgxLowcodeRendererComponent } from 'ngx-lowcode-renderer';
@@ -39,6 +39,25 @@ import { ThyIconRegistry } from 'ngx-tethys/icon';
           <button type="button" class="demo-shell__control" (click)="loadPreset('blank')">
             {{ copy().blankPreset }}
           </button>
+          <div class="demo-shell__tenant-switch">
+            <span>{{ copy().tenantLabel }}</span>
+            <button
+              type="button"
+              class="demo-shell__control"
+              [class.demo-shell__control--active]="tenantId() === 'tenant-a'"
+              (click)="switchTenant('tenant-a')"
+            >
+              Tenant A
+            </button>
+            <button
+              type="button"
+              class="demo-shell__control"
+              [class.demo-shell__control--active]="tenantId() === 'tenant-b'"
+              (click)="switchTenant('tenant-b')"
+            >
+              Tenant B
+            </button>
+          </div>
         </div>
 
         <ngx-lowcode-designer
@@ -78,6 +97,10 @@ import { ThyIconRegistry } from 'ngx-tethys/icon';
           <div>
             <strong>{{ schema().actions.length }}</strong>
             <span>{{ copy().actions }}</span>
+          </div>
+          <div>
+            <strong>{{ tenantId() }}</strong>
+            <span>{{ copy().activeTenant }}</span>
           </div>
         </div>
 
@@ -148,6 +171,20 @@ import { ThyIconRegistry } from 'ngx-tethys/icon';
         padding: 8px 14px;
         font-size: 13px;
       }
+      .demo-shell__control--active {
+        border-color: #1d4ed8;
+        color: #1d4ed8;
+      }
+      .demo-shell__tenant-switch {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .demo-shell__tenant-switch span {
+        color: #475467;
+        font-size: 12px;
+        font-weight: 600;
+      }
       .demo-shell__preview {
         background: rgba(255, 255, 255, 0.88);
         border: 1px solid #d0d5dd;
@@ -194,7 +231,10 @@ import { ThyIconRegistry } from 'ngx-tethys/icon';
 export class AppComponent {
   private readonly iconRegistry = inject(ThyIconRegistry);
   private readonly sanitizer = inject(DomSanitizer);
-  protected readonly schema = signal<NgxLowcodePageSchema>(structuredClone(mockPageSchema));
+  protected readonly tenantId = signal<'tenant-a' | 'tenant-b'>('tenant-a');
+  protected readonly schema = signal<NgxLowcodePageSchema>(
+    prepareSchemaForBff(structuredClone(mockPageSchema), this.tenantId())
+  );
   protected readonly lastCommand = signal('ready');
   protected readonly locale = signal<NgxLowcodeDesignerLocale>('zh-CN');
   protected readonly nodeCount = computed(() => this.countNodes(this.schema().layoutTree));
@@ -208,7 +248,7 @@ export class AppComponent {
 
   protected loadPreset(preset: 'orders' | 'landing' | 'blank'): void {
     if (preset === 'orders') {
-      this.schema.set(structuredClone(mockPageSchema));
+      this.schema.set(prepareSchemaForBff(structuredClone(mockPageSchema), this.tenantId()));
       this.lastCommand.set(this.copy().ordersLoaded);
       return;
     }
@@ -228,8 +268,19 @@ export class AppComponent {
           ? '设计器应自动把它归一成 page 根节点。'
           : 'Designer should normalize this into a page root automatically.'
     };
+    blankSchema.state = withTenantState(blankSchema.state, this.tenantId());
     this.schema.set(blankSchema);
     this.lastCommand.set(this.copy().blankLoaded);
+  }
+
+  protected switchTenant(tenantId: 'tenant-a' | 'tenant-b'): void {
+    this.tenantId.set(tenantId);
+    this.schema.update((schema) => {
+      const nextSchema = structuredClone(schema);
+      nextSchema.state = withTenantState(nextSchema.state, tenantId);
+      return nextSchema;
+    });
+    this.lastCommand.set(`${this.copy().tenantSwitched}: ${tenantId}`);
   }
 
   private countNodes(nodes: NgxLowcodeNodeSchema[]): number {
@@ -244,12 +295,15 @@ const demoCopy = {
     ordersPreset: '加载订单查询示例',
     landingPreset: '加载落地页示例',
     blankPreset: '加载空白 Schema',
+    tenantLabel: '租户',
     rendererOnly: '仅渲染器',
     hostPreview: '宿主预览',
     noPageDescription: '暂无页面描述',
     nodes: '节点',
     datasources: '数据源',
     actions: '动作',
+    activeTenant: '当前租户',
+    tenantSwitched: '已切换租户',
     ordersLoaded: '已加载订单示例',
     landingLoaded: '已加载落地页示例',
     blankLoaded: '已加载空白 Schema'
@@ -261,12 +315,15 @@ const demoCopy = {
     ordersPreset: 'Load Orders Demo',
     landingPreset: 'Load Landing Demo',
     blankPreset: 'Load Blank Schema',
+    tenantLabel: 'Tenant',
     rendererOnly: 'renderer only',
     hostPreview: 'Host Preview',
     noPageDescription: 'No page description',
     nodes: 'nodes',
     datasources: 'datasources',
     actions: 'actions',
+    activeTenant: 'active tenant',
+    tenantSwitched: 'tenant switched',
     ordersLoaded: 'orders demo loaded',
     landingLoaded: 'landing demo loaded',
     blankLoaded: 'blank schema loaded'
@@ -332,4 +389,87 @@ function createLandingSchema(): NgxLowcodePageSchema {
       }
     ]
   };
+}
+
+function prepareSchemaForBff(schema: NgxLowcodePageSchema, tenantId: string): NgxLowcodePageSchema {
+  const nextSchema = structuredClone(schema);
+  nextSchema.state = withTenantState(nextSchema.state, tenantId);
+  nextSchema.datasources = nextSchema.datasources.map((datasource) =>
+    datasource.id === 'orders-datasource' ? toBffDatasource(datasource) : datasource
+  );
+  nextSchema.state['tableData'] = createTenantMockRows(tenantId);
+  return nextSchema;
+}
+
+function withTenantState(
+  state: Record<string, unknown>,
+  tenantId: string
+): Record<string, unknown> {
+  return {
+    ...state,
+    tenantId,
+    userId: `demo-${tenantId}-user`,
+    roles: ['USER']
+  };
+}
+
+function toBffDatasource(datasource: NgxLowcodeDatasourceDefinition): NgxLowcodeDatasourceDefinition {
+  return {
+    ...datasource,
+    type: 'rest',
+    request: {
+      method: 'POST',
+      url: '/query',
+      params: {
+        table: 'orders',
+        fields: ['id', 'owner', 'channel', 'priority', 'status']
+      }
+    },
+    mockData: [
+      ...createTenantMockRows('tenant-a'),
+      ...createTenantMockRows('tenant-b')
+    ]
+  };
+}
+
+function createTenantMockRows(tenantId: string): Array<Record<string, string>> {
+  if (tenantId === 'tenant-b') {
+    return [
+      {
+        id: 'SO-B1001',
+        owner: 'Brenda',
+        channel: 'partner',
+        priority: 'high',
+        status: 'active',
+        tenant_id: 'tenant-b'
+      },
+      {
+        id: 'SO-B1002',
+        owner: 'Bryan',
+        channel: 'web',
+        priority: 'low',
+        status: 'paused',
+        tenant_id: 'tenant-b'
+      }
+    ];
+  }
+
+  return [
+    {
+      id: 'SO-A1001',
+      owner: 'Alice',
+      channel: 'web',
+      priority: 'high',
+      status: 'active',
+      tenant_id: 'tenant-a'
+    },
+    {
+      id: 'SO-A1002',
+      owner: 'Aria',
+      channel: 'store',
+      priority: 'medium',
+      status: 'paused',
+      tenant_id: 'tenant-a'
+    }
+  ];
 }

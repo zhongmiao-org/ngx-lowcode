@@ -24,6 +24,8 @@ import { NgxLowcodeDropListRegistryService } from '../../services/drop-list-regi
   providers: [NgxLowcodeDropListRegistryService]
 })
 export class NgxLowcodeRendererComponent {
+  private static readonly runtimeDatasourceErrorsKey = '__runtimeDatasourceErrors';
+
   private readonly config = inject(NGX_LOWCODE_CONFIG, { optional: true }) as NgxLowcodeConfig | null;
 
   readonly schema = input.required<NgxLowcodePageSchema>();
@@ -142,15 +144,21 @@ export class NgxLowcodeRendererComponent {
     }
 
     if (step.type === 'callDatasource' && step.datasourceId) {
-      const result = await this.runtime().executeDatasourceById(step.datasourceId, payload);
-      const datasource = schema.datasources.find((item) => item.id === step.datasourceId);
-      const stateKey = step.stateKey ?? datasource?.responseMapping?.stateKey;
+      try {
+        const result = await this.runtime().executeDatasourceById(step.datasourceId, payload);
+        const datasource = schema.datasources.find((item) => item.id === step.datasourceId);
+        const stateKey = step.stateKey ?? datasource?.responseMapping?.stateKey;
 
-      if (stateKey) {
-        this.stateSignal.update((current) => ({
-          ...current,
-          [stateKey]: result
-        }));
+        if (stateKey) {
+          this.stateSignal.update((current) => ({
+            ...current,
+            [stateKey]: result
+          }));
+        }
+
+        this.clearDatasourceRuntimeError(step.datasourceId);
+      } catch (error) {
+        this.setDatasourceRuntimeError(step.datasourceId, this.resolveErrorMessage(error));
       }
 
       await this.runExternalActionExecutor(schema, action, step, payload);
@@ -180,5 +188,52 @@ export class NgxLowcodeRendererComponent {
     };
 
     await executor(request);
+  }
+
+  private setDatasourceRuntimeError(datasourceId: string, message: string): void {
+    this.stateSignal.update((current) => {
+      const currentErrors = this.getDatasourceRuntimeErrors(current);
+      return {
+        ...current,
+        [NgxLowcodeRendererComponent.runtimeDatasourceErrorsKey]: {
+          ...currentErrors,
+          [datasourceId]: message
+        }
+      };
+    });
+  }
+
+  private clearDatasourceRuntimeError(datasourceId: string): void {
+    this.stateSignal.update((current) => {
+      const currentErrors = this.getDatasourceRuntimeErrors(current);
+      if (!(datasourceId in currentErrors)) {
+        return current;
+      }
+
+      const { [datasourceId]: _removed, ...nextErrors } = currentErrors;
+      return {
+        ...current,
+        [NgxLowcodeRendererComponent.runtimeDatasourceErrorsKey]: nextErrors
+      };
+    });
+  }
+
+  private getDatasourceRuntimeErrors(state: Record<string, unknown>): Record<string, string> {
+    const value = state[NgxLowcodeRendererComponent.runtimeDatasourceErrorsKey];
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      const raw = value as Record<string, unknown>;
+      return Object.entries(raw).reduce<Record<string, string>>((acc, [key, item]) => {
+        acc[key] = String(item ?? '');
+        return acc;
+      }, {});
+    }
+    return {};
+  }
+
+  private resolveErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return String(error ?? 'Unknown datasource error');
   }
 }

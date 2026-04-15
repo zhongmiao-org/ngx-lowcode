@@ -2,9 +2,9 @@ import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core
 import { provideHttpClient } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
-import { provideNgxLowcode } from 'ngx-lowcode-core';
+import { defaultActionExecutor, NGX_LOWCODE_CONFIG } from 'ngx-lowcode-core';
 import { provideNgxLowcodeMaterials } from 'ngx-lowcode-materials';
-import { mockActionExecutor, mockDatasourceExecutor } from 'ngx-lowcode-testing';
+import { DemoBffDatasourceExecutorService } from './demo-bff-datasource-executor.service';
 
 import { routes } from './app.routes';
 
@@ -14,10 +14,14 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideAnimations(),
     provideRouter(routes),
-    provideNgxLowcode({
-      actionExecutor: mockActionExecutor,
-      datasourceExecutor: mockDatasourceExecutor
-    }),
+    {
+      provide: NGX_LOWCODE_CONFIG,
+      useFactory: (executor: DemoBffDatasourceExecutorService) => ({
+        actionExecutor: defaultActionExecutor(),
+        datasourceExecutor: executor.execute
+      }),
+      deps: [DemoBffDatasourceExecutorService]
+    },
     provideNgxLowcodeMaterials()
   ]
 };
