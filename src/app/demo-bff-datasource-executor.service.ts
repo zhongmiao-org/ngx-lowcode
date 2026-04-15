@@ -21,6 +21,15 @@ interface DemoQueryResponse {
   rows: unknown[];
 }
 
+interface DemoOrderRow {
+  id: string;
+  owner: string;
+  channel: string;
+  priority: string;
+  status: string;
+  tenant_id: string;
+}
+
 type DemoQuerySource = 'bff' | 'fallback';
 type DemoQueryStatus = 'success' | 'fallback' | 'error';
 
@@ -36,6 +45,8 @@ export interface DemoQueryExecutionSnapshot {
 
 @Injectable({ providedIn: 'root' })
 export class DemoBffDatasourceExecutorService {
+  private readonly tenantStores = new Map<string, DemoOrderRow[]>();
+
   readonly lastExecution = signal<DemoQueryExecutionSnapshot>({
     requestId: '-',
     source: 'bff',
@@ -48,10 +59,41 @@ export class DemoBffDatasourceExecutorService {
 
   constructor(private readonly http: HttpClient) {}
 
-  execute: NgxLowcodeDatasourceExecutor = async ({ datasource, state }: NgxLowcodeDatasourceRequest) => {
+  execute: NgxLowcodeDatasourceExecutor = async ({
+    datasource,
+    state,
+    payload
+  }: NgxLowcodeDatasourceRequest) => {
+    switch (datasource.id) {
+      case 'orders-create-datasource':
+        return this.createOrder(state);
+      case 'orders-update-datasource':
+        return this.updateOrder(state);
+      case 'orders-delete-datasource':
+        return this.deleteOrder(state);
+      case 'extract-row-id-datasource':
+        return extractPayloadField(payload, 'id');
+      case 'extract-row-owner-datasource':
+        return extractPayloadField(payload, 'owner');
+      case 'extract-row-channel-datasource':
+        return extractPayloadField(payload, 'channel');
+      case 'extract-row-priority-datasource':
+        return extractPayloadField(payload, 'priority');
+      case 'extract-row-status-datasource':
+        return extractPayloadField(payload, 'status');
+      default:
+        return this.queryOrders(datasource, state);
+    }
+  };
+
+  private async queryOrders(
+    datasource: NgxLowcodeDatasourceDefinition,
+    state: Record<string, unknown>
+  ): Promise<DemoOrderRow[]> {
     const endpoint = resolveEndpoint(datasource);
     const payload = toQueryPayload(datasource, state);
     const requestId = crypto.randomUUID();
+    const store = this.getTenantStore(payload.tenantId, datasource);
 
     try {
       const response = await firstValueFrom(
@@ -61,20 +103,24 @@ export class DemoBffDatasourceExecutorService {
           }
         })
       );
-      const rows = Array.isArray(response.rows) ? response.rows : [];
+      const rows = normalizeRows(response.rows, payload.tenantId);
+      if (rows.length > 0) {
+        this.tenantStores.set(payload.tenantId, rows);
+      }
+      const filteredRows = filterRows(this.tenantStores.get(payload.tenantId) ?? rows, state, payload.tenantId);
       this.recordExecution({
         requestId,
         source: 'bff',
         status: 'success',
         tenantId: payload.tenantId,
-        rowCount: rows.length,
+        rowCount: filteredRows.length,
         message: 'query succeeded'
       });
-      return rows;
+      return filteredRows;
     } catch (error) {
       if (shouldFallback(error)) {
         console.warn('[demo] bff unavailable, fallback to mockData', error);
-        const rows = fallbackMockRows(datasource, state);
+        const rows = filterRows(store, state, payload.tenantId);
         this.recordExecution({
           requestId,
           source: 'fallback',
@@ -96,7 +142,90 @@ export class DemoBffDatasourceExecutorService {
       });
       throw error;
     }
-  };
+  }
+
+  private createOrder(state: Record<string, unknown>): DemoOrderRow[] {
+    const tenantId = String(state['tenantId'] ?? 'tenant-a');
+    const store = [...this.getTenantStore(tenantId)];
+    const row = toEditorRow(state, tenantId);
+    if (!row) {
+      return filterRows(store, state, tenantId);
+    }
+
+    const next = store.filter((item) => item.id !== row.id);
+    next.unshift(row);
+    this.tenantStores.set(tenantId, next);
+    this.recordExecution({
+      requestId: 'local-create',
+      source: 'fallback',
+      status: 'success',
+      tenantId,
+      rowCount: next.length,
+      message: `created ${row.id}`
+    });
+    return filterRows(next, state, tenantId);
+  }
+
+  private updateOrder(state: Record<string, unknown>): DemoOrderRow[] {
+    const tenantId = String(state['tenantId'] ?? 'tenant-a');
+    const store = [...this.getTenantStore(tenantId)];
+    const row = toEditorRow(state, tenantId);
+    if (!row) {
+      return filterRows(store, state, tenantId);
+    }
+
+    const index = store.findIndex((item) => item.id === row.id);
+    if (index >= 0) {
+      store[index] = row;
+    } else {
+      store.unshift(row);
+    }
+    this.tenantStores.set(tenantId, store);
+    this.recordExecution({
+      requestId: 'local-update',
+      source: 'fallback',
+      status: 'success',
+      tenantId,
+      rowCount: store.length,
+      message: `updated ${row.id}`
+    });
+    return filterRows(store, state, tenantId);
+  }
+
+  private deleteOrder(state: Record<string, unknown>): DemoOrderRow[] {
+    const tenantId = String(state['tenantId'] ?? 'tenant-a');
+    const targetId = String(state['formOrderId'] ?? state['selectedOrderId'] ?? '').trim();
+    const store = [...this.getTenantStore(tenantId)];
+    if (!targetId) {
+      return filterRows(store, state, tenantId);
+    }
+
+    const next = store.filter((item) => item.id !== targetId);
+    this.tenantStores.set(tenantId, next);
+    this.recordExecution({
+      requestId: 'local-delete',
+      source: 'fallback',
+      status: 'success',
+      tenantId,
+      rowCount: next.length,
+      message: `deleted ${targetId}`
+    });
+    return filterRows(next, state, tenantId);
+  }
+
+  private getTenantStore(tenantId: string, datasource?: NgxLowcodeDatasourceDefinition): DemoOrderRow[] {
+    const existing = this.tenantStores.get(tenantId);
+    if (existing) {
+      return existing;
+    }
+
+    const seedRows =
+      datasource?.mockData && Array.isArray(datasource.mockData)
+        ? normalizeRows(datasource.mockData, tenantId)
+        : createTenantSeedRows(tenantId);
+    this.tenantStores.set(tenantId, seedRows);
+    return seedRows;
+  }
 
   private recordExecution(execution: Omit<DemoQueryExecutionSnapshot, 'happenedAt'>): void {
     this.lastExecution.set({
@@ -225,28 +354,113 @@ function resolveErrorMessage(error: unknown): string {
   return String(error ?? 'unknown error');
 }
 
-function fallbackMockRows(
-  datasource: NgxLowcodeDatasourceDefinition,
-  state: Record<string, unknown>
-): Record<string, unknown>[] {
-  const rows = Array.isArray(datasource.mockData) ? datasource.mockData : [];
-  const tenantId = String(state['tenantId'] ?? 'tenant-a');
+function filterRows(rows: DemoOrderRow[], state: Record<string, unknown>, tenantId: string): DemoOrderRow[] {
   const keyword = String(state['keyword'] ?? '').toLowerCase().trim();
+  const owner = String(state['owner'] ?? '').toLowerCase().trim();
+  const channel = String(state['channel'] ?? 'all');
+  const priority = String(state['priority'] ?? 'all');
   const status = String(state['status'] ?? 'all');
 
   return rows.filter((row) => {
-    if (typeof row !== 'object' || row === null) {
-      return false;
-    }
-    const typed = row as Record<string, unknown>;
-    const rowTenant = String(typed['tenant_id'] ?? typed['tenantId'] ?? '');
+    const rowTenant = String(row.tenant_id ?? '');
     const tenantMatched = !rowTenant || rowTenant === tenantId;
     const keywordMatched =
       !keyword ||
-      Object.values(typed)
+      Object.values(row)
         .map((value) => String(value).toLowerCase())
         .some((value) => value.includes(keyword));
-    const statusMatched = status === 'all' || String(typed['status']) === status;
-    return tenantMatched && keywordMatched && statusMatched;
+    const ownerMatched = !owner || String(row.owner).toLowerCase().includes(owner);
+    const statusMatched = status === 'all' || String(row.status) === status;
+    const channelMatched = channel === 'all' || String(row.channel) === channel;
+    const priorityMatched = priority === 'all' || String(row.priority) === priority;
+    return tenantMatched && keywordMatched && ownerMatched && statusMatched && channelMatched && priorityMatched;
   });
+}
+
+function normalizeRows(input: unknown, tenantId: string): DemoOrderRow[] {
+  if (!Array.isArray(input)) {
+    return [];
+  }
+  return input
+    .filter((item) => typeof item === 'object' && item !== null)
+    .map((item) => normalizeRow(item as Record<string, unknown>, tenantId));
+}
+
+function normalizeRow(row: Record<string, unknown>, tenantId: string): DemoOrderRow {
+  return {
+    id: String(row['id'] ?? ''),
+    owner: String(row['owner'] ?? ''),
+    channel: String(row['channel'] ?? 'web'),
+    priority: String(row['priority'] ?? 'medium'),
+    status: String(row['status'] ?? 'active'),
+    tenant_id: String(row['tenant_id'] ?? row['tenantId'] ?? tenantId)
+  };
+}
+
+function toEditorRow(state: Record<string, unknown>, tenantId: string): DemoOrderRow | null {
+  const id = String(state['formOrderId'] ?? '').trim();
+  if (!id) {
+    return null;
+  }
+  return {
+    id,
+    owner: String(state['formOwner'] ?? '').trim(),
+    channel: String(state['formChannel'] ?? 'web'),
+    priority: String(state['formPriority'] ?? 'medium'),
+    status: String(state['formStatus'] ?? 'active'),
+    tenant_id: tenantId
+  };
+}
+
+function extractPayloadField(payload: unknown, key: keyof DemoOrderRow): string {
+  if (!payload || typeof payload !== 'object') {
+    return '';
+  }
+  const row = (payload as Record<string, unknown>)['row'];
+  if (!row || typeof row !== 'object') {
+    return '';
+  }
+  return String((row as Record<string, unknown>)[key] ?? '');
+}
+
+function createTenantSeedRows(tenantId: string): DemoOrderRow[] {
+  if (tenantId === 'tenant-b') {
+    return [
+      {
+        id: 'SO-B1001',
+        owner: 'Brenda',
+        channel: 'partner',
+        priority: 'high',
+        status: 'active',
+        tenant_id: 'tenant-b'
+      },
+      {
+        id: 'SO-B1002',
+        owner: 'Bryan',
+        channel: 'web',
+        priority: 'low',
+        status: 'paused',
+        tenant_id: 'tenant-b'
+      }
+    ];
+  }
+
+  return [
+    {
+      id: 'SO-A1001',
+      owner: 'Alice',
+      channel: 'web',
+      priority: 'high',
+      status: 'active',
+      tenant_id: 'tenant-a'
+    },
+    {
+      id: 'SO-A1002',
+      owner: 'Aria',
+      channel: 'store',
+      priority: 'medium',
+      status: 'paused',
+      tenant_id: 'tenant-a'
+    }
+  ];
 }

@@ -76,10 +76,17 @@ npm start
 
 1. 启动 `meta-lc-bff` 与 PostgreSQL/Redis。
 2. 打开 demo，在 `Tenant A` 与 `Tenant B` 间切换。
-3. 通过 action 按钮触发订单查询。
-4. 在预览区记录 `request-id`，并验证 table 回填结果按租户隔离。
-5. 仅在 BFF 不可用（如 `status=0/502/503/504`）时回落 mock 数据；其他错误保持错误语义。
-6. 使用以下 SQL 对照审计落盘：
+3. 在 `Query Filters` 中触发查询（`Search` 或 `status/channel/priority` 变更自动触发），验证 table 回填。
+4. 在 `Order CRUD Editor` 中执行完整 CRUD：
+   - Create：填写 `formOrderId/formOwner/formChannel/formPriority/formStatus` 后点 `Create`
+   - Update：点击 table 行回填编辑器后修改字段并点 `Update`
+   - Delete：选择行或输入 `formOrderId` 后点 `Delete`
+5. 验证控件联动：
+   - table 行点击触发 `selectedOrderId + 表单字段` 回填
+   - `status/channel/priority` 变更触发联动查询
+6. 在预览区记录 `request-id`，并验证租户隔离与 CRUD 结果。
+7. 仅在 BFF 不可用（如 `status=0/502/503/504`）时回落 mock 数据；其他错误保持错误语义。
+8. 使用以下 SQL 对照审计落盘：
 
 ```sql
 SELECT request_id, tenant_id, status, row_count, error_message, created_at
