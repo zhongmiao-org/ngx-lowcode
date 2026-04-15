@@ -109,6 +109,22 @@ npm test
 npm start
 ```
 
+## Demo Integration with `meta-lc-bff`
+
+The root `src` demo is wired to BFF `/query` and supports tenant switching.
+
+- default BFF endpoint: `http://localhost:3000/query`
+- runtime override:
+  - `window.__LC_BFF_URL__ = "http://<host>:3000"` before app bootstrap
+  - or set datasource `request.url` to absolute URL
+
+Demo verification path:
+
+1. Start `meta-lc-bff` with PostgreSQL/Redis.
+2. Open demo and switch `Tenant A` / `Tenant B`.
+3. Trigger orders query via action button.
+4. Confirm table rows are tenant-isolated and query fallback is visible only on BFF failure.
+
 ## Build Targets
 
 ```bash

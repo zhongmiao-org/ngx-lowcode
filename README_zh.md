@@ -63,6 +63,22 @@ npm test
 npm start
 ```
 
+## 与 `meta-lc-bff` 的演示联调
+
+根目录 `src` 下的 demo 已接入 BFF `/query`，并支持租户切换演示。
+
+- 默认 BFF 地址：`http://localhost:3000/query`
+- 运行时覆盖方式：
+  - 应用启动前设置 `window.__LC_BFF_URL__ = "http://<host>:3000"`
+  - 或在 datasource `request.url` 中写绝对地址
+
+演示建议路径：
+
+1. 启动 `meta-lc-bff` 与 PostgreSQL/Redis。
+2. 打开 demo，在 `Tenant A` 与 `Tenant B` 间切换。
+3. 通过 action 按钮触发订单查询。
+4. 验证 table 回填结果按租户隔离，且仅在 BFF 不可用时才回落 mock 数据。
+
 ## 构建目标
 
 ```bash
