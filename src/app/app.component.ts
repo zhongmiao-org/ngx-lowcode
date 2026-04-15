@@ -510,15 +510,27 @@ function createOrdersDatasources(): NgxLowcodeDatasourceDefinition[] {
     },
     {
       id: 'orders-create-datasource',
-      type: 'local-crud'
+      type: 'rest',
+      request: {
+        method: 'POST',
+        url: '/mutation'
+      }
     },
     {
       id: 'orders-update-datasource',
-      type: 'local-crud'
+      type: 'rest',
+      request: {
+        method: 'POST',
+        url: '/mutation'
+      }
     },
     {
       id: 'orders-delete-datasource',
-      type: 'local-crud'
+      type: 'rest',
+      request: {
+        method: 'POST',
+        url: '/mutation'
+      }
     },
     {
       id: 'extract-row-id-datasource',
