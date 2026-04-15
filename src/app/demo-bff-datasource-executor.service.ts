@@ -6,6 +6,7 @@ import {
   NgxLowcodeDatasourceExecutor,
   NgxLowcodeDatasourceRequest
 } from 'ngx-lowcode-core-types';
+import { createTenantSeedRows } from './demo-project-schema';
 
 interface DemoQueryRequest {
   table: string;
@@ -36,17 +37,9 @@ interface DemoMutationResponse {
   row: unknown | null;
 }
 
-interface DemoOrderRow {
-  id: string;
-  owner: string;
-  channel: string;
-  priority: string;
-  status: string;
-  tenant_id: string;
-}
-
 type DemoQuerySource = 'bff' | 'fallback';
 type DemoQueryStatus = 'success' | 'fallback' | 'error';
+type DemoRecordRow = Record<string, string>;
 
 export interface DemoQueryExecutionSnapshot {
   requestId: string;
@@ -60,7 +53,7 @@ export interface DemoQueryExecutionSnapshot {
 
 @Injectable({ providedIn: 'root' })
 export class DemoBffDatasourceExecutorService {
-  private readonly tenantStores = new Map<string, DemoOrderRow[]>();
+  private readonly tenantStores = new Map<string, DemoRecordRow[]>();
 
   readonly lastExecution = signal<DemoQueryExecutionSnapshot>({
     requestId: '-',
@@ -79,36 +72,26 @@ export class DemoBffDatasourceExecutorService {
     state,
     payload
   }: NgxLowcodeDatasourceRequest) => {
-    switch (datasource.id) {
-      case 'orders-create-datasource':
-        return this.mutateOrder(datasource, state, 'create');
-      case 'orders-update-datasource':
-        return this.mutateOrder(datasource, state, 'update');
-      case 'orders-delete-datasource':
-        return this.mutateOrder(datasource, state, 'delete');
-      case 'extract-row-id-datasource':
-        return extractPayloadField(payload, 'id');
-      case 'extract-row-owner-datasource':
-        return extractPayloadField(payload, 'owner');
-      case 'extract-row-channel-datasource':
-        return extractPayloadField(payload, 'channel');
-      case 'extract-row-priority-datasource':
-        return extractPayloadField(payload, 'priority');
-      case 'extract-row-status-datasource':
-        return extractPayloadField(payload, 'status');
-      default:
-        return this.queryOrders(datasource, state);
+    if (datasource.type === 'local-payload') {
+      return extractPayloadField(payload, String(datasource.request?.params?.['field'] ?? 'id'));
     }
+
+    const operation = resolveMutationOperation(datasource.id);
+    if (operation) {
+      return this.mutateRecord(datasource, state, operation);
+    }
+
+    return this.queryRecords(datasource, state);
   };
 
-  private async queryOrders(
+  private async queryRecords(
     datasource: NgxLowcodeDatasourceDefinition,
     state: Record<string, unknown>
-  ): Promise<DemoOrderRow[]> {
+  ): Promise<DemoRecordRow[]> {
     const endpoint = resolveEndpoint(datasource);
     const payload = toQueryPayload(datasource, state);
     const requestId = crypto.randomUUID();
-    const store = this.getTenantStore(payload.tenantId, datasource);
+    const store = this.getTenantStore(payload.tenantId, resolveTable(datasource), datasource);
 
     try {
       const response = await firstValueFrom(
@@ -119,7 +102,7 @@ export class DemoBffDatasourceExecutorService {
         })
       );
       const rows = normalizeRows(response.rows, payload.tenantId);
-      this.tenantStores.set(payload.tenantId, rows);
+      this.tenantStores.set(getStoreKey(payload.tenantId, payload.table), rows);
       const filteredRows = filterRows(rows, state, payload.tenantId);
       this.recordExecution({
         requestId,
@@ -132,7 +115,6 @@ export class DemoBffDatasourceExecutorService {
       return filteredRows;
     } catch (error) {
       if (shouldFallback(error)) {
-        console.warn('[demo] bff unavailable, fallback to mockData', error);
         const rows = filterRows(store, state, payload.tenantId);
         this.recordExecution({
           requestId,
@@ -157,13 +139,13 @@ export class DemoBffDatasourceExecutorService {
     }
   }
 
-  private async mutateOrder(
+  private async mutateRecord(
     datasource: NgxLowcodeDatasourceDefinition,
     state: Record<string, unknown>,
     operation: DemoMutationRequest['operation']
-  ): Promise<DemoOrderRow[]> {
+  ): Promise<DemoRecordRow | null> {
     const endpoint = resolveMutationEndpoint(datasource);
-    const payload = toMutationPayload(state, operation);
+    const payload = toMutationPayload(datasource, state, operation);
     const requestId = crypto.randomUUID();
 
     try {
@@ -177,7 +159,17 @@ export class DemoBffDatasourceExecutorService {
       if (response.rowCount < 1) {
         throw new Error(`${operation} affected no rows`);
       }
-      return this.refreshOrders(state, payload.tenantId);
+      this.recordExecution({
+        requestId,
+        source: 'bff',
+        status: 'success',
+        tenantId: payload.tenantId,
+        rowCount: response.rowCount,
+        message: `${operation} succeeded`
+      });
+      return response.row && typeof response.row === 'object'
+        ? normalizeRow(response.row as Record<string, unknown>, payload.tenantId)
+        : null;
     } catch (error) {
       this.recordExecution({
         requestId,
@@ -191,31 +183,13 @@ export class DemoBffDatasourceExecutorService {
     }
   }
 
-  private async refreshOrders(
-    state: Record<string, unknown>,
-    tenantId: string
-  ): Promise<DemoOrderRow[]> {
-    const datasource: NgxLowcodeDatasourceDefinition = {
-      id: 'orders-query-datasource',
-      type: 'rest',
-      request: {
-        method: 'POST',
-        url: '/query',
-        params: {
-          table: 'orders',
-          fields: ['id', 'owner', 'channel', 'priority', 'status', 'tenant_id']
-        }
-      }
-    };
-
-    return this.queryOrders(datasource, {
-      ...state,
-      tenantId
-    });
-  }
-
-  private getTenantStore(tenantId: string, datasource?: NgxLowcodeDatasourceDefinition): DemoOrderRow[] {
-    const existing = this.tenantStores.get(tenantId);
+  private getTenantStore(
+    tenantId: string,
+    table: string,
+    datasource?: NgxLowcodeDatasourceDefinition
+  ): DemoRecordRow[] {
+    const storeKey = getStoreKey(tenantId, table);
+    const existing = this.tenantStores.get(storeKey);
     if (existing) {
       return existing;
     }
@@ -223,8 +197,8 @@ export class DemoBffDatasourceExecutorService {
     const seedRows =
       datasource?.mockData && Array.isArray(datasource.mockData)
         ? normalizeRows(datasource.mockData, tenantId)
-        : createTenantSeedRows(tenantId);
-    this.tenantStores.set(tenantId, seedRows);
+        : createTenantSeedRows(table, tenantId);
+    this.tenantStores.set(storeKey, seedRows);
     return seedRows;
   }
 
@@ -234,6 +208,21 @@ export class DemoBffDatasourceExecutorService {
       happenedAt: new Date().toISOString()
     });
   }
+}
+
+function resolveMutationOperation(
+  datasourceId: string
+): DemoMutationRequest['operation'] | null {
+  if (datasourceId.endsWith('-create-datasource')) {
+    return 'create';
+  }
+  if (datasourceId.endsWith('-update-datasource')) {
+    return 'update';
+  }
+  if (datasourceId.endsWith('-delete-datasource')) {
+    return 'delete';
+  }
+  return null;
 }
 
 function resolveEndpoint(datasource: NgxLowcodeDatasourceDefinition): string {
@@ -274,14 +263,10 @@ function toQueryPayload(
   const userId = String(state['userId'] ?? `${tenantId}-user`);
   const roles = normalizeRoles(state['roles']);
 
-  const table = resolveTable(datasource);
-  const fields = resolveFields(datasource);
-  const filters = resolveFilters(state);
-
   return {
-    table,
-    fields,
-    filters,
+    table: resolveTable(datasource),
+    fields: resolveFields(datasource),
+    filters: resolveFilters(state),
     tenantId,
     userId,
     roles,
@@ -290,33 +275,51 @@ function toQueryPayload(
 }
 
 function toMutationPayload(
+  datasource: NgxLowcodeDatasourceDefinition,
   state: Record<string, unknown>,
   operation: DemoMutationRequest['operation']
 ): DemoMutationRequest {
   const tenantId = String(state['tenantId'] ?? 'tenant-a');
   const userId = String(state['userId'] ?? `${tenantId}-user`);
   const roles = normalizeRoles(state['roles']);
-  const id = String(state['formOrderId'] ?? state['selectedOrderId'] ?? '').trim();
+  const table = resolveTable(datasource);
+  const keyField = String(datasource.request?.params?.['keyField'] ?? 'id');
+  const fieldStateMap = resolveFieldStateMap(datasource);
+  const keyValue = String(state[fieldStateMap[keyField] ?? `form_${keyField}`] ?? state['selectedRecordId'] ?? '').trim();
+
+  const data =
+    operation === 'delete'
+      ? undefined
+      : Object.entries(fieldStateMap).reduce<Record<string, string>>((acc, [fieldName, stateKey]) => {
+          acc[fieldName] = String(state[stateKey] ?? '').trim();
+          return acc;
+        }, {});
 
   return {
-    table: 'orders',
+    table,
     operation,
     tenantId,
     userId,
     roles,
     key: {
-      id
+      [keyField]: keyValue
     },
-    data: operation === 'delete'
-      ? undefined
-      : {
-          id,
-          owner: String(state['formOwner'] ?? '').trim(),
-          channel: String(state['formChannel'] ?? 'web'),
-          priority: String(state['formPriority'] ?? 'medium'),
-          status: String(state['formStatus'] ?? 'active')
-        }
+    data
   };
+}
+
+function resolveFieldStateMap(datasource: NgxLowcodeDatasourceDefinition): Record<string, string> {
+  const raw = datasource.request?.params?.['fieldStateMap'];
+  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+    return Object.entries(raw as Record<string, unknown>).reduce<Record<string, string>>((acc, [field, stateKey]) => {
+      acc[field] = String(stateKey);
+      return acc;
+    }, {});
+  }
+  return resolveFields(datasource).reduce<Record<string, string>>((acc, field) => {
+    acc[field] = `form_${field}`;
+    return acc;
+  }, {});
 }
 
 function resolveTable(datasource: NgxLowcodeDatasourceDefinition): string {
@@ -340,33 +343,42 @@ function resolveFields(datasource: NgxLowcodeDatasourceDefinition): string[] {
   if (Array.isArray(fields) && fields.every((item) => typeof item === 'string')) {
     return fields;
   }
-  return ['id', 'owner', 'channel', 'priority', 'status'];
+  return ['id'];
 }
 
 function resolveFilters(state: Record<string, unknown>): Record<string, string | number | boolean> {
   const filters: Record<string, string | number | boolean> = {};
-  const appendIfValid = (key: string): void => {
-    const value = state[key];
-    if (typeof value === 'string') {
-      const normalized = value.trim();
-      if (!normalized || normalized === 'all') {
-        return;
-      }
-      filters[key] = normalized;
+
+  Object.entries(state).forEach(([key, value]) => {
+    if (!key.startsWith('filter_')) {
       return;
     }
-    if (typeof value === 'number' || typeof value === 'boolean') {
-      filters[key] = value;
-    }
-  };
+    appendFilter(filters, key.replace(/^filter_/, ''), value);
+  });
 
-  appendIfValid('keyword');
-  appendIfValid('owner');
-  appendIfValid('channel');
-  appendIfValid('priority');
-  appendIfValid('status');
+  ['keyword', 'owner', 'channel', 'priority', 'status'].forEach((legacyKey) => {
+    appendFilter(filters, legacyKey, state[legacyKey]);
+  });
 
   return filters;
+}
+
+function appendFilter(
+  target: Record<string, string | number | boolean>,
+  key: string,
+  value: unknown
+): void {
+  if (typeof value === 'string') {
+    const normalized = value.trim();
+    if (!normalized || normalized === 'all') {
+      return;
+    }
+    target[key] = normalized;
+    return;
+  }
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    target[key] = value;
+  }
 }
 
 function normalizeRoles(input: unknown): string[] {
@@ -377,10 +389,7 @@ function normalizeRoles(input: unknown): string[] {
 }
 
 function shouldFallback(error: unknown): boolean {
-  if (!(error instanceof HttpErrorResponse)) {
-    return false;
-  }
-  return [0, 502, 503, 504].includes(error.status);
+  return error instanceof HttpErrorResponse && [0, 502, 503, 504].includes(error.status);
 }
 
 function resolveErrorMessage(error: unknown): string {
@@ -396,30 +405,31 @@ function resolveErrorMessage(error: unknown): string {
   return String(error ?? 'unknown error');
 }
 
-function filterRows(rows: DemoOrderRow[], state: Record<string, unknown>, tenantId: string): DemoOrderRow[] {
-  const keyword = String(state['keyword'] ?? '').toLowerCase().trim();
-  const owner = String(state['owner'] ?? '').toLowerCase().trim();
-  const channel = String(state['channel'] ?? 'all');
-  const priority = String(state['priority'] ?? 'all');
-  const status = String(state['status'] ?? 'all');
+function filterRows(
+  rows: DemoRecordRow[],
+  state: Record<string, unknown>,
+  tenantId: string
+): DemoRecordRow[] {
+  const filters = resolveFilters(state);
 
   return rows.filter((row) => {
-    const rowTenant = String(row.tenant_id ?? '');
+    const rowTenant = String(row['tenant_id'] ?? '');
     const tenantMatched = !rowTenant || rowTenant === tenantId;
-    const keywordMatched =
-      !keyword ||
-      Object.values(row)
-        .map((value) => String(value).toLowerCase())
-        .some((value) => value.includes(keyword));
-    const ownerMatched = !owner || String(row.owner).toLowerCase().includes(owner);
-    const statusMatched = status === 'all' || String(row.status) === status;
-    const channelMatched = channel === 'all' || String(row.channel) === channel;
-    const priorityMatched = priority === 'all' || String(row.priority) === priority;
-    return tenantMatched && keywordMatched && ownerMatched && statusMatched && channelMatched && priorityMatched;
+    return (
+      tenantMatched &&
+      Object.entries(filters).every(([key, value]) => {
+        if (key === 'keyword') {
+          return Object.values(row)
+            .map((item) => String(item).toLowerCase())
+            .some((item) => item.includes(String(value).toLowerCase()));
+        }
+        return String(row[key] ?? '').toLowerCase().includes(String(value).toLowerCase());
+      })
+    );
   });
 }
 
-function normalizeRows(input: unknown, tenantId: string): DemoOrderRow[] {
+function normalizeRows(input: unknown, tenantId: string): DemoRecordRow[] {
   if (!Array.isArray(input)) {
     return [];
   }
@@ -428,33 +438,17 @@ function normalizeRows(input: unknown, tenantId: string): DemoOrderRow[] {
     .map((item) => normalizeRow(item as Record<string, unknown>, tenantId));
 }
 
-function normalizeRow(row: Record<string, unknown>, tenantId: string): DemoOrderRow {
-  return {
-    id: String(row['id'] ?? ''),
-    owner: String(row['owner'] ?? ''),
-    channel: String(row['channel'] ?? 'web'),
-    priority: String(row['priority'] ?? 'medium'),
-    status: String(row['status'] ?? 'active'),
-    tenant_id: String(row['tenant_id'] ?? row['tenantId'] ?? tenantId)
-  };
+function normalizeRow(row: Record<string, unknown>, tenantId: string): DemoRecordRow {
+  return Object.entries({
+    ...row,
+    tenant_id: row['tenant_id'] ?? row['tenantId'] ?? tenantId
+  }).reduce<DemoRecordRow>((acc, [key, value]) => {
+    acc[key] = String(value ?? '');
+    return acc;
+  }, {});
 }
 
-function toEditorRow(state: Record<string, unknown>, tenantId: string): DemoOrderRow | null {
-  const id = String(state['formOrderId'] ?? '').trim();
-  if (!id) {
-    return null;
-  }
-  return {
-    id,
-    owner: String(state['formOwner'] ?? '').trim(),
-    channel: String(state['formChannel'] ?? 'web'),
-    priority: String(state['formPriority'] ?? 'medium'),
-    status: String(state['formStatus'] ?? 'active'),
-    tenant_id: tenantId
-  };
-}
-
-function extractPayloadField(payload: unknown, key: keyof DemoOrderRow): string {
+function extractPayloadField(payload: unknown, key: string): string {
   if (!payload || typeof payload !== 'object') {
     return '';
   }
@@ -465,44 +459,6 @@ function extractPayloadField(payload: unknown, key: keyof DemoOrderRow): string 
   return String((row as Record<string, unknown>)[key] ?? '');
 }
 
-function createTenantSeedRows(tenantId: string): DemoOrderRow[] {
-  if (tenantId === 'tenant-b') {
-    return [
-      {
-        id: 'SO-B1001',
-        owner: 'Brenda',
-        channel: 'partner',
-        priority: 'high',
-        status: 'active',
-        tenant_id: 'tenant-b'
-      },
-      {
-        id: 'SO-B1002',
-        owner: 'Bryan',
-        channel: 'web',
-        priority: 'low',
-        status: 'paused',
-        tenant_id: 'tenant-b'
-      }
-    ];
-  }
-
-  return [
-    {
-      id: 'SO-A1001',
-      owner: 'Alice',
-      channel: 'web',
-      priority: 'high',
-      status: 'active',
-      tenant_id: 'tenant-a'
-    },
-    {
-      id: 'SO-A1002',
-      owner: 'Aria',
-      channel: 'store',
-      priority: 'medium',
-      status: 'paused',
-      tenant_id: 'tenant-a'
-    }
-  ];
+function getStoreKey(tenantId: string, table: string): string {
+  return `${tenantId}:${table}`;
 }

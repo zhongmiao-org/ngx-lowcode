@@ -217,6 +217,66 @@
         }
       }
     },
+    "ngx-lowcode-meta-model": {
+      "projectType": "library",
+      "root": "projects/ngx-lowcode-meta-model",
+      "sourceRoot": "projects/ngx-lowcode-meta-model/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "projects/ngx-lowcode-meta-model/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-lowcode-meta-model/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ngx-lowcode-meta-model/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/ngx-lowcode-meta-model/tsconfig.spec.json",
+            "polyfills": []
+          }
+        }
+      }
+    },
+    "ngx-lowcode-datasource": {
+      "projectType": "library",
+      "root": "projects/ngx-lowcode-datasource",
+      "sourceRoot": "projects/ngx-lowcode-datasource/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "projects/ngx-lowcode-datasource/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-lowcode-datasource/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ngx-lowcode-datasource/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/ngx-lowcode-datasource/tsconfig.spec.json",
+            "polyfills": []
+          }
+        }
+      }
+    },
     "ngx-lowcode-testing": {
       "projectType": "library",
       "root": "projects/ngx-lowcode-testing",
