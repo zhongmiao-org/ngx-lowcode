@@ -16,9 +16,11 @@
       "ngx-lowcode-core-types": ["./dist/ngx-lowcode-core-types"],
       "ngx-lowcode-core-utils": ["./dist/ngx-lowcode-core-utils"],
       "ngx-lowcode-core": ["./dist/ngx-lowcode-core"],
+      "ngx-lowcode-datasource": ["./dist/ngx-lowcode-datasource"],
       "ngx-lowcode-i18n": ["./dist/ngx-lowcode-i18n"],
       "ngx-lowcode-designer": ["./dist/ngx-lowcode-designer"],
       "ngx-lowcode-materials": ["./dist/ngx-lowcode-materials"],
+      "ngx-lowcode-meta-model": ["./dist/ngx-lowcode-meta-model"],
       "ngx-lowcode-puzzle-adapter": ["./dist/ngx-lowcode-puzzle-adapter"],
       "ngx-lowcode-renderer": ["./dist/ngx-lowcode-renderer"],
       "ngx-lowcode-testing": ["./dist/ngx-lowcode-testing"]

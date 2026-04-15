@@ -1,0 +1,12 @@
+{
+  "name": "ngx-lowcode-datasource",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "ngx-lowcode-core-types": "^0.0.1",
+    "ngx-lowcode-meta-model": "^0.0.1"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false
+}

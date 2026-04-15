@@ -4,12 +4,12 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve demo",
-    "build": "ng build ngx-lowcode-core-types && ng build ngx-lowcode-i18n && ng build ngx-lowcode-core-utils && ng build ngx-lowcode-core && ng build ngx-lowcode-renderer && ng build ngx-lowcode-materials && ng build ngx-lowcode-designer && ng build ngx-lowcode-testing && ng build ngx-lowcode-puzzle-adapter && ng build demo",
-    "build:libs": "ng build ngx-lowcode-core-types && ng build ngx-lowcode-i18n && ng build ngx-lowcode-core-utils && ng build ngx-lowcode-core && ng build ngx-lowcode-renderer && ng build ngx-lowcode-materials && ng build ngx-lowcode-designer && ng build ngx-lowcode-testing && ng build ngx-lowcode-puzzle-adapter",
+    "build": "ng build ngx-lowcode-core-types && ng build ngx-lowcode-i18n && ng build ngx-lowcode-core-utils && ng build ngx-lowcode-meta-model && ng build ngx-lowcode-datasource && ng build ngx-lowcode-core && ng build ngx-lowcode-renderer && ng build ngx-lowcode-materials && ng build ngx-lowcode-designer && ng build ngx-lowcode-testing && ng build ngx-lowcode-puzzle-adapter && ng build demo",
+    "build:libs": "ng build ngx-lowcode-core-types && ng build ngx-lowcode-i18n && ng build ngx-lowcode-core-utils && ng build ngx-lowcode-meta-model && ng build ngx-lowcode-datasource && ng build ngx-lowcode-core && ng build ngx-lowcode-renderer && ng build ngx-lowcode-materials && ng build ngx-lowcode-designer && ng build ngx-lowcode-testing && ng build ngx-lowcode-puzzle-adapter",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "watch": "ng build ngx-lowcode-core-types && ng build ngx-lowcode-i18n && ng build ngx-lowcode-core-utils && ng build demo --watch --configuration development",
-    "test": "ng test ngx-lowcode-core --watch=false && ng test ngx-lowcode-renderer --watch=false && ng test ngx-lowcode-materials --watch=false && ng test ngx-lowcode-designer --watch=false && ng test ngx-lowcode-puzzle-adapter --watch=false && ng test demo --watch=false"
+    "watch": "ng build ngx-lowcode-core-types && ng build ngx-lowcode-i18n && ng build ngx-lowcode-core-utils && ng build ngx-lowcode-meta-model && ng build ngx-lowcode-datasource && ng build demo --watch --configuration development",
+    "test": "ng test ngx-lowcode-core --watch=false && ng test ngx-lowcode-meta-model --watch=false && ng test ngx-lowcode-datasource --watch=false && ng test ngx-lowcode-renderer --watch=false && ng test ngx-lowcode-materials --watch=false && ng test ngx-lowcode-designer --watch=false && ng test ngx-lowcode-puzzle-adapter --watch=false && ng test demo --watch=false"
   },
   "private": true,
   "dependencies": {
