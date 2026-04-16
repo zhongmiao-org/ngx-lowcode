@@ -99,6 +99,76 @@ import { DemoWorkspaceService } from './demo-workspace.service';
                 </div>
               </div>
             }
+
+            <div class="workspace-page__card">
+              <div class="workspace-page__header">
+                <div>
+                  <p class="workspace-page__eyebrow">ER</p>
+                  <h3>Relations</h3>
+                </div>
+                <div class="workspace-page__actions">
+                  <button thyButton="outline-primary" size="sm" (click)="addRelationRow()">Add Relation</button>
+                </div>
+              </div>
+
+              @if (workspace.metaModel().relations.length === 0) {
+                <div class="workspace-page__row">
+                  <span>No relation configured yet.</span>
+                </div>
+              } @else {
+                <div class="workspace-page__list">
+                  @for (relation of workspace.metaModel().relations; track relation.id) {
+                    <div class="workspace-page__row">
+                      <select
+                        class="workspace-page__select workspace-page__input--compact"
+                        [value]="relation.fromTableId"
+                        (change)="onRelationFromTableChange(relation.id, $any($event.target).value)"
+                      >
+                        @for (tableId of tableIds(); track tableId) {
+                          <option [value]="tableId">{{ tableId }}</option>
+                        }
+                      </select>
+                      <select
+                        class="workspace-page__select workspace-page__input--compact"
+                        [value]="relation.fromColumnId"
+                        (change)="workspace.updateRelation(relation.id, { fromColumnId: $any($event.target).value })"
+                      >
+                        @for (columnId of columnsForTable(relation.fromTableId); track columnId) {
+                          <option [value]="columnId">{{ columnId }}</option>
+                        }
+                      </select>
+                      <select
+                        class="workspace-page__select workspace-page__input--compact"
+                        [value]="relation.kind"
+                        (change)="workspace.updateRelation(relation.id, { kind: toRelationKind($any($event.target).value) })"
+                      >
+                        <option value="many-to-one">many-to-one</option>
+                        <option value="one-to-many">one-to-many</option>
+                      </select>
+                      <select
+                        class="workspace-page__select workspace-page__input--compact"
+                        [value]="relation.toTableId"
+                        (change)="onRelationToTableChange(relation.id, $any($event.target).value)"
+                      >
+                        @for (tableId of tableIds(); track tableId) {
+                          <option [value]="tableId">{{ tableId }}</option>
+                        }
+                      </select>
+                      <select
+                        class="workspace-page__select workspace-page__input--compact"
+                        [value]="relation.toColumnId"
+                        (change)="workspace.updateRelation(relation.id, { toColumnId: $any($event.target).value })"
+                      >
+                        @for (columnId of columnsForTable(relation.toTableId); track columnId) {
+                          <option [value]="columnId">{{ columnId }}</option>
+                        }
+                      </select>
+                      <button thyButton="outline-danger" size="sm" (click)="workspace.removeRelation(relation.id)">Delete</button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
       </thy-card>
 
       <thy-card thyBordered="false" class="workspace-page__panel">
@@ -181,6 +251,7 @@ import { DemoWorkspaceService } from './demo-workspace.service';
 export class DemoModelPageComponent {
   protected readonly workspace = inject(DemoWorkspaceService);
   protected readonly copy = computed(() => getDemoProjectI18n(this.workspace.locale()));
+  protected readonly tableIds = computed(() => this.workspace.metaModel().tables.map((table) => table.id));
   protected readonly columnTypes: readonly NgxLowcodeMetaColumnType[] = [
     'string',
     'text',
@@ -195,5 +266,32 @@ export class DemoModelPageComponent {
     return this.columnTypes.includes(value as NgxLowcodeMetaColumnType)
       ? (value as NgxLowcodeMetaColumnType)
       : 'string';
+  }
+
+  protected addRelationRow(): void {
+    const tableIds = this.tableIds();
+    const fromTableId = tableIds[0] ?? '';
+    const toTableId = tableIds[1] ?? tableIds[0] ?? '';
+    const fromColumnId = this.columnsForTable(fromTableId)[0] ?? '';
+    const toColumnId = this.columnsForTable(toTableId)[0] ?? '';
+    this.workspace.addRelation(fromTableId, fromColumnId, toTableId, toColumnId);
+  }
+
+  protected columnsForTable(tableId: string): string[] {
+    return this.workspace.metaModel().tables.find((table) => table.id === tableId)?.columns.map((column) => column.id) ?? [];
+  }
+
+  protected onRelationFromTableChange(relationId: string, tableId: string): void {
+    const defaultColumnId = this.columnsForTable(tableId)[0] ?? '';
+    this.workspace.updateRelation(relationId, { fromTableId: tableId, fromColumnId: defaultColumnId });
+  }
+
+  protected onRelationToTableChange(relationId: string, tableId: string): void {
+    const defaultColumnId = this.columnsForTable(tableId)[0] ?? '';
+    this.workspace.updateRelation(relationId, { toTableId: tableId, toColumnId: defaultColumnId });
+  }
+
+  protected toRelationKind(value: string): 'many-to-one' | 'one-to-many' {
+    return value === 'one-to-many' ? 'one-to-many' : 'many-to-one';
   }
 }

@@ -60,4 +60,25 @@ describe('DemoWorkspaceService', () => {
     column = service.metaModel().tables.find((table) => table.id === tableId)?.columns.find((item) => item.id === columnId);
     expect(column?.required).toBeTrue();
   });
+
+  it('supports relation-designer modeling for add/update/remove relation', () => {
+    const initialCount = service.metaModel().relations.length;
+    service.addRelation('orders', 'customer_id', 'customers', 'id', 'many-to-one');
+    expect(service.metaModel().relations.length).toBe(initialCount + 1);
+
+    const relationId = service.metaModel().relations.at(-1)?.id;
+    expect(relationId).toBeTruthy();
+    if (!relationId) {
+      return;
+    }
+
+    service.updateRelation(relationId, { kind: 'one-to-many', toTableId: 'orders', toColumnId: 'id' });
+    const updated = service.metaModel().relations.find((relation) => relation.id === relationId);
+    expect(updated?.kind).toBe('one-to-many');
+    expect(updated?.toTableId).toBe('orders');
+    expect(updated?.toColumnId).toBe('id');
+
+    service.removeRelation(relationId);
+    expect(service.metaModel().relations.find((relation) => relation.id === relationId)).toBeUndefined();
+  });
 });

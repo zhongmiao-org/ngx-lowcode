@@ -139,14 +139,70 @@ export class DemoWorkspaceService {
     if (!orders || !customers) {
       return;
     }
-    const relationId = `${orders.id}-${customers.id}-${model.relations.length + 1}`;
+    this.addRelation(orders.id, 'customer_id', customers.id, 'id', 'many-to-one');
+  }
+
+  addRelation(
+    fromTableId: string,
+    fromColumnId: string,
+    toTableId: string,
+    toColumnId: string,
+    kind: 'many-to-one' | 'one-to-many' = 'many-to-one'
+  ): void {
+    const model = this.metaModel();
+    if (!fromTableId || !fromColumnId || !toTableId || !toColumnId) {
+      return;
+    }
+    const fromExists = model.tables.some((table) => table.id === fromTableId && table.columns.some((column) => column.id === fromColumnId));
+    const toExists = model.tables.some((table) => table.id === toTableId && table.columns.some((column) => column.id === toColumnId));
+    if (!fromExists || !toExists) {
+      return;
+    }
+    const relationId = this.nextRelationId();
     this.metaModel.set(
       appendRelationDraft(
         model,
-        createMetaRelationDraft(relationId, `${orders.id} -> ${customers.id}`, orders.id, 'customer_id', customers.id, 'id')
+        createMetaRelationDraft(relationId, `${fromTableId}.${fromColumnId} -> ${toTableId}.${toColumnId}`, fromTableId, fromColumnId, toTableId, toColumnId, kind)
       )
     );
-    this.lastCommand.set(`foreign key added: ${relationId}`);
+    this.lastCommand.set(`relation added: ${relationId}`);
+  }
+
+  updateRelation(
+    relationId: string,
+    patch: Partial<{
+      fromTableId: string;
+      fromColumnId: string;
+      toTableId: string;
+      toColumnId: string;
+      kind: 'many-to-one' | 'one-to-many';
+    }>
+  ): void {
+    this.metaModel.update((model) => ({
+      ...model,
+      relations: model.relations.map((relation) => {
+        if (relation.id !== relationId) {
+          return relation;
+        }
+        const next = {
+          ...relation,
+          ...patch
+        };
+        return {
+          ...next,
+          name: `${next.fromTableId}.${next.fromColumnId} -> ${next.toTableId}.${next.toColumnId}`
+        };
+      })
+    }));
+    this.lastCommand.set(`relation updated: ${relationId}`);
+  }
+
+  removeRelation(relationId: string): void {
+    this.metaModel.update((model) => ({
+      ...model,
+      relations: model.relations.filter((relation) => relation.id !== relationId)
+    }));
+    this.lastCommand.set(`relation removed: ${relationId}`);
   }
 
   addIndex(tableId: string): void {
@@ -341,6 +397,17 @@ export class DemoWorkspaceService {
 
   private findTableLabel(tableId: string): string {
     return this.metaModel().tables.find((table) => table.id === tableId)?.label ?? tableId;
+  }
+
+  private nextRelationId(): string {
+    const existingIds = new Set(this.metaModel().relations.map((relation) => relation.id));
+    let nextIndex = this.metaModel().relations.length + 1;
+    let nextId = `relation_${nextIndex}`;
+    while (existingIds.has(nextId)) {
+      nextIndex += 1;
+      nextId = `relation_${nextIndex}`;
+    }
+    return nextId;
   }
 }
 
