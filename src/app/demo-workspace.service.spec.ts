@@ -81,4 +81,30 @@ describe('DemoWorkspaceService', () => {
     service.removeRelation(relationId);
     expect(service.metaModel().relations.find((relation) => relation.id === relationId)).toBeUndefined();
   });
+
+  it('applies permission/api designer config into schema and state', () => {
+    service.updatePermissionApiConfig({
+      queryEndpoint: '/query-v2',
+      mutationEndpoint: '/mutation-v2',
+      roles: ['MANAGER', 'USER'],
+      selectedOrgId: 'dept-a-1',
+      permissionScope: 'DEPT_AND_CHILDREN',
+      customOrgIds: ['dept-a-1', 'dept-a-2'],
+      stateKeys: {
+        tenantId: 'tenantId',
+        userId: 'userId',
+        roles: 'roles',
+        selectedRecordId: 'selectedOrderId'
+      },
+      orgIdStateKeys: ['selectedOrgId', 'orgId']
+    });
+
+    expect(service.schema().state['roles']).toEqual(['MANAGER', 'USER']);
+    expect(service.schema().state['selectedOrgId']).toBe('dept-a-1');
+    const queryDatasource = service.schema().datasources.find((datasource) => datasource.id.endsWith('-query-datasource'));
+    const mutationDatasource = service.schema().datasources.find((datasource) => datasource.id.endsWith('-update-datasource'));
+    expect(queryDatasource?.request?.url).toBe('/query-v2');
+    expect(mutationDatasource?.request?.url).toBe('/mutation-v2');
+    expect((mutationDatasource?.request?.params?.['permissionScope'] as string) ?? '').toBe('DEPT_AND_CHILDREN');
+  });
 });
