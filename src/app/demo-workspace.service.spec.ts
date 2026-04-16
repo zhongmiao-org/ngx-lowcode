@@ -107,4 +107,29 @@ describe('DemoWorkspaceService', () => {
     expect(mutationDatasource?.request?.url).toBe('/mutation-v2');
     expect((mutationDatasource?.request?.params?.['permissionScope'] as string) ?? '').toBe('DEPT_AND_CHILDREN');
   });
+
+  it('exports snapshot json and restores from imported snapshot', async () => {
+    service.addTable();
+    const originalTableCount = service.metaModel().tables.length;
+    const exported = service.exportCurrentSnapshotJson('spec-export');
+
+    service.addTable();
+    expect(service.metaModel().tables.length).toBe(originalTableCount + 1);
+
+    await service.importSnapshotJsonAndRestore(exported);
+    expect(service.metaModel().tables.length).toBe(originalTableCount);
+    const listed = await service.listSnapshotPoints();
+    expect(listed.length).toBeGreaterThan(0);
+  });
+
+  it('rejects snapshot import when checksum mismatches', async () => {
+    const exported = JSON.parse(service.exportCurrentSnapshotJson('checksum-test')) as {
+      metadata: { checksum: string };
+    };
+    exported.metadata.checksum = 'fnv1a-bad';
+
+    await expectAsync(service.importSnapshotJsonAndRestore(JSON.stringify(exported))).toBeRejectedWithError(
+      /checksum mismatch/
+    );
+  });
 });
