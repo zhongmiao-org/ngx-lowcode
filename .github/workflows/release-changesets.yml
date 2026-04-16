@@ -44,6 +44,7 @@ jobs:
         run: npm run build:libs
 
       - name: Create version PR or publish
+        id: changesets
         uses: changesets/action@v1
         with:
           version: npm run release:version
@@ -55,3 +56,39 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Finalize root/package changelogs after publish
+        if: ${{ steps.changesets.outputs.published == 'true' }}
+        env:
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+        run: |
+          mkdir -p .tmp
+          node .github/scripts/finalize_published_changelogs.mjs "${PUBLISHED_PACKAGES}"
+
+      - name: Create changelog PR and enable auto-merge
+        if: ${{ steps.changesets.outputs.published == 'true' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet -- CHANGELOG.md CHANGELOG.zh-CN.md projects/*/CHANGELOG.md; then
+            echo "No changelog finalize diff after publish."
+            exit 0
+          fi
+
+          VERSION="$(node -p "require('./projects/ngx-lowcode/package.json').version")"
+          BRANCH="chore/changelog-finalize-${VERSION}-${GITHUB_RUN_ID}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "${BRANCH}"
+          git add CHANGELOG.md CHANGELOG.zh-CN.md projects/*/CHANGELOG.md
+          git commit -m "chore(changelog): finalize ${VERSION} release logs"
+          git push --set-upstream origin "${BRANCH}"
+
+          PR_URL="$(gh pr create \
+            --title "chore(changelog): finalize ${VERSION} release logs" \
+            --body "Automated finalize after publish. Includes root + package changelog updates." \
+            --base main \
+            --head "${BRANCH}")"
+          echo "Created changelog PR: ${PR_URL}"
+          gh pr merge --auto --squash "${PR_URL}"
