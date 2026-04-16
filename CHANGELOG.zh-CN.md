@@ -1,12 +1,31 @@
 [English](CHANGELOG.md) | 中文文档
 
+
 ## [Unreleased]
 
-- chore(release): 新增 @zhongmiao/ngx-lowcode-\* npm 发版流水线。
-- fix(ci): 重新生成 package-lock.json，修复 chokidar/readdirp 导致的 npm ci 失配。
-- feat(release): 切换到 Changesets 子包独立版本与按变更发布模型。
-- docs(changelog): 为 11 个子包补齐独立 changelog 基线。
-- feat(release): 新增总包 `@zhongmiao/ngx-lowcode`，并强制非空 changeset 必须包含总包。
-- feat(release): Draft 改为基于待发布 changeset 自动按子包分组汇总。
-- chore(ci): 新增 `ci-watchdog` 工作流，确定性故障自动开 lockfile 修复 PR，非确定性故障自动建待排查 issue。
-- fix(ci): 升级 actions 到 Node24 兼容版本，并强化 release 流程（监听 `release` 事件 + 本地 dist 路径发包）。
+## 0.1.0 (2026-04-16)
+
+## 发布包清单
+### @zhongmiao/ngx-lowcode-core@0.1.0
+- Initial public scoped release under `@zhongmiao/*`.
+### @zhongmiao/ngx-lowcode-core-types@0.1.0
+- Initial public scoped release under `@zhongmiao/*`.
+### @zhongmiao/ngx-lowcode-core-utils@0.1.0
+- Initial public scoped release under `@zhongmiao/*`.
+### @zhongmiao/ngx-lowcode-datasource@0.1.0
+- Initial public scoped release under `@zhongmiao/*`.
+### @zhongmiao/ngx-lowcode-designer@0.1.0
+- Initial public scoped release under `@zhongmiao/*`.
+### @zhongmiao/ngx-lowcode-i18n@0.1.0
+- Initial public scoped release under `@zhongmiao/*`.
+### @zhongmiao/ngx-lowcode-materials@0.1.0
+- Initial public scoped release under `@zhongmiao/*`.
+### @zhongmiao/ngx-lowcode-meta-model@0.1.0
+- Initial public scoped release under `@zhongmiao/*`.
+### @zhongmiao/ngx-lowcode-puzzle-adapter@0.1.0
+- Initial public scoped release under `@zhongmiao/*`.
+### @zhongmiao/ngx-lowcode-renderer@0.1.0
+- Initial public scoped release under `@zhongmiao/*`.
+### @zhongmiao/ngx-lowcode-testing@0.1.0
+- Initial public scoped release under `@zhongmiao/*`.
+
