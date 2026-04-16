@@ -48,9 +48,9 @@ jobs:
         env:
           CHROME_BIN_REAL: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: |
-          cat > /tmp/chrome-no-sandbox <<'EOF'
+          cat > /tmp/chrome-no-sandbox <<EOF
           #!/usr/bin/env bash
-          exec "" --headless=new --disable-gpu --no-sandbox --disable-dev-shm-usage ""
+          exec "${CHROME_BIN_REAL}" --headless=new --disable-gpu --no-sandbox --disable-dev-shm-usage "\$@"
           EOF
           chmod +x /tmp/chrome-no-sandbox
           CHROME_BIN=/tmp/chrome-no-sandbox npm run test
