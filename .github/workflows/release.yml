@@ -1,0 +1,174 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dist_tag:
+        description: npm dist-tag (latest / next)
+        required: false
+        default: latest
+        type: choice
+        options:
+          - latest
+          - next
+
+concurrency:
+  group: release-manual-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Prepare release metadata
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      release_sha: ${{ steps.meta.outputs.release_sha }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.3.0
+          cache: npm
+
+      - name: Pin npm version
+        run: npm i -g npm@11.4.2
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build libraries
+        run: npm run build:libs
+
+      - name: Version consistency
+        run: npm run version:check
+
+      - name: Compose release metadata from package changelogs
+        run: |
+          mkdir -p .tmp
+          npm run -s release:draft-notes:json > .tmp/release-metadata.json
+          npm run -s release:draft-notes > .tmp/release-draft.md
+
+      - name: Capture release commit
+        id: meta
+        run: |
+          echo "release_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload release metadata artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-metadata
+          path: |
+            .tmp/release-metadata.json
+            .tmp/release-draft.md
+
+  publish:
+    name: Publish npm packages
+    needs:
+      - prepare
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout release commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.release_sha }}
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.3.0
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Pin npm version
+        run: npm i -g npm@11.4.2
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build libraries
+        run: npm run build:libs
+
+      - name: Publish all packages by package.json versions
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [[ -z "${NODE_AUTH_TOKEN}" ]]; then
+            echo "NPM_TOKEN is not configured."
+            exit 1
+          fi
+          npm run publish:all -- --tag "${{ inputs.dist_tag }}"
+
+  finalize-changelog:
+    name: Finalize changelogs and open PR
+    needs:
+      - prepare
+      - publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.3.0
+          cache: npm
+
+      - name: Pin npm version
+        run: npm i -g npm@11.4.2
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download release metadata artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-metadata
+          path: .tmp
+
+      - name: Finalize root/package changelogs
+        run: |
+          npm run -s release:finalize-unreleased -- .tmp/release-metadata.json
+
+      - name: Create changelog PR and enable auto-merge
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet -- CHANGELOG.md CHANGELOG.zh-CN.md projects/*/CHANGELOG.md; then
+            echo "No changelog changes detected."
+            exit 0
+          fi
+
+          VERSION="$(node -p "require('./projects/ngx-lowcode/package.json').version")"
+          BRANCH="chore/changelog-finalize-${VERSION}-${GITHUB_RUN_ID}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "${BRANCH}"
+          git add CHANGELOG.md CHANGELOG.zh-CN.md projects/*/CHANGELOG.md
+          git commit -m "chore(changelog): finalize ${VERSION} release logs"
+          git push --set-upstream origin "${BRANCH}"
+
+          PR_URL="$(gh pr create \
+            --title "chore(changelog): finalize ${VERSION} release logs" \
+            --body "Automated changelog finalize after manual release publish." \
+            --base main \
+            --head "${BRANCH}")"
+          echo "Created changelog PR: ${PR_URL}"
+          gh pr merge --auto --squash "${PR_URL}"
