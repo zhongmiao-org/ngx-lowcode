@@ -201,4 +201,9 @@ jobs:
             --base main \
             --head "${BRANCH}")"
           echo "Created changelog PR: ${PR_URL}"
-          gh pr merge --auto --squash "${PR_URL}"
+          if gh pr merge --auto --squash "${PR_URL}"; then
+            echo "Enabled auto-merge for ${PR_URL}"
+          else
+            echo "Auto-merge is unavailable for this repository. Falling back to direct squash merge."
+            gh pr merge --squash --delete-branch "${PR_URL}"
+          fi
