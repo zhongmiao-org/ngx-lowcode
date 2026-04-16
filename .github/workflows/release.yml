@@ -11,6 +11,13 @@ on:
         options:
           - latest
           - next
+  release:
+    types:
+      - published
+      - prereleased
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 concurrency:
   group: release-manual-${{ github.ref }}
@@ -26,13 +33,13 @@ jobs:
       release_sha: ${{ steps.meta.outputs.release_sha }}
     steps:
       - name: Checkout main
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
-          ref: main
+          ref: ${{ github.event_name == 'release' && github.event.release.tag_name || 'main' }}
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24.3.0
           cache: npm
@@ -61,7 +68,7 @@ jobs:
           echo "release_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Upload release metadata artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: release-metadata
           path: |
@@ -77,17 +84,16 @@ jobs:
       contents: read
     steps:
       - name: Checkout release commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ needs.prepare.outputs.release_sha }}
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24.3.0
           cache: npm
-          registry-url: https://registry.npmjs.org
 
       - name: Pin npm version
         run: npm i -g npm@11.4.2
@@ -98,6 +104,30 @@ jobs:
       - name: Build libraries
         run: npm run build:libs
 
+      - name: Resolve dist-tag
+        id: dist
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            TAG="${{ inputs.dist_tag }}"
+          elif [[ "${{ github.event.release.prerelease || false }}" == "true" ]]; then
+            TAG="next"
+          else
+            TAG="latest"
+          fi
+          echo "dist_tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Configure npm auth
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [[ -z "${NODE_AUTH_TOKEN}" ]]; then
+            echo "NPM_TOKEN is not configured."
+            exit 1
+          fi
+          cat > ~/.npmrc <<EOF
+          //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+          EOF
+
       - name: Publish all packages by package.json versions
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -106,7 +136,7 @@ jobs:
             echo "NPM_TOKEN is not configured."
             exit 1
           fi
-          npm run publish:all -- --tag "${{ inputs.dist_tag }}"
+          npm run publish:all -- --tag "${{ steps.dist.outputs.dist_tag }}"
 
   finalize-changelog:
     name: Finalize changelogs and open PR
@@ -119,13 +149,13 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout main
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: main
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24.3.0
           cache: npm
@@ -137,7 +167,7 @@ jobs:
         run: npm ci
 
       - name: Download release metadata artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: release-metadata
           path: .tmp

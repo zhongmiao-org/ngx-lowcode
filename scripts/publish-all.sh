@@ -77,7 +77,7 @@ for item in "${PACKAGES[@]}"; do
   fi
 
   echo "Publishing ${pkg}@${SOURCE_VERSION} with dist-tag ${DIST_TAG}"
-  npm publish "${dist_dir}" --tag "${DIST_TAG}" --access public
+  npm publish "./${dist_dir}" --tag "${DIST_TAG}" --access public --registry https://registry.npmjs.org
 
 done
 
