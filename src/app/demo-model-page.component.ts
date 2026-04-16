@@ -5,6 +5,7 @@ import { ThyCardModule } from 'ngx-tethys/card';
 import { ThyEmptyModule } from 'ngx-tethys/empty';
 import { ThyResultModule } from 'ngx-tethys/result';
 import { ThyTagModule } from 'ngx-tethys/tag';
+import type { NgxLowcodeMetaColumnType } from 'ngx-lowcode-meta-model';
 import { DemoWorkspaceService } from './demo-workspace.service';
 
 @Component({
@@ -59,12 +60,37 @@ import { DemoWorkspaceService } from './demo-workspace.service';
                         [value]="column.name"
                         (input)="workspace.renameColumn(table.id, column.id, $any($event.target).value)"
                       />
-                      <thy-tag thyColor="default" thyTheme="outline" thySize="sm">{{ column.type }}</thy-tag>
+                      <select
+                        class="workspace-page__select workspace-page__input--compact"
+                        [value]="column.type"
+                        (change)="workspace.setColumnType(table.id, column.id, toColumnType($any($event.target).value))"
+                      >
+                        @for (type of columnTypes; track type) {
+                          <option [value]="type">{{ type }}</option>
+                        }
+                      </select>
                       <thy-tags>
                         <thy-tag [thyColor]="column.primary ? 'danger' : (column.required ? 'success' : 'default')" thyTheme="weak-fill" thySize="sm">
                           {{ column.primary ? 'PK' : (column.required ? 'REQ' : 'OPT') }}
                         </thy-tag>
                       </thy-tags>
+                      <label class="workspace-page__switch">
+                        <input
+                          type="checkbox"
+                          [checked]="column.required"
+                          [disabled]="column.primary"
+                          (change)="workspace.setColumnRequired(table.id, column.id, $any($event.target).checked)"
+                        />
+                        Required
+                      </label>
+                      <label class="workspace-page__switch">
+                        <input
+                          type="checkbox"
+                          [checked]="column.primary"
+                          (change)="workspace.setColumnPrimary(table.id, column.id, $any($event.target).checked)"
+                        />
+                        Primary
+                      </label>
                       <button thyButton="outline-danger" size="sm" (click)="workspace.removeColumn(table.id, column.id)">
                         Delete
                       </button>
@@ -131,6 +157,20 @@ import { DemoWorkspaceService } from './demo-workspace.service';
       .workspace-page__tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
       .workspace-page__input { border: 1px solid #cbd5e1; border-radius: 12px; background: #fff; }
       .workspace-page__input { padding: 8px 10px; }
+      .workspace-page__select {
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        background: #fff;
+        padding: 6px 8px;
+        min-width: 98px;
+      }
+      .workspace-page__switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        color: #334155;
+      }
       .workspace-page__input--compact { padding: 6px 8px; }
       .workspace-page__ok { color: #0f766e; font-weight: 600; }
       .workspace-page__code { background: #0f172a; color: #e2e8f0; padding: 10px; border-radius: 12px; overflow: auto; font-size: 11px; }
@@ -141,4 +181,19 @@ import { DemoWorkspaceService } from './demo-workspace.service';
 export class DemoModelPageComponent {
   protected readonly workspace = inject(DemoWorkspaceService);
   protected readonly copy = computed(() => getDemoProjectI18n(this.workspace.locale()));
+  protected readonly columnTypes: readonly NgxLowcodeMetaColumnType[] = [
+    'string',
+    'text',
+    'number',
+    'boolean',
+    'date',
+    'datetime',
+    'json'
+  ];
+
+  protected toColumnType(value: string): NgxLowcodeMetaColumnType {
+    return this.columnTypes.includes(value as NgxLowcodeMetaColumnType)
+      ? (value as NgxLowcodeMetaColumnType)
+      : 'string';
+  }
 }
