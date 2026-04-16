@@ -3,7 +3,19 @@
 
 ## [Unreleased]
 
+- fix(changelog): 为所有子包新增 `CHANGELOG.zh-CN.md`，并对“子包代码改动”启用中英双 changelog 强制门禁。
+- fix(release): 发布元数据与 finalize 改为中英文双通道，避免英文变更被写入中文 changelog。
+
 ## 0.1.0 (2026-04-16)
+
+- chore(release): 新增 @zhongmiao/ngx-lowcode-\* npm 发版流水线。
+- fix(ci): 重新生成 package-lock.json，修复 chokidar/readdirp 导致的 npm ci 失配。
+- feat(release): 切换到 Changesets 子包独立版本与按变更发布模型。
+- docs(changelog): 为 11 个子包补齐独立 changelog 基线。
+- feat(release): 新增总包 `@zhongmiao/ngx-lowcode`，并强制非空 changeset 必须包含总包。
+- feat(release): Draft 改为基于待发布 changeset 自动按子包分组汇总。
+- chore(ci): 新增 `ci-watchdog` 工作流，确定性故障自动开 lockfile 修复 PR，非确定性故障自动建待排查 issue。
+- fix(ci): 升级 actions 到 Node24 兼容版本，并强化 release 流程（监听 `release` 事件 + 本地 dist 路径发包）。
 
 ## 发布包清单
 ### @zhongmiao/ngx-lowcode-core@0.1.0
@@ -28,4 +40,3 @@
 - Initial public scoped release under `@zhongmiao/*`.
 ### @zhongmiao/ngx-lowcode-testing@0.1.0
 - Initial public scoped release under `@zhongmiao/*`.
-

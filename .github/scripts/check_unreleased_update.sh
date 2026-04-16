@@ -32,7 +32,7 @@ if [[ "$(printf '%s\n' "${CHANGED_FILES}" | sed '/^$/d' | wc -l | tr -d ' ')" -e
 fi
 
 CODE_CHANGED="$(printf '%s\n' "${CHANGED_FILES}" \
-  | grep -Ev '^(CHANGELOG\.md|CHANGELOG\.zh-CN\.md|README(\.zh)?\.md|docs/|\.github/|\.changeset/|projects/.+/CHANGELOG\.md$)' || true)"
+  | grep -Ev '^(CHANGELOG\.md|CHANGELOG\.zh-CN\.md|README(\.zh)?\.md|docs/|\.github/|\.changeset/|projects/.+/CHANGELOG(\.zh-CN)?\.md$|projects/.+/README(\.zh)?\.md$)' || true)"
 
 if [[ -z "${CODE_CHANGED}" ]]; then
   echo "No code-impacting files changed, skipping changelog gate."
@@ -76,15 +76,51 @@ has_package_changelog_update() {
   printf '%s\n' "${CHANGED_FILES}" | grep -Eq '^projects/.+/CHANGELOG\.md$'
 }
 
+is_changed_file() {
+  local file="$1"
+  grep -Fxq "${file}" <<< "${CHANGED_FILES}"
+}
+
+collect_changed_package_dirs() {
+  printf '%s\n' "${CHANGED_FILES}" \
+    | grep -E '^projects/[^/]+/' \
+    | grep -Ev '^projects/[^/]+/(CHANGELOG(\.zh-CN)?\.md|README(\.zh)?\.md)$' \
+    | awk -F/ '{print $1 "/" $2}' \
+    | sort -u
+}
+
+validate_package_changelog_pair() {
+  local pkg_dir="$1"
+  local en_file="${pkg_dir}/CHANGELOG.md"
+  local zh_file="${pkg_dir}/CHANGELOG.zh-CN.md"
+
+  if ! is_changed_file "${en_file}" || ! is_changed_file "${zh_file}"; then
+    echo "Package ${pkg_dir} has code changes; both ${en_file} and ${zh_file} must be updated."
+    exit 1
+  fi
+
+  validate_changelog_file "${en_file}"
+  validate_changelog_file "${zh_file}"
+}
+
 if has_changeset_update; then
   node .github/scripts/validate_changeset_policy.mjs "${BASE_REF}" "${HEAD_REF}"
-  echo "Changelog gate passed via changeset update."
+  echo "Changeset policy check passed."
+fi
+
+PACKAGE_DIRS="$(collect_changed_package_dirs || true)"
+if [[ -n "${PACKAGE_DIRS}" ]]; then
+  while IFS= read -r pkg_dir; do
+    [[ -z "${pkg_dir}" ]] && continue
+    validate_package_changelog_pair "${pkg_dir}"
+  done <<< "${PACKAGE_DIRS}"
+  echo "Changelog gate passed via bilingual package changelog updates."
   exit 0
 fi
 
 if has_package_changelog_update; then
-  echo "Changelog gate passed via package changelog update."
-  exit 0
+  echo "Package changelog files changed without package code changes."
+  echo "Skipping package bilingual requirement and continuing to root gate checks."
 fi
 
 validate_changelog_file "CHANGELOG.md"

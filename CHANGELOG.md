@@ -3,6 +3,9 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+- fix(changelog): add per-package `CHANGELOG.zh-CN.md` and enforce bilingual changelog updates for package code changes.
+- fix(release): split package release metadata/finalize flow into English and Chinese channels to avoid cross-language pollution.
+
 ## 0.1.0 (2026-04-16)
 
 ## Released Packages
@@ -28,4 +31,3 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 - Initial public scoped release under `@zhongmiao/*`.
 ### @zhongmiao/ngx-lowcode-testing@0.1.0
 - Initial public scoped release under `@zhongmiao/*`.
-

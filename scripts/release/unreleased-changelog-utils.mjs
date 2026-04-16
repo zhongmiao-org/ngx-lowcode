@@ -42,20 +42,24 @@ export function loadPackageReleaseMetadata() {
     if (!entry.isDirectory()) continue;
     const dir = path.join(projectsDir, entry.name);
     const packageJsonPath = path.join(dir, 'package.json');
-    const changelogPath = path.join(dir, 'CHANGELOG.md');
-    if (!fs.existsSync(packageJsonPath) || !fs.existsSync(changelogPath)) continue;
+    const changelogPathEn = path.join(dir, 'CHANGELOG.md');
+    const changelogPathZh = path.join(dir, 'CHANGELOG.zh-CN.md');
+    if (!fs.existsSync(packageJsonPath) || !fs.existsSync(changelogPathEn)) continue;
 
     const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-    const changelog = fs.readFileSync(changelogPath, 'utf8');
-    const unreleased = extractUnreleased(changelog);
-    if (!unreleased) continue;
+    const changelogEn = fs.readFileSync(changelogPathEn, 'utf8');
+    const unreleasedEn = extractUnreleased(changelogEn);
+    const unreleasedZh = fs.existsSync(changelogPathZh) ? readUnreleasedFromFile(changelogPathZh) : '';
+    if (!unreleasedEn && !unreleasedZh) continue;
 
     packages.push({
       name: pkg.name,
       version: pkg.version,
       projectDir: path.relative(process.cwd(), dir),
-      changelogPath: path.relative(process.cwd(), changelogPath),
-      unreleased
+      changelogPathEn: path.relative(process.cwd(), changelogPathEn),
+      changelogPathZh: fs.existsSync(changelogPathZh) ? path.relative(process.cwd(), changelogPathZh) : '',
+      unreleasedEn,
+      unreleasedZh
     });
   }
 

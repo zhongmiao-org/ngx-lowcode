@@ -37,8 +37,14 @@ const runFinalize = (version, bodyFile, changelogFile) => {
 
 const rootLines = ['## Released Packages', ''];
 for (const pkg of packages) {
+  if (!pkg.unreleasedEn || !pkg.unreleasedZh) {
+    console.error(
+      `Package ${pkg.name} must provide both English and Chinese Unreleased content before finalize.`
+    );
+    process.exit(1);
+  }
   rootLines.push(`### ${pkg.name}@${pkg.version}`);
-  rootLines.push(pkg.unreleased);
+  rootLines.push(pkg.unreleasedEn);
   rootLines.push('');
 }
 const rootBodyPath = '.tmp/release-root-body.md';
@@ -49,7 +55,7 @@ if (fs.existsSync('CHANGELOG.zh-CN.md')) {
   const zhLines = ['## 发布包清单', ''];
   for (const pkg of packages) {
     zhLines.push(`### ${pkg.name}@${pkg.version}`);
-    zhLines.push(pkg.unreleased);
+    zhLines.push(pkg.unreleasedZh);
     zhLines.push('');
   }
   const zhBodyPath = '.tmp/release-root-body-zh.md';
@@ -58,7 +64,14 @@ if (fs.existsSync('CHANGELOG.zh-CN.md')) {
 }
 
 for (const pkg of packages) {
-  const bodyPath = `.tmp/release-${pkg.name.replace(/[@/]/g, '_')}.md`;
-  fs.writeFileSync(bodyPath, `${pkg.unreleased}\n`, 'utf8');
-  runFinalize(pkg.version, bodyPath, pkg.changelogPath);
+  const slug = pkg.name.replace(/[@/]/g, '_');
+  const bodyPathEn = `.tmp/release-${slug}.md`;
+  fs.writeFileSync(bodyPathEn, `${pkg.unreleasedEn}\n`, 'utf8');
+  runFinalize(pkg.version, bodyPathEn, pkg.changelogPathEn);
+
+  if (pkg.changelogPathZh) {
+    const bodyPathZh = `.tmp/release-${slug}-zh.md`;
+    fs.writeFileSync(bodyPathZh, `${pkg.unreleasedZh}\n`, 'utf8');
+    runFinalize(pkg.version, bodyPathZh, pkg.changelogPathZh);
+  }
 }
