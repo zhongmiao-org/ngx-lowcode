@@ -50,7 +50,7 @@ jobs:
         run: |
           cat > /tmp/chrome-no-sandbox <<'EOF'
           #!/usr/bin/env bash
-          exec "${CHROME_BIN_REAL}" --no-sandbox --disable-dev-shm-usage "$@"
+          exec "${CHROME_BIN_REAL}" --headless=new --disable-gpu --no-sandbox --disable-dev-shm-usage "$@"
           EOF
           chmod +x /tmp/chrome-no-sandbox
           CHROME_BIN=/tmp/chrome-no-sandbox npm run test
