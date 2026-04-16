@@ -1,0 +1,50 @@
+name: CI Watchdog
+
+on:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+
+jobs:
+  watchdog:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.3.0
+
+      - name: Pin npm version
+        run: npm i -g npm@11.4.2
+
+      - name: Install gh cli auth context
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh auth status
+
+      - name: Run watchdog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RUN_ID=""
+          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+            RUN_ID="${{ github.event.workflow_run.id }}"
+          fi
+          bash .github/scripts/ci_watchdog.sh "${RUN_ID}"

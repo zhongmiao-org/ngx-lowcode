@@ -2,6 +2,9 @@
   "name": "ngx-lowcode",
   "version": "0.1.0",
   "packageManager": "npm@11.4.2",
+  "workspaces": [
+    "projects/*"
+  ],
   "scripts": {
     "ng": "ng",
     "start": "ng serve demo",
@@ -16,8 +19,10 @@
     "publish:all": "bash scripts/publish-all.sh",
     "changeset": "changeset",
     "release:version": "changeset version",
-    "release:publish": "changeset publish",
-    "release:status": "changeset status --verbose"
+    "release:publish": "bash scripts/publish-all.sh",
+    "release:status": "changeset status --verbose",
+    "release:draft-notes": "node scripts/release/compose-draft-notes.mjs",
+    "release:next-version": "node scripts/release/next-aggregate-version.mjs"
   },
   "private": true,
   "dependencies": {

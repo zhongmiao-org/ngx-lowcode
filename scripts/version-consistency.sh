@@ -1,31 +1,35 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_VERSION="$(node -p "require('./package.json').version")"
 PACKAGE_FILES=(projects/*/package.json)
-
 if [[ ${#PACKAGE_FILES[@]} -eq 0 ]]; then
   echo "No project package.json files found under projects/."
   exit 1
 fi
 
-echo "Root version: ${ROOT_VERSION}"
-
+seen_aggregate="false"
 for file in "${PACKAGE_FILES[@]}"; do
   PKG_NAME="$(node -p "require('./${file}').name")"
   PKG_VERSION="$(node -p "require('./${file}').version")"
-  if [[ "${PKG_VERSION}" != "${ROOT_VERSION}" ]]; then
-    echo "Version mismatch: ${PKG_NAME} (${PKG_VERSION}) != root (${ROOT_VERSION})"
+
+  if [[ "${PKG_NAME}" == "@zhongmiao/ngx-lowcode" ]]; then
+    seen_aggregate="true"
+  fi
+
+  if [[ ! "${PKG_NAME}" =~ ^@zhongmiao/ngx-lowcode ]]; then
+    echo "Invalid package scope: ${PKG_NAME}"
+    exit 1
+  fi
+
+  if ! node -e "const semver=process.argv[1];process.exit(/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/.test(semver)?0:1)" "${PKG_VERSION}"; then
+    echo "Invalid semver version for ${PKG_NAME}: ${PKG_VERSION}"
     exit 1
   fi
 done
 
-if [[ -n "${GITHUB_REF_NAME:-}" && "${GITHUB_REF_TYPE:-}" == "tag" ]]; then
-  EXPECTED_TAG="v${ROOT_VERSION}"
-  if [[ "${GITHUB_REF_NAME}" != "${EXPECTED_TAG}" ]]; then
-    echo "Tag/version mismatch: tag=${GITHUB_REF_NAME}, expected=${EXPECTED_TAG}"
-    exit 1
-  fi
+if [[ "${seen_aggregate}" != "true" ]]; then
+  echo "Missing aggregate package @zhongmiao/ngx-lowcode under projects/."
+  exit 1
 fi
 
-echo "Version consistency check passed."
+echo "Version consistency check passed (independent package versions)."

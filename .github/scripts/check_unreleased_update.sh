@@ -77,6 +77,7 @@ has_package_changelog_update() {
 }
 
 if has_changeset_update; then
+  node .github/scripts/validate_changeset_policy.mjs "${BASE_REF}" "${HEAD_REF}"
   echo "Changelog gate passed via changeset update."
   exit 0
 fi
