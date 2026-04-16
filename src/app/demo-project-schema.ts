@@ -2,6 +2,9 @@ import type { NgxLowcodeDatasourceDefinition, NgxLowcodePageSchema } from 'ngx-l
 import { bindDatasourceToNode, createCrudPageSchema, createDatasourceDraftsFromModel, createQueryPageSchema, type NgxLowcodeDatasourceDraft } from 'ngx-lowcode-datasource';
 import { createCommerceModelPreset, type NgxLowcodeMetaModelDraft } from 'ngx-lowcode-meta-model';
 
+const DEMO_SELECTED_ORDER_STATE_KEY = 'selectedOrderId';
+const DEMO_ORG_ID_STATE_KEYS = ['orgId', 'form_org_id', 'org_id', 'selectedOrgId'] as const;
+
 export function createDemoMetaModelPreset(): NgxLowcodeMetaModelDraft {
   return createCommerceModelPreset();
 }
@@ -41,21 +44,22 @@ export function createDemoGeneratedSchema(
     dataKey: 'tableData',
     rowClickActionId: 'select-row-action'
   });
+  const orchestrated = applyDemoOrchestrationConventions(hydrated, draft, tenantId);
 
   return {
-    ...hydrated,
+    ...orchestrated,
     pageMeta: {
-      ...hydrated.pageMeta,
+      ...orchestrated.pageMeta,
       description:
         kind === 'crud'
           ? `Commercial demo workspace for ${draft.tableId} with model-driven CRUD generation.`
           : `Commercial demo workspace for ${draft.tableId} with model-driven query generation.`
     },
     state: {
-      ...hydrated.state,
+      ...orchestrated.state,
       tableData: createTenantSeedRows(draft.tableId, tenantId)
     },
-    datasources: hydrated.datasources.map((datasource: NgxLowcodeDatasourceDefinition) =>
+    datasources: orchestrated.datasources.map((datasource: NgxLowcodeDatasourceDefinition) =>
       datasource.id === `${draft.tableId}-query-datasource`
         ? {
             ...datasource,
@@ -63,6 +67,132 @@ export function createDemoGeneratedSchema(
           }
         : datasource
     )
+  };
+}
+
+function applyDemoOrchestrationConventions(
+  schema: NgxLowcodePageSchema,
+  draft: NgxLowcodeDatasourceDraft,
+  tenantId: string
+): NgxLowcodePageSchema {
+  const selectedStateValue = String(schema.state['selectedRecordId'] ?? '');
+
+  return {
+    ...schema,
+    state: {
+      ...schema.state,
+      tenantId,
+      userId: `demo-${tenantId}-user`,
+      roles: Array.isArray(schema.state['roles']) ? schema.state['roles'] : ['USER'],
+      selectedRecordId: selectedStateValue,
+      [DEMO_SELECTED_ORDER_STATE_KEY]: selectedStateValue
+    },
+    datasources: schema.datasources.map((datasource) => withDatasourceOrchestrationConfig(datasource, draft)),
+    actions: schema.actions.map((action) => withActionOrchestrationConfig(action)),
+    layoutTree: schema.layoutTree.map((node) => withLayoutOrchestrationConfig(node))
+  };
+}
+
+function withDatasourceOrchestrationConfig(
+  datasource: NgxLowcodeDatasourceDefinition,
+  draft: NgxLowcodeDatasourceDraft
+): NgxLowcodeDatasourceDefinition {
+  const queryDatasourceId = `${draft.tableId}-query-datasource`;
+  const mutationMatch = datasource.id.match(new RegExp(`^${draft.tableId}-(create|update|delete)-datasource$`));
+  if (datasource.id === queryDatasourceId) {
+    return {
+      ...datasource,
+      request: {
+        ...datasource.request,
+        params: {
+          ...datasource.request?.params,
+          stateKeys: {
+            tenantId: 'tenantId',
+            userId: 'userId',
+            roles: 'roles'
+          },
+          filterStatePrefix: 'filter_'
+        }
+      }
+    };
+  }
+
+  if (mutationMatch) {
+    return {
+      ...datasource,
+      request: {
+        ...datasource.request,
+        params: {
+          ...datasource.request?.params,
+          operation: mutationMatch[1],
+          stateKeys: {
+            tenantId: 'tenantId',
+            userId: 'userId',
+            roles: 'roles',
+            selectedRecordId: DEMO_SELECTED_ORDER_STATE_KEY
+          },
+          orgIdStateKeys: [...DEMO_ORG_ID_STATE_KEYS]
+        }
+      }
+    };
+  }
+
+  return datasource;
+}
+
+function withActionOrchestrationConfig(action: NgxLowcodePageSchema['actions'][number]): NgxLowcodePageSchema['actions'][number] {
+  if (action.id === 'select-row-action') {
+    return {
+      ...action,
+      steps: action.steps.map((step) =>
+        step.type === 'callDatasource' && step.stateKey === 'selectedRecordId'
+          ? {
+              ...step,
+              stateKey: DEMO_SELECTED_ORDER_STATE_KEY
+            }
+          : step
+      )
+    };
+  }
+
+  if (action.id === 'clear-editor-action') {
+    return {
+      ...action,
+      steps: action.steps.map((step) =>
+        step.type === 'setState' && step.patch
+          ? {
+              ...step,
+              patch: {
+                ...step.patch,
+                [DEMO_SELECTED_ORDER_STATE_KEY]: '',
+                selectedRecordId: ''
+              }
+            }
+          : step
+      )
+    };
+  }
+
+  return action;
+}
+
+function withLayoutOrchestrationConfig(node: NgxLowcodePageSchema['layoutTree'][number]): NgxLowcodePageSchema['layoutTree'][number] {
+  const currentText = typeof node.props['text'] === 'string' ? node.props['text'] : null;
+  const patchedText =
+    node.id === 'crud-hint' && currentText
+      ? currentText.replace(/selectedRecordId/g, DEMO_SELECTED_ORDER_STATE_KEY)
+      : currentText;
+
+  return {
+    ...node,
+    props:
+      patchedText === null
+        ? node.props
+        : {
+            ...node.props,
+            text: patchedText
+          },
+    children: node.children?.map((child) => withLayoutOrchestrationConfig(child))
   };
 }
 

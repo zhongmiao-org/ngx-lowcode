@@ -38,6 +38,13 @@ interface DemoMutationResponse {
   row: unknown | null;
 }
 
+interface DemoDatasourceStateKeysConfig {
+  tenantId?: string;
+  userId?: string;
+  roles?: string;
+  selectedRecordId?: string;
+}
+
 type DemoQuerySource = 'bff' | 'fallback';
 type DemoQueryStatus = 'success' | 'fallback' | 'error';
 type DemoRecordRow = Record<string, string>;
@@ -77,7 +84,7 @@ export class DemoBffDatasourceExecutorService {
       return extractPayloadField(payload, String(datasource.request?.params?.['field'] ?? 'id'));
     }
 
-    const operation = resolveMutationOperation(datasource.id);
+    const operation = resolveMutationOperation(datasource);
     if (operation) {
       return this.mutateRecord(datasource, state, operation);
     }
@@ -104,7 +111,7 @@ export class DemoBffDatasourceExecutorService {
       );
       const rows = normalizeRows(response.rows, payload.tenantId);
       this.tenantStores.set(getStoreKey(payload.tenantId, payload.table), rows);
-      const filteredRows = filterRows(rows, state, payload.tenantId);
+      const filteredRows = filterRows(rows, datasource, state, payload.tenantId);
       this.recordExecution({
         requestId,
         source: 'bff',
@@ -116,7 +123,7 @@ export class DemoBffDatasourceExecutorService {
       return filteredRows;
     } catch (error) {
       if (shouldFallback(error)) {
-        const rows = filterRows(store, state, payload.tenantId);
+        const rows = filterRows(store, datasource, state, payload.tenantId);
         this.recordExecution({
           requestId,
           source: 'fallback',
@@ -212,15 +219,20 @@ export class DemoBffDatasourceExecutorService {
 }
 
 function resolveMutationOperation(
-  datasourceId: string
+  datasource: NgxLowcodeDatasourceDefinition
 ): DemoMutationRequest['operation'] | null {
-  if (datasourceId.endsWith('-create-datasource')) {
+  const configured = datasource.request?.params?.['operation'];
+  if (configured === 'create' || configured === 'update' || configured === 'delete') {
+    return configured;
+  }
+
+  if (datasource.id.endsWith('-create-datasource')) {
     return 'create';
   }
-  if (datasourceId.endsWith('-update-datasource')) {
+  if (datasource.id.endsWith('-update-datasource')) {
     return 'update';
   }
-  if (datasourceId.endsWith('-delete-datasource')) {
+  if (datasource.id.endsWith('-delete-datasource')) {
     return 'delete';
   }
   return null;
@@ -260,14 +272,15 @@ function toQueryPayload(
   datasource: NgxLowcodeDatasourceDefinition,
   state: Record<string, unknown>
 ): DemoQueryRequest {
-  const tenantId = String(state['tenantId'] ?? 'tenant-a');
-  const userId = String(state['userId'] ?? `${tenantId}-user`);
-  const roles = normalizeRoles(state['roles']);
+  const stateKeys = resolveStateKeysConfig(datasource);
+  const tenantId = String(state[stateKeys.tenantId] ?? 'tenant-a');
+  const userId = String(state[stateKeys.userId] ?? `${tenantId}-user`);
+  const roles = normalizeRoles(state[stateKeys.roles]);
 
   return {
     table: resolveTable(datasource),
     fields: resolveFields(datasource),
-    filters: resolveFilters(state),
+    filters: resolveFilters(datasource, state),
     tenantId,
     userId,
     roles,
@@ -280,14 +293,17 @@ function toMutationPayload(
   state: Record<string, unknown>,
   operation: DemoMutationRequest['operation']
 ): DemoMutationRequest {
-  const tenantId = String(state['tenantId'] ?? 'tenant-a');
-  const userId = String(state['userId'] ?? `${tenantId}-user`);
-  const roles = normalizeRoles(state['roles']);
+  const stateKeys = resolveStateKeysConfig(datasource);
+  const tenantId = String(state[stateKeys.tenantId] ?? 'tenant-a');
+  const userId = String(state[stateKeys.userId] ?? `${tenantId}-user`);
+  const roles = normalizeRoles(state[stateKeys.roles]);
   const table = resolveTable(datasource);
   const keyField = String(datasource.request?.params?.['keyField'] ?? 'id');
   const fieldStateMap = resolveFieldStateMap(datasource);
-  const keyValue = String(state[fieldStateMap[keyField] ?? `form_${keyField}`] ?? state['selectedRecordId'] ?? '').trim();
-  const orgId = resolveOrgId(state, tenantId);
+  const keyValue = String(
+    state[fieldStateMap[keyField] ?? `form_${keyField}`] ?? state[stateKeys.selectedRecordId] ?? ''
+  ).trim();
+  const orgId = resolveOrgId(datasource, state, tenantId);
 
   const data =
     operation === 'delete'
@@ -311,8 +327,13 @@ function toMutationPayload(
   };
 }
 
-function resolveOrgId(state: Record<string, unknown>, tenantId: string): string {
-  const candidates = [state['orgId'], state['form_org_id'], state['org_id'], state['selectedOrgId']];
+function resolveOrgId(
+  datasource: NgxLowcodeDatasourceDefinition,
+  state: Record<string, unknown>,
+  tenantId: string
+): string {
+  const stateKeys = resolveOrgIdStateKeys(datasource);
+  const candidates = stateKeys.map((stateKey) => state[stateKey]);
   for (const candidate of candidates) {
     if (typeof candidate === 'string' && candidate.trim()) {
       return candidate.trim();
@@ -333,6 +354,25 @@ function resolveFieldStateMap(datasource: NgxLowcodeDatasourceDefinition): Recor
     acc[field] = `form_${field}`;
     return acc;
   }, {});
+}
+
+function resolveStateKeysConfig(datasource: NgxLowcodeDatasourceDefinition): Required<DemoDatasourceStateKeysConfig> {
+  const raw = datasource.request?.params?.['stateKeys'];
+  const normalized = raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as DemoDatasourceStateKeysConfig) : {};
+  return {
+    tenantId: normalized.tenantId?.trim() || 'tenantId',
+    userId: normalized.userId?.trim() || 'userId',
+    roles: normalized.roles?.trim() || 'roles',
+    selectedRecordId: normalized.selectedRecordId?.trim() || 'selectedRecordId'
+  };
+}
+
+function resolveOrgIdStateKeys(datasource: NgxLowcodeDatasourceDefinition): string[] {
+  const raw = datasource.request?.params?.['orgIdStateKeys'];
+  if (Array.isArray(raw) && raw.every((item) => typeof item === 'string' && item.trim())) {
+    return raw.map((item) => item.trim());
+  }
+  return ['orgId', 'form_org_id', 'org_id', 'selectedOrgId'];
 }
 
 function resolveTable(datasource: NgxLowcodeDatasourceDefinition): string {
@@ -359,21 +399,50 @@ function resolveFields(datasource: NgxLowcodeDatasourceDefinition): string[] {
   return ['id'];
 }
 
-function resolveFilters(state: Record<string, unknown>): Record<string, string | number | boolean> {
+function resolveFilters(
+  datasource: NgxLowcodeDatasourceDefinition,
+  state: Record<string, unknown>
+): Record<string, string | number | boolean> {
   const filters: Record<string, string | number | boolean> = {};
+  const prefix = resolveFilterStatePrefix(datasource);
+  const explicitFilterStateKeys = resolveFilterStateKeys(datasource);
 
-  Object.entries(state).forEach(([key, value]) => {
-    if (!key.startsWith('filter_')) {
-      return;
-    }
-    appendFilter(filters, key.replace(/^filter_/, ''), value);
+  explicitFilterStateKeys.forEach((stateKey, filterKey) => {
+    appendFilter(filters, filterKey, state[stateKey]);
   });
 
-  ['keyword', 'owner', 'channel', 'priority', 'status'].forEach((legacyKey) => {
+  Object.entries(state).forEach(([key, value]) => {
+    if (!key.startsWith(prefix)) {
+      return;
+    }
+    appendFilter(filters, key.slice(prefix.length), value);
+  });
+
+  ['keyword', 'owner', 'channel', 'priority', 'status', 'org_id'].forEach((legacyKey) => {
     appendFilter(filters, legacyKey, state[legacyKey]);
   });
 
   return filters;
+}
+
+function resolveFilterStatePrefix(datasource: NgxLowcodeDatasourceDefinition): string {
+  const raw = datasource.request?.params?.['filterStatePrefix'];
+  if (typeof raw === 'string' && raw.trim()) {
+    return raw.trim();
+  }
+  return 'filter_';
+}
+
+function resolveFilterStateKeys(datasource: NgxLowcodeDatasourceDefinition): Map<string, string> {
+  const raw = datasource.request?.params?.['filterStateKeys'];
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return new Map();
+  }
+  return new Map(
+    Object.entries(raw as Record<string, unknown>)
+      .filter(([, value]) => typeof value === 'string' && value.trim())
+      .map(([filterKey, stateKey]) => [filterKey, String(stateKey).trim()])
+  );
 }
 
 function appendFilter(
@@ -420,10 +489,11 @@ function resolveErrorMessage(error: unknown): string {
 
 function filterRows(
   rows: DemoRecordRow[],
+  datasource: NgxLowcodeDatasourceDefinition,
   state: Record<string, unknown>,
   tenantId: string
 ): DemoRecordRow[] {
-  const filters = resolveFilters(state);
+  const filters = resolveFilters(datasource, state);
 
   return rows.filter((row) => {
     const rowTenant = String(row['tenant_id'] ?? '');
