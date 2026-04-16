@@ -10,8 +10,8 @@ import {
   signal
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { findNodeById, findParentNode } from 'ngx-lowcode-core-utils';
-import { NgxLowcodeMaterialRegistry } from 'ngx-lowcode-core';
+import { findNodeById, findParentNode } from '@zhongmiao/ngx-lowcode-core-utils';
+import { NgxLowcodeMaterialRegistry } from '@zhongmiao/ngx-lowcode-core';
 import {
   NgxLowcodeActionDefinition,
   NgxLowcodeActionStep,
@@ -21,8 +21,8 @@ import {
   NgxLowcodeNodeSchema,
   NgxLowcodePageSchema,
   NgxLowcodeSetterDefinition
-} from 'ngx-lowcode-core-types';
-import { NgxLowcodeDesignerI18n, NgxLowcodeLocale } from 'ngx-lowcode-i18n';
+} from '@zhongmiao/ngx-lowcode-core-types';
+import { NgxLowcodeDesignerI18n, NgxLowcodeLocale } from '@zhongmiao/ngx-lowcode-i18n';
 import { ThyButtonModule } from 'ngx-tethys/button';
 import { ThyCollapseModule } from 'ngx-tethys/collapse';
 import { ThyColorPickerModule } from 'ngx-tethys/color-picker';

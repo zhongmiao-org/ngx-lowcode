@@ -15,7 +15,7 @@ import {
   NgxLowcodePageSchema,
   NgxLowcodeRuntimeContext,
   NgxLowcodeWebSocketManager
-} from 'ngx-lowcode-core-types';
+} from '@zhongmiao/ngx-lowcode-core-types';
 import { NgxLowcodeRenderChildrenComponent } from '../render-children/ngx-lowcode-render-children.component';
 import { NgxLowcodeDropListRegistryService } from '../../services/drop-list-registry.service';
 

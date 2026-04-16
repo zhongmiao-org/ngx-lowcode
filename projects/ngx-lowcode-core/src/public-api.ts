@@ -61,4 +61,4 @@ export {
   removeNodeById,
   resolveDropTargetInsertion,
   updateNodeById
-} from 'ngx-lowcode-core-utils';
+} from '@zhongmiao/ngx-lowcode-core-utils';

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { NgxLowcodeRendererComponent } from 'ngx-lowcode-renderer';
-import { getDemoProjectI18n } from 'ngx-lowcode-i18n';
+import { NgxLowcodeRendererComponent } from '@zhongmiao/ngx-lowcode-renderer';
+import { getDemoProjectI18n } from '@zhongmiao/ngx-lowcode-i18n';
 import { ThyCardModule } from 'ngx-tethys/card';
 import { DemoBffDatasourceExecutorService } from './demo-bff-datasource-executor.service';
 import { DemoWorkspaceService } from './demo-workspace.service';

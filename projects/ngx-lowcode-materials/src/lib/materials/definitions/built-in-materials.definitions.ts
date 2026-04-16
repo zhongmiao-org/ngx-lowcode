@@ -1,8 +1,8 @@
 import {
   NgxLowcodeComponentDefinition as MaterialDefinition,
   NgxLowcodeMaterialCreateNodeOptions
-} from 'ngx-lowcode-core-types';
-import { getMaterialsI18n, NgxLowcodeLocale } from 'ngx-lowcode-i18n';
+} from '@zhongmiao/ngx-lowcode-core-types';
+import { getMaterialsI18n, NgxLowcodeLocale } from '@zhongmiao/ngx-lowcode-i18n';
 import { NgxLowcodeButtonMaterialComponent } from '../components/button/ngx-lowcode-button-material.component';
 import { NgxLowcodeFormMaterialComponent } from '../components/form/ngx-lowcode-form-material.component';
 import { NgxLowcodeInputMaterialComponent } from '../components/input/ngx-lowcode-input-material.component';

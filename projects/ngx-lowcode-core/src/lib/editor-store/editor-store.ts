@@ -9,13 +9,13 @@ import {
   moveNode,
   removeNodeById,
   updateNodeById
-} from 'ngx-lowcode-core-utils';
+} from '@zhongmiao/ngx-lowcode-core-utils';
 import {
   NgxLowcodeEditorCommand,
   NgxLowcodeEditorState,
   NgxLowcodeNodeSchema,
   NgxLowcodePageSchema
-} from 'ngx-lowcode-core-types';
+} from '@zhongmiao/ngx-lowcode-core-types';
 import { NgxLowcodeMaterialRegistry } from '../material-registry';
 
 function createInitialEditorState(schema: NgxLowcodePageSchema = createDefaultPageSchema()): NgxLowcodeEditorState {

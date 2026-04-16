@@ -1,7 +1,7 @@
 import { NgComponentOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
-import { NgxLowcodeMaterialRegistry } from 'ngx-lowcode-core';
-import { NgxLowcodeDropTarget, NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
+import { NgxLowcodeMaterialRegistry } from '@zhongmiao/ngx-lowcode-core';
+import { NgxLowcodeDropTarget, NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from '@zhongmiao/ngx-lowcode-core-types';
 
 @Component({
   selector: 'ngx-lowcode-node-renderer',

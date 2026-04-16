@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import type { NgxLowcodeNodeSchema, NgxLowcodePageSchema } from 'ngx-lowcode-core-types';
-import { bindDatasourceToNode, createDatasourceDraftsFromModel, type NgxLowcodeDatasourceDraft } from 'ngx-lowcode-datasource';
+import type { NgxLowcodeNodeSchema, NgxLowcodePageSchema } from '@zhongmiao/ngx-lowcode-core-types';
+import { bindDatasourceToNode, createDatasourceDraftsFromModel, type NgxLowcodeDatasourceDraft } from '@zhongmiao/ngx-lowcode-datasource';
 import {
   appendColumnDraft,
   appendIndexDraft,
@@ -16,8 +16,8 @@ import {
   type NgxLowcodeMetaColumnType,
   type NgxLowcodeMetaIndexDraft,
   type NgxLowcodeMetaModelDraft
-} from 'ngx-lowcode-meta-model';
-import { NgxLowcodeDesignerLocale } from 'ngx-lowcode-i18n';
+} from '@zhongmiao/ngx-lowcode-meta-model';
+import { NgxLowcodeDesignerLocale } from '@zhongmiao/ngx-lowcode-i18n';
 import { DemoDslSnapshotRecord, DemoSnapshotStoreService } from './demo-snapshot-store.service';
 import { createDemoGeneratedSchema, createOrdersDemoSchema } from './demo-project-schema';
 

@@ -2,8 +2,8 @@ import { CdkDragEnd, CdkDragStart, DragDropModule } from '@angular/cdk/drag-drop
 
 import { ChangeDetectionStrategy, Component, OnChanges, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgxLowcodeComponentDefinition, NgxLowcodeNodeSchema, NgxLowcodePageSchema } from 'ngx-lowcode-core-types';
-import { getMaterialsI18n, NgxLowcodeDesignerI18n, NgxLowcodeLocale } from 'ngx-lowcode-i18n';
+import { NgxLowcodeComponentDefinition, NgxLowcodeNodeSchema, NgxLowcodePageSchema } from '@zhongmiao/ngx-lowcode-core-types';
+import { getMaterialsI18n, NgxLowcodeDesignerI18n, NgxLowcodeLocale } from '@zhongmiao/ngx-lowcode-i18n';
 import { ThyButtonModule } from 'ngx-tethys/button';
 import { ThyInputModule } from 'ngx-tethys/input';
 import { ThyTabsModule } from 'ngx-tethys/tabs';

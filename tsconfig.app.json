@@ -6,16 +6,16 @@
     "outDir": "./out-tsc/app",
     "types": [],
     "paths": {
-      "ngx-lowcode-core-types": ["projects/ngx-lowcode-core-types/src/public-api.ts"],
-      "ngx-lowcode-core-utils": ["projects/ngx-lowcode-core-utils/src/public-api.ts"],
-      "ngx-lowcode-core": ["projects/ngx-lowcode-core/src/public-api.ts"],
-      "ngx-lowcode-datasource": ["projects/ngx-lowcode-datasource/src/public-api.ts"],
-      "ngx-lowcode-i18n": ["projects/ngx-lowcode-i18n/src/public-api.ts"],
-      "ngx-lowcode-designer": ["projects/ngx-lowcode-designer/src/public-api.ts"],
-      "ngx-lowcode-materials": ["projects/ngx-lowcode-materials/src/public-api.ts"],
-      "ngx-lowcode-meta-model": ["projects/ngx-lowcode-meta-model/src/public-api.ts"],
-      "ngx-lowcode-renderer": ["projects/ngx-lowcode-renderer/src/public-api.ts"],
-      "ngx-lowcode-testing": ["projects/ngx-lowcode-testing/src/public-api.ts"]
+      "@zhongmiao/ngx-lowcode-core-types": ["projects/ngx-lowcode-core-types/src/public-api.ts"],
+      "@zhongmiao/ngx-lowcode-core-utils": ["projects/ngx-lowcode-core-utils/src/public-api.ts"],
+      "@zhongmiao/ngx-lowcode-core": ["projects/ngx-lowcode-core/src/public-api.ts"],
+      "@zhongmiao/ngx-lowcode-datasource": ["projects/ngx-lowcode-datasource/src/public-api.ts"],
+      "@zhongmiao/ngx-lowcode-i18n": ["projects/ngx-lowcode-i18n/src/public-api.ts"],
+      "@zhongmiao/ngx-lowcode-designer": ["projects/ngx-lowcode-designer/src/public-api.ts"],
+      "@zhongmiao/ngx-lowcode-materials": ["projects/ngx-lowcode-materials/src/public-api.ts"],
+      "@zhongmiao/ngx-lowcode-meta-model": ["projects/ngx-lowcode-meta-model/src/public-api.ts"],
+      "@zhongmiao/ngx-lowcode-renderer": ["projects/ngx-lowcode-renderer/src/public-api.ts"],
+      "@zhongmiao/ngx-lowcode-testing": ["projects/ngx-lowcode-testing/src/public-api.ts"]
     }
   },
   "files": [

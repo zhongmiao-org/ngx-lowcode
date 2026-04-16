@@ -6,7 +6,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { By } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideNgxLowcodeMaterials } from 'ngx-lowcode-materials';
+import { provideNgxLowcodeMaterials } from '@zhongmiao/ngx-lowcode-materials';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
 

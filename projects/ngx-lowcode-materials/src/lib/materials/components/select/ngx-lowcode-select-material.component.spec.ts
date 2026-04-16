@@ -1,6 +1,6 @@
 import { signal, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
+import { NgxLowcodeRuntimeContext } from '@zhongmiao/ngx-lowcode-core-types';
 import { NgxLowcodeSelectMaterialComponent } from './ngx-lowcode-select-material.component';
 
 describe('NgxLowcodeSelectMaterialComponent', () => {

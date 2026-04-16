@@ -109,10 +109,32 @@ ng build demo
 
 ## 发布方向
 
-当前内部是多包结构，推荐的对外发布形态是：
+当前内部是多包结构，对外 npm scope 固定为 `@zhongmiao/*`。
 
-- 默认安装入口：`ngx-lowcode`
-- 高级按需入口：`ngx-lowcode-core`、`ngx-lowcode-renderer`、`ngx-lowcode-designer`、`ngx-lowcode-materials`
-- 可选适配包：`ngx-lowcode-puzzle-adapter`
+- 核心链路包：
+  - `@zhongmiao/ngx-lowcode-core-types`
+  - `@zhongmiao/ngx-lowcode-i18n`
+  - `@zhongmiao/ngx-lowcode-core-utils`
+  - `@zhongmiao/ngx-lowcode-meta-model`
+  - `@zhongmiao/ngx-lowcode-datasource`
+  - `@zhongmiao/ngx-lowcode-core`
+- 运行与设计包：
+  - `@zhongmiao/ngx-lowcode-renderer`
+  - `@zhongmiao/ngx-lowcode-materials`
+  - `@zhongmiao/ngx-lowcode-designer`
+- 支撑包：
+  - `@zhongmiao/ngx-lowcode-testing`
+  - `@zhongmiao/ngx-lowcode-puzzle-adapter`
 
-聚合包负责对外暴露稳定 API，内部仍保持明确的职责边界。
+## 发布流程
+
+- CI：`.github/workflows/ci.yml` 在 PR 执行 lint/test/build + changelog gate。
+- 草稿：`.github/workflows/release-draft.yml` 在 `main` 自动更新 Release Draft（来源 `CHANGELOG.md`）。
+- 空窗期：若 `## [Unreleased]` 为空，Draft 流程成功跳过，不再报红。
+- 发布：手动点击 Draft 的 **Publish release** 后，`.github/workflows/release-publish.yml` 自动发布 11 个子包。
+
+发布前置条件：
+
+- 仓库或组织已配置 `NPM_TOKEN`
+- 版本一致性通过（`npm run version:check`）
+- 构建产物就绪（Workflow 内执行 `npm run build:libs`）

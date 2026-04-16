@@ -1,6 +1,6 @@
 {
   "name": "ngx-lowcode",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve demo",
@@ -9,7 +9,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "watch": "ng build ngx-lowcode-core-types && ng build ngx-lowcode-i18n && ng build ngx-lowcode-core-utils && ng build ngx-lowcode-meta-model && ng build ngx-lowcode-datasource && ng build demo --watch --configuration development",
-    "test": "ng test ngx-lowcode-core --watch=false && ng test ngx-lowcode-meta-model --watch=false && ng test ngx-lowcode-datasource --watch=false && ng test ngx-lowcode-renderer --watch=false && ng test ngx-lowcode-materials --watch=false && ng test ngx-lowcode-designer --watch=false && ng test ngx-lowcode-puzzle-adapter --watch=false && ng test demo --watch=false"
+    "test": "ng test ngx-lowcode-core --watch=false && ng test ngx-lowcode-meta-model --watch=false && ng test ngx-lowcode-datasource --watch=false && ng test ngx-lowcode-renderer --watch=false && ng test ngx-lowcode-materials --watch=false && ng test ngx-lowcode-designer --watch=false && ng test ngx-lowcode-puzzle-adapter --watch=false && ng test demo --watch=false",
+    "lint": "npm run format:check",
+    "version:check": "bash scripts/version-consistency.sh",
+    "publish:all": "bash scripts/publish-all.sh"
   },
   "private": true,
   "dependencies": {

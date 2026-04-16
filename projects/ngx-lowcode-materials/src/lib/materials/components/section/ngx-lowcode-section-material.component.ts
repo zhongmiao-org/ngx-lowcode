@@ -1,7 +1,7 @@
 import { CdkDragDrop, CdkDragEnter, CdkDragExit, DragDropModule } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
-import { NgxLowcodeDropTarget, NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
-import { NgxLowcodeNodeRendererComponent } from 'ngx-lowcode-renderer';
+import { NgxLowcodeDropTarget, NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from '@zhongmiao/ngx-lowcode-core-types';
+import { NgxLowcodeNodeRendererComponent } from '@zhongmiao/ngx-lowcode-renderer';
 import { ThyGridModule } from 'ngx-tethys/grid';
 type ThyFlexDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 type ThyFlexWrap = 'nowrap' | 'wrap' | 'wrap-reverse';

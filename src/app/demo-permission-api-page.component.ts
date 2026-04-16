@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { getDemoProjectI18n } from 'ngx-lowcode-i18n';
+import { getDemoProjectI18n } from '@zhongmiao/ngx-lowcode-i18n';
 import { ThyButtonModule } from 'ngx-tethys/button';
 import { ThyCardModule } from 'ngx-tethys/card';
 import { DemoPermissionApiConfig, DemoPermissionScope, DemoWorkspaceService } from './demo-workspace.service';

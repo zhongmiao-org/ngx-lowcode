@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { NgxLowcodeComponentDefinition } from 'ngx-lowcode-core-types';
+import { NgxLowcodeComponentDefinition } from '@zhongmiao/ngx-lowcode-core-types';
 
 @Injectable({
   providedIn: 'root'

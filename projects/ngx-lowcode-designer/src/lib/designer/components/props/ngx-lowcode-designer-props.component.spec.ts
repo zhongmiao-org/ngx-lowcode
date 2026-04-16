@@ -1,9 +1,9 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { registerLowcodeMaterials } from 'ngx-lowcode-core';
-import { getDesignerI18n } from 'ngx-lowcode-i18n';
-import { getBuiltInMaterials } from 'ngx-lowcode-materials';
-import { mockPageSchema } from 'ngx-lowcode-testing';
+import { registerLowcodeMaterials } from '@zhongmiao/ngx-lowcode-core';
+import { getDesignerI18n } from '@zhongmiao/ngx-lowcode-i18n';
+import { getBuiltInMaterials } from '@zhongmiao/ngx-lowcode-materials';
+import { mockPageSchema } from '@zhongmiao/ngx-lowcode-testing';
 import { NgxLowcodeDesignerPropsComponent } from './ngx-lowcode-designer-props.component';
 
 describe('NgxLowcodeDesignerPropsComponent', () => {

@@ -1,9 +1,13 @@
 {
-  "name": "ngx-lowcode-i18n",
-  "version": "0.0.1",
+  "name": "@zhongmiao/ngx-lowcode-i18n",
+  "version": "0.1.0",
   "peerDependencies": {},
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }

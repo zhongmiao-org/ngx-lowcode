@@ -1,12 +1,16 @@
 {
-  "name": "ngx-lowcode-datasource",
-  "version": "0.0.1",
+  "name": "@zhongmiao/ngx-lowcode-datasource",
+  "version": "0.1.0",
   "peerDependencies": {
-    "ngx-lowcode-core-types": "^0.0.1",
-    "ngx-lowcode-meta-model": "^0.0.1"
+    "@zhongmiao/ngx-lowcode-core-types": "^0.1.0",
+    "@zhongmiao/ngx-lowcode-meta-model": "^0.1.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }
