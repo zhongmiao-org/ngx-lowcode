@@ -1,6 +1,7 @@
 {
   "name": "ngx-lowcode",
   "version": "0.1.0",
+  "packageManager": "npm@11.4.2",
   "scripts": {
     "ng": "ng",
     "start": "ng serve demo",
@@ -12,7 +13,11 @@
     "test": "ng test ngx-lowcode-core --watch=false && ng test ngx-lowcode-meta-model --watch=false && ng test ngx-lowcode-datasource --watch=false && ng test ngx-lowcode-renderer --watch=false && ng test ngx-lowcode-materials --watch=false && ng test ngx-lowcode-designer --watch=false && ng test ngx-lowcode-puzzle-adapter --watch=false && ng test demo --watch=false",
     "lint": "npm run format:check",
     "version:check": "bash scripts/version-consistency.sh",
-    "publish:all": "bash scripts/publish-all.sh"
+    "publish:all": "bash scripts/publish-all.sh",
+    "changeset": "changeset",
+    "release:version": "changeset version",
+    "release:publish": "changeset publish",
+    "release:status": "changeset status --verbose"
   },
   "private": true,
   "dependencies": {
@@ -36,6 +41,8 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
+    "@changesets/changelog-git": "^0.2.1",
+    "@changesets/cli": "^2.29.7",
     "@angular/build": "21.2.7",
     "@angular/cli": "21.2.7",
     "@angular/compiler-cli": "21.2.7",

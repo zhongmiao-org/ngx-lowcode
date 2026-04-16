@@ -24,13 +24,15 @@ normalize_block() {
   sed 's/[[:space:]]*$//' | sed '/^[[:space:]]*$/d'
 }
 
-if [[ "$(git diff --name-only "${BASE_REF}" "${HEAD_REF}" | wc -l | tr -d ' ')" -eq 0 ]]; then
+CHANGED_FILES="$(git diff --name-only "${BASE_REF}" "${HEAD_REF}")"
+
+if [[ "$(printf '%s\n' "${CHANGED_FILES}" | sed '/^$/d' | wc -l | tr -d ' ')" -eq 0 ]]; then
   echo "No files changed, skipping changelog gate."
   exit 0
 fi
 
-CODE_CHANGED="$(git diff --name-only "${BASE_REF}" "${HEAD_REF}" \
-  | grep -Ev '^(CHANGELOG\.md|CHANGELOG\.zh-CN\.md|README(\.zh)?\.md|docs/|\.github/)' || true)"
+CODE_CHANGED="$(printf '%s\n' "${CHANGED_FILES}" \
+  | grep -Ev '^(CHANGELOG\.md|CHANGELOG\.zh-CN\.md|README(\.zh)?\.md|docs/|\.github/|\.changeset/|projects/.+/CHANGELOG\.md$)' || true)"
 
 if [[ -z "${CODE_CHANGED}" ]]; then
   echo "No code-impacting files changed, skipping changelog gate."
@@ -66,7 +68,25 @@ validate_changelog_file() {
   fi
 }
 
+has_changeset_update() {
+  printf '%s\n' "${CHANGED_FILES}" | grep -Eq '^\.changeset/.+\.md$' && ! printf '%s\n' "${CHANGED_FILES}" | grep -Eq '^\.changeset/README\.md$'
+}
+
+has_package_changelog_update() {
+  printf '%s\n' "${CHANGED_FILES}" | grep -Eq '^projects/.+/CHANGELOG\.md$'
+}
+
+if has_changeset_update; then
+  echo "Changelog gate passed via changeset update."
+  exit 0
+fi
+
+if has_package_changelog_update; then
+  echo "Changelog gate passed via package changelog update."
+  exit 0
+fi
+
 validate_changelog_file "CHANGELOG.md"
 validate_changelog_file "CHANGELOG.zh-CN.md"
 
-echo "Changelog gate passed."
+echo "Changelog gate passed via root Unreleased update."

@@ -129,12 +129,13 @@ ng build demo
 ## 发布流程
 
 - CI：`.github/workflows/ci.yml` 在 PR 执行 lint/test/build + changelog gate。
-- 草稿：`.github/workflows/release-draft.yml` 在 `main` 自动更新 Release Draft（来源 `CHANGELOG.md`）。
+- Changesets 主发布：`.github/workflows/release-changesets.yml` 在 `main` 执行，存在 changeset 时自动开版本 PR，合并后仅发布有改动的子包。
+- Legacy 草稿（过渡兜底）：`.github/workflows/release-draft.yml` + `.github/workflows/release-publish.yml` 保留但默认关闭。
 - 空窗期：若 `## [Unreleased]` 为空，Draft 流程成功跳过，不再报红。
-- 发布：手动点击 Draft 的 **Publish release** 后，`.github/workflows/release-publish.yml` 自动发布 11 个子包。
+- 代码改动时必须更新 `.changeset/*.md` 或对应子包 `CHANGELOG.md`。
 
 发布前置条件：
 
 - 仓库或组织已配置 `NPM_TOKEN`
-- 版本一致性通过（`npm run version:check`）
-- 构建产物就绪（Workflow 内执行 `npm run build:libs`）
+- `npm ci` 后 lockfile 无漂移（CI 已强制检查）
+- 构建产物就绪（workflow 执行 `npm run build:libs`）
