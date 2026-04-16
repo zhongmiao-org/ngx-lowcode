@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import type { NgxLowcodeNodeSchema, NgxLowcodePageSchema } from 'ngx-lowcode-core-types';
 import { bindDatasourceToNode, createDatasourceDraftsFromModel, type NgxLowcodeDatasourceDraft } from 'ngx-lowcode-datasource';
 import {
@@ -18,6 +18,7 @@ import {
   type NgxLowcodeMetaModelDraft
 } from 'ngx-lowcode-meta-model';
 import { NgxLowcodeDesignerLocale } from 'ngx-lowcode-i18n';
+import { DemoDslSnapshotRecord, DemoSnapshotStoreService } from './demo-snapshot-store.service';
 import { createDemoGeneratedSchema, createOrdersDemoSchema } from './demo-project-schema';
 
 export type DemoPermissionScope = 'SELF' | 'DEPT' | 'DEPT_AND_CHILDREN' | 'CUSTOM_ORG_SET' | 'TENANT_ALL';
@@ -38,8 +39,23 @@ export interface DemoPermissionApiConfig {
   orgIdStateKeys: string[];
 }
 
+export interface DemoDslSnapshotMetadataV1 {
+  version: 'demo-dsl-snapshot-v1';
+  timestamp: string;
+  checksum: string;
+  label: string;
+}
+
+export interface DemoDslSnapshotV1 {
+  metadata: DemoDslSnapshotMetadataV1;
+  metaModel: NgxLowcodeMetaModelDraft;
+  datasourceDrafts: NgxLowcodeDatasourceDraft[];
+  schema: NgxLowcodePageSchema;
+}
+
 @Injectable({ providedIn: 'root' })
 export class DemoWorkspaceService {
+  private readonly snapshotStore = inject(DemoSnapshotStoreService);
   readonly projectId = signal<'commerce-core' | 'crm-ops'>('commerce-core');
   readonly tenantId = signal<'tenant-a' | 'tenant-b'>('tenant-a');
   readonly locale = signal<NgxLowcodeDesignerLocale>('zh-CN');
@@ -68,6 +84,13 @@ export class DemoWorkspaceService {
   );
   readonly selectedDatasource = computed(
     () => this.datasourceDrafts().find((draft) => draft.id === this.selectedDatasourceId()) ?? this.datasourceDrafts()[0] ?? null
+  );
+  readonly snapshotFingerprint = computed(() =>
+    stableStringify({
+      metaModel: this.metaModel(),
+      datasourceDrafts: this.datasourceDrafts(),
+      schema: this.schema()
+    })
   );
   readonly permissionApiConfig = computed(() => this.readPermissionApiConfig());
   readonly selectedTable = computed(
@@ -448,6 +471,75 @@ export class DemoWorkspaceService {
     this.lastCommand.set('permission/api config updated');
   }
 
+  async saveSnapshotPoint(label?: string): Promise<DemoDslSnapshotRecord> {
+    const snapshot = this.createSnapshot(label);
+    const id = this.nextSnapshotId();
+    const record: DemoDslSnapshotRecord = {
+      id,
+      version: snapshot.metadata.version,
+      timestamp: snapshot.metadata.timestamp,
+      checksum: snapshot.metadata.checksum,
+      label: snapshot.metadata.label,
+      payload: snapshot
+    };
+    await this.snapshotStore.saveSnapshot(record);
+    this.lastCommand.set(`snapshot saved: ${record.label}`);
+    return record;
+  }
+
+  async listSnapshotPoints(): Promise<DemoDslSnapshotRecord[]> {
+    return await this.snapshotStore.listSnapshots();
+  }
+
+  async deleteSnapshotPoint(id: string): Promise<void> {
+    await this.snapshotStore.deleteSnapshot(id);
+    this.lastCommand.set(`snapshot removed: ${id}`);
+  }
+
+  async restoreSnapshotPoint(id: string): Promise<void> {
+    const record = await this.snapshotStore.getSnapshot(id);
+    if (!record) {
+      this.lastCommand.set(`snapshot not found: ${id}`);
+      return;
+    }
+    const snapshot = this.parseSnapshotPayload(record.payload);
+    const validation = validateSnapshot(snapshot);
+    if (!validation.ok) {
+      throw new Error(validation.reason);
+    }
+    this.applySnapshot(snapshot);
+    this.lastCommand.set(`snapshot restored: ${record.label}`);
+  }
+
+  exportCurrentSnapshotJson(label = 'manual-export'): string {
+    const snapshot = this.createSnapshot(label);
+    return JSON.stringify(snapshot, null, 2);
+  }
+
+  async importSnapshotJsonAndRestore(rawJson: string): Promise<void> {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(rawJson);
+    } catch (error) {
+      throw new Error(`invalid json: ${(error as Error).message}`);
+    }
+    const snapshot = this.parseSnapshotPayload(parsed);
+    const validation = validateSnapshot(snapshot);
+    if (!validation.ok) {
+      throw new Error(validation.reason);
+    }
+    await this.snapshotStore.saveSnapshot({
+      id: this.nextSnapshotId(),
+      version: snapshot.metadata.version,
+      timestamp: snapshot.metadata.timestamp,
+      checksum: snapshot.metadata.checksum,
+      label: snapshot.metadata.label || 'imported-snapshot',
+      payload: snapshot
+    });
+    this.applySnapshot(snapshot);
+    this.lastCommand.set(`snapshot imported: ${snapshot.metadata.label}`);
+  }
+
   private countNodes(nodes: NgxLowcodeNodeSchema[]): number {
     return nodes.reduce((total, node) => total + 1 + this.countNodes(node.children ?? []), 0);
   }
@@ -545,6 +637,43 @@ export class DemoWorkspaceService {
     }
     return nextId;
   }
+
+  private createSnapshot(label?: string): DemoDslSnapshotV1 {
+    const timestamp = new Date().toISOString();
+    const payload = {
+      metaModel: this.metaModel(),
+      datasourceDrafts: this.datasourceDrafts(),
+      schema: this.schema()
+    };
+    const checksum = computeSnapshotChecksum(payload);
+    return {
+      metadata: {
+        version: 'demo-dsl-snapshot-v1',
+        timestamp,
+        checksum,
+        label: label?.trim() || `snapshot-${timestamp}`
+      },
+      metaModel: structuredClone(payload.metaModel),
+      datasourceDrafts: structuredClone(payload.datasourceDrafts),
+      schema: structuredClone(payload.schema)
+    };
+  }
+
+  private parseSnapshotPayload(payload: unknown): DemoDslSnapshotV1 {
+    return structuredClone(payload as DemoDslSnapshotV1);
+  }
+
+  private applySnapshot(snapshot: DemoDslSnapshotV1): void {
+    this.metaModel.set(structuredClone(snapshot.metaModel));
+    this.datasourceDrafts.set(structuredClone(snapshot.datasourceDrafts));
+    this.selectedTableId.set(this.metaModel().tables[0]?.id ?? '');
+    this.selectedDatasourceId.set(this.datasourceDrafts()[0]?.id ?? '');
+    this.schema.set(structuredClone(snapshot.schema));
+  }
+
+  private nextSnapshotId(): string {
+    return `snapshot-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  }
 }
 
 function slugify(input: string): string {
@@ -592,4 +721,64 @@ function normalizeOrgIdStateKeys(input: unknown): string[] {
 
 function isPermissionScope(input: unknown): input is DemoPermissionScope {
   return input === 'SELF' || input === 'DEPT' || input === 'DEPT_AND_CHILDREN' || input === 'CUSTOM_ORG_SET' || input === 'TENANT_ALL';
+}
+
+function stableStringify(input: unknown): string {
+  return JSON.stringify(sortObjectKeys(input));
+}
+
+function sortObjectKeys(input: unknown): unknown {
+  if (Array.isArray(input)) {
+    return input.map((item) => sortObjectKeys(item));
+  }
+  if (input !== null && typeof input === 'object') {
+    return Object.keys(input as Record<string, unknown>)
+      .sort()
+      .reduce<Record<string, unknown>>((acc, key) => {
+        acc[key] = sortObjectKeys((input as Record<string, unknown>)[key]);
+        return acc;
+      }, {});
+  }
+  return input;
+}
+
+function computeSnapshotChecksum(payload: {
+  metaModel: NgxLowcodeMetaModelDraft;
+  datasourceDrafts: NgxLowcodeDatasourceDraft[];
+  schema: NgxLowcodePageSchema;
+}): string {
+  const text = stableStringify(payload);
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < text.length; index += 1) {
+    hash ^= text.charCodeAt(index);
+    hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+  }
+  return `fnv1a-${(hash >>> 0).toString(16)}`;
+}
+
+function validateSnapshot(snapshot: DemoDslSnapshotV1): { ok: true } | { ok: false; reason: string } {
+  if (!snapshot || typeof snapshot !== 'object') {
+    return { ok: false, reason: 'invalid snapshot payload' };
+  }
+  if (snapshot.metadata?.version !== 'demo-dsl-snapshot-v1') {
+    return { ok: false, reason: 'unsupported snapshot version' };
+  }
+  if (!snapshot.metaModel || !Array.isArray(snapshot.metaModel.tables)) {
+    return { ok: false, reason: 'metaModel missing or invalid' };
+  }
+  if (!Array.isArray(snapshot.datasourceDrafts)) {
+    return { ok: false, reason: 'datasourceDrafts missing or invalid' };
+  }
+  if (!snapshot.schema || !Array.isArray(snapshot.schema.layoutTree)) {
+    return { ok: false, reason: 'schema missing or invalid' };
+  }
+  const checksum = computeSnapshotChecksum({
+    metaModel: snapshot.metaModel,
+    datasourceDrafts: snapshot.datasourceDrafts,
+    schema: snapshot.schema
+  });
+  if (checksum !== snapshot.metadata.checksum) {
+    return { ok: false, reason: 'snapshot checksum mismatch' };
+  }
+  return { ok: true };
 }

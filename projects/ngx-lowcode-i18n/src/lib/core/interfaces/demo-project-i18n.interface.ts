@@ -62,6 +62,16 @@ export interface NgxLowcodeDemoProjectI18n {
   permissionSectionTitle: string;
   apiDesignerTitle: string;
   generatedPageTitle: string;
+  dslVersioningTitle: string;
+  dslVersioningSubtitle: string;
+  autoSnapshotToggle: string;
+  createSnapshot: string;
+  restoreSnapshot: string;
+  deleteSnapshot: string;
+  exportDsl: string;
+  importDsl: string;
+  refreshSnapshots: string;
+  snapshotEmpty: string;
   routeConfigTitle: string;
   routeConfigDescription: string;
   routeConfigPathLabel: string;
