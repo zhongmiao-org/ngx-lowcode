@@ -1,5 +1,15 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import {
+  NGX_LOWCODE_ACTION_MANAGER,
+  NGX_LOWCODE_DATASOURCE_MANAGER,
+  NGX_LOWCODE_WEBSOCKET_MANAGER
+} from 'ngx-lowcode-core';
+import type {
+  NgxLowcodeActionManager,
+  NgxLowcodeDataSourceManager,
+  NgxLowcodeWebSocketManager
+} from 'ngx-lowcode-core-types';
 import { mockPageSchema } from 'ngx-lowcode-testing';
 import { NgxLowcodeRendererComponent } from './ngx-lowcode-renderer.component';
 
@@ -7,7 +17,21 @@ describe('NgxLowcodeRendererComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [NgxLowcodeRendererComponent],
-      providers: [provideZonelessChangeDetection()]
+      providers: [
+        provideZonelessChangeDetection(),
+        {
+          provide: NGX_LOWCODE_ACTION_MANAGER,
+          useValue: createActionManagerSpy()
+        },
+        {
+          provide: NGX_LOWCODE_DATASOURCE_MANAGER,
+          useValue: createDataSourceManagerSpy(async ({ datasource }) => datasource.mockData ?? [])
+        },
+        {
+          provide: NGX_LOWCODE_WEBSOCKET_MANAGER,
+          useValue: createWebSocketManagerSpy()
+        }
+      ]
     }).compileComponents();
   });
 
@@ -73,9 +97,7 @@ describe('NgxLowcodeRendererComponent', () => {
   });
 
   it('executes datasource-backed actions and writes datasource results into runtime state', async () => {
-    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
-    const schema = structuredClone(mockPageSchema);
-    const datasourceExecutor = jasmine.createSpy('datasourceExecutor').and.callFake(async ({ state }) => [
+    const dataSourceManager = createDataSourceManagerSpy(async ({ state }) => [
       {
         id: 'SO-3001',
         owner: state['owner'],
@@ -83,9 +105,11 @@ describe('NgxLowcodeRendererComponent', () => {
         status: state['status']
       }
     ]);
+    TestBed.overrideProvider(NGX_LOWCODE_DATASOURCE_MANAGER, { useValue: dataSourceManager });
 
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    const schema = structuredClone(mockPageSchema);
     fixture.componentRef.setInput('schema', schema);
-    fixture.componentRef.setInput('datasourceExecutor', datasourceExecutor);
     fixture.componentRef.setInput('context', {
       owner: 'Carol',
       channel: 'partner',
@@ -96,7 +120,7 @@ describe('NgxLowcodeRendererComponent', () => {
     const runtime = fixture.componentInstance.runtime();
     await runtime.executeActionById('search-action');
 
-    expect(datasourceExecutor).toHaveBeenCalled();
+    expect(dataSourceManager.execute).toHaveBeenCalled();
     expect(runtime.state()['tableData']).toEqual([
       {
         id: 'SO-3001',
@@ -108,34 +132,35 @@ describe('NgxLowcodeRendererComponent', () => {
   });
 
   it('writes empty datasource result into runtime state without throwing', async () => {
+    const dataSourceManager = createDataSourceManagerSpy(async () => []);
+    TestBed.overrideProvider(NGX_LOWCODE_DATASOURCE_MANAGER, { useValue: dataSourceManager });
+
     const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
     const schema = structuredClone(mockPageSchema);
-    const datasourceExecutor = jasmine.createSpy('datasourceExecutor').and.resolveTo([]);
 
     fixture.componentRef.setInput('schema', schema);
-    fixture.componentRef.setInput('datasourceExecutor', datasourceExecutor);
     await fixture.whenStable();
 
     const runtime = fixture.componentInstance.runtime();
     await expectAsync(runtime.executeActionById('search-action')).toBeResolved();
 
-    expect(datasourceExecutor).toHaveBeenCalled();
+    expect(dataSourceManager.execute).toHaveBeenCalled();
     expect(runtime.state()['tableData']).toEqual([]);
   });
 
   it('overwrites datasource state on consecutive queries instead of accumulating stale rows', async () => {
-    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
-    const schema = structuredClone(mockPageSchema);
-    const datasourceExecutor = jasmine.createSpy('datasourceExecutor').and.callFake(async ({ state }) => {
+    const dataSourceManager = createDataSourceManagerSpy(async ({ state }) => {
       const status = String(state['status'] ?? 'all');
       if (status === 'paused') {
         return [{ id: 'SO-4002', owner: 'Bob', status: 'paused' }];
       }
       return [{ id: 'SO-4001', owner: 'Alice', status: 'active' }];
     });
+    TestBed.overrideProvider(NGX_LOWCODE_DATASOURCE_MANAGER, { useValue: dataSourceManager });
 
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    const schema = structuredClone(mockPageSchema);
     fixture.componentRef.setInput('schema', schema);
-    fixture.componentRef.setInput('datasourceExecutor', datasourceExecutor);
     await fixture.whenStable();
 
     const runtime = fixture.componentInstance.runtime();
@@ -146,21 +171,21 @@ describe('NgxLowcodeRendererComponent', () => {
     runtime.setState({ status: 'paused' });
     await runtime.executeActionById('search-action');
     expect(runtime.state()['tableData']).toEqual([{ id: 'SO-4002', owner: 'Bob', status: 'paused' }]);
-    expect(datasourceExecutor).toHaveBeenCalledTimes(2);
+    expect(dataSourceManager.execute).toHaveBeenCalledTimes(2);
   });
 
   it('captures datasource errors into runtime state and allows next query to recover', async () => {
-    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
-    const schema = structuredClone(mockPageSchema);
-    const datasourceExecutor = jasmine.createSpy('datasourceExecutor').and.callFake(async ({ state }) => {
+    const dataSourceManager = createDataSourceManagerSpy(async ({ state }) => {
       if (String(state['keyword'] ?? '') === 'fail') {
         throw new Error('datasource unavailable');
       }
       return [{ id: 'SO-5001', owner: 'Recovery', status: 'active' }];
     });
+    TestBed.overrideProvider(NGX_LOWCODE_DATASOURCE_MANAGER, { useValue: dataSourceManager });
 
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    const schema = structuredClone(mockPageSchema);
     fixture.componentRef.setInput('schema', schema);
-    fixture.componentRef.setInput('datasourceExecutor', datasourceExecutor);
     fixture.componentRef.setInput('context', { keyword: 'fail' });
     await fixture.whenStable();
 
@@ -177,7 +202,7 @@ describe('NgxLowcodeRendererComponent', () => {
     expect(runtime.state()['__runtimeDatasourceErrors']).toEqual({});
   });
 
-  it('falls back to datasource mockData when no datasource executor is provided', async () => {
+  it('falls back to datasource mockData when datasource manager returns mock values', async () => {
     const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
     const schema = structuredClone(mockPageSchema);
 
@@ -189,4 +214,62 @@ describe('NgxLowcodeRendererComponent', () => {
 
     expect(datasourceResult).toEqual(schema.datasources[0]?.mockData);
   });
+
+  it('connects and disconnects websocket manager with subscription lifecycle', async () => {
+    const webSocketManager = createWebSocketManagerSpy();
+    const schema = structuredClone(mockPageSchema);
+    schema.datasources = [
+      ...schema.datasources,
+      {
+        id: 'realtime-orders',
+        type: 'middleware-command',
+        command: {
+          transport: 'websocket',
+          target: 'orders-updates'
+        }
+      }
+    ];
+    TestBed.overrideProvider(NGX_LOWCODE_WEBSOCKET_MANAGER, { useValue: webSocketManager });
+
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    fixture.componentRef.setInput('schema', schema);
+    await fixture.whenStable();
+
+    expect(webSocketManager.connect).toHaveBeenCalled();
+    expect(webSocketManager.subscribe).toHaveBeenCalledWith('orders-updates', jasmine.any(Function));
+
+    fixture.destroy();
+    expect(webSocketManager.unsubscribe).toHaveBeenCalledWith('orders-updates', jasmine.any(Function));
+    expect(webSocketManager.disconnect).toHaveBeenCalled();
+  });
 });
+
+function createDataSourceManagerSpy(
+  executeImpl: NgxLowcodeDataSourceManager['execute']
+): NgxLowcodeDataSourceManager & { execute: jasmine.Spy } {
+  const execute = jasmine.createSpy('dataSourceManager.execute').and.callFake(executeImpl);
+  return {
+    execute
+  };
+}
+
+function createActionManagerSpy(): NgxLowcodeActionManager & { execute: jasmine.Spy } {
+  const execute = jasmine.createSpy('actionManager.execute').and.resolveTo(undefined);
+  return {
+    execute
+  };
+}
+
+function createWebSocketManagerSpy(): NgxLowcodeWebSocketManager & {
+  connect: jasmine.Spy;
+  subscribe: jasmine.Spy;
+  unsubscribe: jasmine.Spy;
+  disconnect: jasmine.Spy;
+} {
+  return {
+    connect: jasmine.createSpy('webSocketManager.connect').and.resolveTo(undefined),
+    subscribe: jasmine.createSpy('webSocketManager.subscribe').and.resolveTo(undefined),
+    unsubscribe: jasmine.createSpy('webSocketManager.unsubscribe').and.resolveTo(undefined),
+    disconnect: jasmine.createSpy('webSocketManager.disconnect').and.resolveTo(undefined)
+  };
+}

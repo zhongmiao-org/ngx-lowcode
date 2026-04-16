@@ -1,11 +1,18 @@
-export { NGX_LOWCODE_CONFIG } from './lib/core';
+export {
+  NGX_LOWCODE_ACTION_MANAGER,
+  NGX_LOWCODE_CONFIG,
+  NGX_LOWCODE_DATASOURCE_MANAGER,
+  NGX_LOWCODE_WEBSOCKET_MANAGER
+} from './lib/core';
 export type {
+  NgxLowcodeActionManager,
   NgxLowcodeActionDefinition,
   NgxLowcodeActionExecutionRequest,
   NgxLowcodeActionExecutor,
   NgxLowcodeActionStep,
   NgxLowcodeComponentDefinition,
   NgxLowcodeConfig,
+  NgxLowcodeDataSourceManager,
   NgxLowcodeDatasourceDefinition,
   NgxLowcodeDatasourceExecutor,
   NgxLowcodeDatasourceRequest,
@@ -26,5 +33,7 @@ export type {
   NgxLowcodeSetterGroup,
   NgxLowcodeSetterOption,
   NgxLowcodeSetterType,
-  NgxLowcodeSlotDefinition
+  NgxLowcodeSlotDefinition,
+  NgxLowcodeWebSocketEventHandler,
+  NgxLowcodeWebSocketManager
 } from './lib/core';

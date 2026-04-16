@@ -1,6 +1,7 @@
 export {
-  defaultActionExecutor,
-  defaultDatasourceExecutor,
+  defaultActionManager,
+  defaultDataSourceManager,
+  defaultWebSocketManager,
   provideNgxLowcode,
   registerLowcodeMaterials
 } from './providers';
