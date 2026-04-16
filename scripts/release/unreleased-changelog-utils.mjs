@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-function extractUnreleased(content) {
+export function extractUnreleased(content) {
   const normalized = content.replace(/\r\n/g, '\n');
   const lines = normalized.split('\n');
   let inSection = false;
@@ -25,6 +25,12 @@ function extractUnreleased(content) {
     .join('\n')
     .trim();
   return cleaned;
+}
+
+export function readUnreleasedFromFile(filePath) {
+  if (!fs.existsSync(filePath)) return '';
+  const content = fs.readFileSync(filePath, 'utf8');
+  return extractUnreleased(content);
 }
 
 export function loadPackageReleaseMetadata() {
@@ -67,5 +73,14 @@ export function loadAggregatePackage() {
   return {
     name: aggregate.name,
     version: aggregate.version
+  };
+}
+
+export function loadRootReleaseNotes() {
+  const rootEn = readUnreleasedFromFile(path.resolve('CHANGELOG.md'));
+  const rootZh = readUnreleasedFromFile(path.resolve('CHANGELOG.zh-CN.md'));
+  return {
+    en: rootEn,
+    zh: rootZh
   };
 }
