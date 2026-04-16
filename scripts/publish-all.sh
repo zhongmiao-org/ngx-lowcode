@@ -11,20 +11,19 @@ if [[ -z "${NODE_AUTH_TOKEN:-}" ]]; then
   exit 1
 fi
 
-ROOT_VERSION="$(node -p "require('./package.json').version")"
-
 declare -a PACKAGES=(
-  "@zhongmiao/ngx-lowcode-core-types:dist/ngx-lowcode-core-types"
-  "@zhongmiao/ngx-lowcode-i18n:dist/ngx-lowcode-i18n"
-  "@zhongmiao/ngx-lowcode-core-utils:dist/ngx-lowcode-core-utils"
-  "@zhongmiao/ngx-lowcode-meta-model:dist/ngx-lowcode-meta-model"
-  "@zhongmiao/ngx-lowcode-datasource:dist/ngx-lowcode-datasource"
-  "@zhongmiao/ngx-lowcode-core:dist/ngx-lowcode-core"
-  "@zhongmiao/ngx-lowcode-renderer:dist/ngx-lowcode-renderer"
-  "@zhongmiao/ngx-lowcode-materials:dist/ngx-lowcode-materials"
-  "@zhongmiao/ngx-lowcode-designer:dist/ngx-lowcode-designer"
-  "@zhongmiao/ngx-lowcode-testing:dist/ngx-lowcode-testing"
-  "@zhongmiao/ngx-lowcode-puzzle-adapter:dist/ngx-lowcode-puzzle-adapter"
+  "@zhongmiao/ngx-lowcode-core-types:projects/ngx-lowcode-core-types/package.json:dist/ngx-lowcode-core-types"
+  "@zhongmiao/ngx-lowcode-i18n:projects/ngx-lowcode-i18n/package.json:dist/ngx-lowcode-i18n"
+  "@zhongmiao/ngx-lowcode-core-utils:projects/ngx-lowcode-core-utils/package.json:dist/ngx-lowcode-core-utils"
+  "@zhongmiao/ngx-lowcode-meta-model:projects/ngx-lowcode-meta-model/package.json:dist/ngx-lowcode-meta-model"
+  "@zhongmiao/ngx-lowcode-datasource:projects/ngx-lowcode-datasource/package.json:dist/ngx-lowcode-datasource"
+  "@zhongmiao/ngx-lowcode-core:projects/ngx-lowcode-core/package.json:dist/ngx-lowcode-core"
+  "@zhongmiao/ngx-lowcode-renderer:projects/ngx-lowcode-renderer/package.json:dist/ngx-lowcode-renderer"
+  "@zhongmiao/ngx-lowcode-materials:projects/ngx-lowcode-materials/package.json:dist/ngx-lowcode-materials"
+  "@zhongmiao/ngx-lowcode-designer:projects/ngx-lowcode-designer/package.json:dist/ngx-lowcode-designer"
+  "@zhongmiao/ngx-lowcode-testing:projects/ngx-lowcode-testing/package.json:dist/ngx-lowcode-testing"
+  "@zhongmiao/ngx-lowcode-puzzle-adapter:projects/ngx-lowcode-puzzle-adapter/package.json:dist/ngx-lowcode-puzzle-adapter"
+  "@zhongmiao/ngx-lowcode:projects/ngx-lowcode/package.json:dist/ngx-lowcode"
 )
 
 is_published() {
@@ -33,8 +32,26 @@ is_published() {
   npm view "${pkg}@${version}" version --registry https://registry.npmjs.org >/dev/null 2>&1
 }
 
+prepare_aggregate_dist() {
+  local source_pkg="projects/ngx-lowcode/package.json"
+  local target_dir="dist/ngx-lowcode"
+
+  rm -rf "${target_dir}"
+  mkdir -p "${target_dir}"
+  cp "${source_pkg}" "${target_dir}/package.json"
+  cp "projects/ngx-lowcode/index.js" "${target_dir}/index.js"
+  cp "projects/ngx-lowcode/index.d.ts" "${target_dir}/index.d.ts"
+  if [[ -f "projects/ngx-lowcode/CHANGELOG.md" ]]; then
+    cp "projects/ngx-lowcode/CHANGELOG.md" "${target_dir}/CHANGELOG.md"
+  fi
+}
+
+prepare_aggregate_dist
+
 for item in "${PACKAGES[@]}"; do
-  IFS=':' read -r pkg dist_dir <<< "${item}"
+  IFS=':' read -r pkg source_pkg dist_dir <<< "${item}"
+
+  SOURCE_VERSION="$(node -p "require('./${source_pkg}').version")"
 
   if [[ ! -f "${dist_dir}/package.json" ]]; then
     echo "Missing dist package.json: ${dist_dir}/package.json"
@@ -49,17 +66,17 @@ for item in "${PACKAGES[@]}"; do
     exit 1
   fi
 
-  if [[ "${DIST_VERSION}" != "${ROOT_VERSION}" ]]; then
-    echo "Dist package version mismatch for ${pkg}: ${DIST_VERSION} != ${ROOT_VERSION}"
+  if [[ "${DIST_VERSION}" != "${SOURCE_VERSION}" ]]; then
+    echo "Dist package version mismatch for ${pkg}: dist=${DIST_VERSION}, source=${SOURCE_VERSION}"
     exit 1
   fi
 
-  if is_published "${pkg}" "${ROOT_VERSION}"; then
-    echo "Skipping ${pkg}@${ROOT_VERSION} (already published)."
+  if is_published "${pkg}" "${SOURCE_VERSION}"; then
+    echo "Skipping ${pkg}@${SOURCE_VERSION} (already published)."
     continue
   fi
 
-  echo "Publishing ${pkg}@${ROOT_VERSION} with dist-tag ${DIST_TAG}"
+  echo "Publishing ${pkg}@${SOURCE_VERSION} with dist-tag ${DIST_TAG}"
   npm publish "${dist_dir}" --tag "${DIST_TAG}" --access public
 
 done

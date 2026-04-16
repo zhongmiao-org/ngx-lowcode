@@ -30,46 +30,37 @@ jobs:
       - name: Pin npm version
         run: npm i -g npm@11.4.2
 
-      - name: Resolve release metadata from main
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve release metadata from pending changesets
         id: meta
         run: |
-          VERSION="$(node -p "require('./package.json').version")"
-          TAG="v${VERSION}"
-          if [[ "${VERSION}" =~ -(beta|rc)\.[0-9]+$ ]]; then
-            PRERELEASE="true"
-          else
-            PRERELEASE="false"
-          fi
-
           set +e
-          bash .github/scripts/extract_unreleased.sh CHANGELOG.md .release_notes.txt
-          EXTRACT_EXIT_CODE="$?"
+          NOTES="$(npm run -s release:draft-notes)"
+          NOTES_EXIT_CODE="$?"
+          NEXT_VERSION="$(npm run -s release:next-version)"
+          NEXT_EXIT_CODE="$?"
           set -e
 
-          if [[ "${EXTRACT_EXIT_CODE}" -eq 2 ]]; then
-            echo "Unreleased section is empty, skipping draft upsert."
+          if [[ "${NOTES_EXIT_CODE}" -ne 0 || "${NEXT_EXIT_CODE}" -ne 0 ]]; then
+            echo "No pending package changes for draft."
             {
-              echo "version=${VERSION}"
-              echo "tag=${TAG}"
-              echo "prerelease=${PRERELEASE}"
               echo "skipped=true"
+              echo "tag="
+              echo "version="
               echo "body="
             } >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          if [[ "${EXTRACT_EXIT_CODE}" -ne 0 ]]; then
-            echo "Failed to extract Unreleased notes."
-            exit "${EXTRACT_EXIT_CODE}"
-          fi
-
+          TAG="v${NEXT_VERSION}"
           {
-            echo "version=${VERSION}"
-            echo "tag=${TAG}"
-            echo "prerelease=${PRERELEASE}"
             echo "skipped=false"
+            echo "tag=${TAG}"
+            echo "version=${NEXT_VERSION}"
             echo "body<<EOF_BODY"
-            cat .release_notes.txt
+            printf '%s\n' "${NOTES}"
             echo "EOF_BODY"
           } >> "$GITHUB_OUTPUT"
 
@@ -79,14 +70,12 @@ jobs:
         env:
           RELEASE_TAG: ${{ steps.meta.outputs.tag }}
           RELEASE_VERSION: ${{ steps.meta.outputs.version }}
-          RELEASE_PRERELEASE: ${{ steps.meta.outputs.prerelease }}
           RELEASE_BODY: ${{ steps.meta.outputs.body }}
         with:
           script: |
             const tag = process.env.RELEASE_TAG;
             const version = process.env.RELEASE_VERSION;
             const body = process.env.RELEASE_BODY || '';
-            const prerelease = process.env.RELEASE_PRERELEASE === 'true';
 
             const releases = await github.paginate(github.rest.repos.listReleases, {
               owner: context.repo.owner,
@@ -94,7 +83,7 @@ jobs:
               per_page: 100,
             });
 
-            const existing = releases.find((r) => r.tag_name === tag);
+            const existing = releases.find((r) => r.tag_name === tag && r.draft);
             if (existing) {
               await github.rest.repos.updateRelease({
                 owner: context.repo.owner,
@@ -105,7 +94,7 @@ jobs:
                 name: tag,
                 body,
                 draft: true,
-                prerelease,
+                prerelease: false,
               });
               core.info(`Updated draft release for ${tag} (version ${version}).`);
             } else {
@@ -117,7 +106,7 @@ jobs:
                 name: tag,
                 body,
                 draft: true,
-                prerelease,
+                prerelease: false,
               });
               core.info(`Created draft release for ${tag} (version ${version}).`);
             }

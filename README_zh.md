@@ -125,14 +125,18 @@ ng build demo
 - 支撑包：
   - `@zhongmiao/ngx-lowcode-testing`
   - `@zhongmiao/ngx-lowcode-puzzle-adapter`
+- 总包：
+  - `@zhongmiao/ngx-lowcode`（统一安装入口与发布汇总追踪）
 
 ## 发布流程
 
 - CI：`.github/workflows/ci.yml` 在 PR 执行 lint/test/build + changelog gate。
-- Changesets 主发布：`.github/workflows/release-changesets.yml` 在 `main` 执行，存在 changeset 时自动开版本 PR，合并后仅发布有改动的子包。
-- Legacy 草稿（过渡兜底）：`.github/workflows/release-draft.yml` + `.github/workflows/release-publish.yml` 保留但默认关闭。
-- 空窗期：若 `## [Unreleased]` 为空，Draft 流程成功跳过，不再报红。
-- 代码改动时必须更新 `.changeset/*.md` 或对应子包 `CHANGELOG.md`。
+- Changesets 主发布：`.github/workflows/release-changesets.yml` 在 `main` 执行，存在 changeset 时自动开版本 PR，合并后发布有改动的子包。
+- 总包联动规则：任何非空 changeset 都必须包含 `@zhongmiao/ngx-lowcode`，保证子包发布时总包同步升版。
+- Draft 汇总：`.github/workflows/release-draft.yml` 从待发布 `.changeset/*.md` 自动组装，按包分组展示本次变更。
+- Legacy 发布链：`.github/workflows/release-publish.yml` 仅保留为 fallback，默认关闭。
+- 代码改动时必须更新 `.changeset/*.md` 或对应子包 `projects/*/CHANGELOG.md`。
+- CI 看护：`.github/workflows/ci-watchdog.yml` 监听 `main` 失败，命中确定性问题自动开修复 PR，否则自动建待排查 issue。
 
 发布前置条件：
 

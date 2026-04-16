@@ -171,14 +171,18 @@ Current internal form is multi-package. Public npm scope is fixed as `@zhongmiao
 - support packages:
   - `@zhongmiao/ngx-lowcode-testing`
   - `@zhongmiao/ngx-lowcode-puzzle-adapter`
+- aggregate package:
+  - `@zhongmiao/ngx-lowcode` (meta package for unified install + release summary tracking)
 
 ## Release Flow
 
 - CI: `.github/workflows/ci.yml` runs lint + test + build + changelog gate on PR.
-- Changesets release: `.github/workflows/release-changesets.yml` runs on `main`, opens version PR when changesets exist, and publishes only changed packages after merge.
-- Legacy draft (transition only): `.github/workflows/release-draft.yml` + `.github/workflows/release-publish.yml` are retained as fallback and disabled by default.
-- Empty draft window: if `## [Unreleased]` is empty, draft workflow exits successfully with skip (no red build).
-- Changelog policy for code changes: update either a `.changeset/*.md` file or the corresponding package changelog.
+- Changesets release: `.github/workflows/release-changesets.yml` runs on `main`, opens version PR when changesets exist, and publishes changed packages.
+- Aggregate package rule: any non-empty changeset must include `@zhongmiao/ngx-lowcode` so aggregate package version always tracks child package releases.
+- Draft summary: `.github/workflows/release-draft.yml` composes draft notes from pending `.changeset/*.md` and groups changes by package.
+- Legacy publish path: `.github/workflows/release-publish.yml` stays fallback-only and is disabled by default.
+- Changelog policy for code changes: update either a `.changeset/*.md` file or the corresponding package changelog under `projects/*/CHANGELOG.md`.
+- CI watchdog: `.github/workflows/ci-watchdog.yml` monitors failed CI on `main`, auto-opens lockfile-fix PR when deterministic, otherwise opens a triage issue.
 
 Release prerequisites:
 
