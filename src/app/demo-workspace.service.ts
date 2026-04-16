@@ -13,6 +13,7 @@ import {
   createMetaTableDraft,
   toMetaSchemaDraft,
   validateMetaModelDraft,
+  type NgxLowcodeMetaColumnType,
   type NgxLowcodeMetaIndexDraft,
   type NgxLowcodeMetaModelDraft
 } from 'ngx-lowcode-meta-model';
@@ -185,6 +186,60 @@ export class DemoWorkspaceService {
           : table
       )
     }));
+  }
+
+  setColumnType(tableId: string, columnId: string, type: NgxLowcodeMetaColumnType): void {
+    this.metaModel.update((model) => ({
+      ...model,
+      tables: model.tables.map((table) =>
+        table.id === tableId
+          ? {
+              ...table,
+              columns: table.columns.map((column) => (column.id === columnId ? { ...column, type } : column))
+            }
+          : table
+      )
+    }));
+    this.lastCommand.set(`column type updated: ${tableId}.${columnId} -> ${type}`);
+  }
+
+  setColumnRequired(tableId: string, columnId: string, required: boolean): void {
+    this.metaModel.update((model) => ({
+      ...model,
+      tables: model.tables.map((table) =>
+        table.id === tableId
+          ? {
+              ...table,
+              columns: table.columns.map((column) =>
+                column.id === columnId ? { ...column, required: column.primary ? true : required } : column
+              )
+            }
+          : table
+      )
+    }));
+    this.lastCommand.set(`column required updated: ${tableId}.${columnId} -> ${required}`);
+  }
+
+  setColumnPrimary(tableId: string, columnId: string, primary: boolean): void {
+    this.metaModel.update((model) => ({
+      ...model,
+      tables: model.tables.map((table) =>
+        table.id === tableId
+          ? {
+              ...table,
+              columns: table.columns.map((column) => {
+                if (primary) {
+                  return column.id === columnId
+                    ? { ...column, primary: true, required: true }
+                    : { ...column, primary: false };
+                }
+                return column.id === columnId ? { ...column, primary: false } : column;
+              })
+            }
+          : table
+      )
+    }));
+    this.lastCommand.set(`column primary updated: ${tableId}.${columnId} -> ${primary}`);
   }
 
   removeTable(tableId: string): void {

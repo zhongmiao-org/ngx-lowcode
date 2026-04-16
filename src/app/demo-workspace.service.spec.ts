@@ -33,4 +33,31 @@ describe('DemoWorkspaceService', () => {
     expect(service.tenantId()).toBe('tenant-b');
     expect(service.schema().pageMeta.id).toContain('query');
   });
+
+  it('supports table-designer field modeling for type/required/primary', () => {
+    service.addTable();
+    const tableId = service.selectedTableId();
+    service.addColumn(tableId);
+    const columnId = service.metaModel().tables.find((table) => table.id === tableId)?.columns.at(-1)?.id;
+    expect(columnId).toBeTruthy();
+    if (!columnId) {
+      return;
+    }
+
+    service.setColumnType(tableId, columnId, 'number');
+    service.setColumnRequired(tableId, columnId, true);
+    let column = service.metaModel().tables.find((table) => table.id === tableId)?.columns.find((item) => item.id === columnId);
+    expect(column?.type).toBe('number');
+    expect(column?.required).toBeTrue();
+    expect(column?.primary).toBeFalse();
+
+    service.setColumnPrimary(tableId, columnId, true);
+    column = service.metaModel().tables.find((table) => table.id === tableId)?.columns.find((item) => item.id === columnId);
+    expect(column?.primary).toBeTrue();
+    expect(column?.required).toBeTrue();
+
+    service.setColumnRequired(tableId, columnId, false);
+    column = service.metaModel().tables.find((table) => table.id === tableId)?.columns.find((item) => item.id === columnId);
+    expect(column?.required).toBeTrue();
+  });
 });
