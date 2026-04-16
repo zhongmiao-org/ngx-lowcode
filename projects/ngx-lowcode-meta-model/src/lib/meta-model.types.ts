@@ -1,11 +1,4 @@
-export type NgxLowcodeMetaColumnType =
-  | 'string'
-  | 'text'
-  | 'number'
-  | 'boolean'
-  | 'date'
-  | 'datetime'
-  | 'json';
+export type NgxLowcodeMetaColumnType = 'string' | 'text' | 'number' | 'boolean' | 'date' | 'datetime' | 'json';
 
 export type NgxLowcodeMetaTableKind = 'root' | 'child';
 

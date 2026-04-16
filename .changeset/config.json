@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
-  "changelog": ["@changesets/changelog-git", {"repo": "zhongmiao-org/ngx-lowcode"}],
+  "changelog": ["@changesets/changelog-git", { "repo": "zhongmiao-org/ngx-lowcode" }],
   "commit": false,
   "fixed": [],
   "linked": [],

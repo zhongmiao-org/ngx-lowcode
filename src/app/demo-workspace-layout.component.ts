@@ -120,10 +120,18 @@ import { DemoWorkspaceService } from './demo-workspace.service';
         <ng-template #headerContent>
           <div class="workspace-layout__header-content">
             <thy-nav thyType="pulled">
-              <a thyNavItem [thyNavItemActive]="activeSection() === 'model'" routerLink="/studio/model">{{ copy().workspaceNavModel }}</a>
-              <a thyNavItem [thyNavItemActive]="activeSection() === 'datasource'" routerLink="/studio/datasource">{{ copy().workspaceNavDatasource }}</a>
-              <a thyNavItem [thyNavItemActive]="activeSection() === 'permission'" routerLink="/studio/permission">{{ copy().workspaceNavPermission }}</a>
-              <a thyNavItem [thyNavItemActive]="activeSection() === 'page'" routerLink="/studio/page/designer">{{ copy().workspaceNavPage }}</a>
+              <a thyNavItem [thyNavItemActive]="activeSection() === 'model'" routerLink="/studio/model">{{
+                copy().workspaceNavModel
+              }}</a>
+              <a thyNavItem [thyNavItemActive]="activeSection() === 'datasource'" routerLink="/studio/datasource">{{
+                copy().workspaceNavDatasource
+              }}</a>
+              <a thyNavItem [thyNavItemActive]="activeSection() === 'permission'" routerLink="/studio/permission">{{
+                copy().workspaceNavPermission
+              }}</a>
+              <a thyNavItem [thyNavItemActive]="activeSection() === 'page'" routerLink="/studio/page/designer">{{
+                copy().workspaceNavPage
+              }}</a>
             </thy-nav>
             <div class="workspace-layout__header-actions">
               <span>{{ copy().localeLabel }}</span>
@@ -139,13 +147,28 @@ import { DemoWorkspaceService } from './demo-workspace.service';
           <thy-sidebar thyDivided="false" class="workspace-layout__sidebar">
             <div class="workspace-layout__sidebar-section">
               <thy-menu class="workspace-layout__menu">
-                <a thyMenuItem thyIcon="dashboard" routerLink="/studio/model" routerLinkActive="workspace-layout__menu-item--active">
+                <a
+                  thyMenuItem
+                  thyIcon="dashboard"
+                  routerLink="/studio/model"
+                  routerLinkActive="workspace-layout__menu-item--active"
+                >
                   <span thyMenuItemName>{{ copy().workspaceNavModel }}</span>
                 </a>
-                <a thyMenuItem thyIcon="blocks" routerLink="/studio/datasource" routerLinkActive="workspace-layout__menu-item--active">
+                <a
+                  thyMenuItem
+                  thyIcon="blocks"
+                  routerLink="/studio/datasource"
+                  routerLinkActive="workspace-layout__menu-item--active"
+                >
                   <span thyMenuItemName>{{ copy().workspaceNavDatasource }}</span>
                 </a>
-                <a thyMenuItem thyIcon="lock" routerLink="/studio/permission" routerLinkActive="workspace-layout__menu-item--active">
+                <a
+                  thyMenuItem
+                  thyIcon="lock"
+                  routerLink="/studio/permission"
+                  routerLinkActive="workspace-layout__menu-item--active"
+                >
                   <span thyMenuItemName>{{ copy().workspaceNavPermission }}</span>
                 </a>
                 <thy-divider></thy-divider>
@@ -161,7 +184,11 @@ import { DemoWorkspaceService } from './demo-workspace.service';
                       >
                         <span thyMenuItemName>{{ table.label }}</span>
                         <thy-menu-item-action>
-                          <a thyAction thyIcon="plus" (click)="$event.stopPropagation(); workspace.addColumn(table.id)"></a>
+                          <a
+                            thyAction
+                            thyIcon="plus"
+                            (click)="$event.stopPropagation(); workspace.addColumn(table.id)"
+                          ></a>
                         </thy-menu-item-action>
                       </a>
                     }
@@ -187,7 +214,11 @@ import { DemoWorkspaceService } from './demo-workspace.service';
                       >
                         <span thyMenuItemName>{{ draft.label }}</span>
                         <thy-menu-item-action>
-                          <a thyAction thyIcon="link" (click)="$event.stopPropagation(); workspace.bindResultTable()"></a>
+                          <a
+                            thyAction
+                            thyIcon="link"
+                            (click)="$event.stopPropagation(); workspace.bindResultTable()"
+                          ></a>
                         </thy-menu-item-action>
                       </a>
                     }
@@ -199,18 +230,22 @@ import { DemoWorkspaceService } from './demo-workspace.service';
                 </a>
               </thy-menu>
             </div>
-
           </thy-sidebar>
         }
 
-        <thy-content class="workspace-layout__content" [class.workspace-layout__content--full]="activeSection() === 'page'">
+        <thy-content
+          class="workspace-layout__content"
+          [class.workspace-layout__content--full]="activeSection() === 'page'"
+        >
           @if (activeSection() !== 'page') {
             <thy-card thyBordered="false" class="workspace-layout__summary">
               <thy-card-content>
                 <div class="workspace-layout__summary-head">
                   <div>
                     <thy-breadcrumb [thySeparator]="'slash'">
-                      <thy-breadcrumb-item><a routerLink="/">{{ copy().backHome }}</a></thy-breadcrumb-item>
+                      <thy-breadcrumb-item
+                        ><a routerLink="/">{{ copy().backHome }}</a></thy-breadcrumb-item
+                      >
                       <thy-breadcrumb-item>{{ copy().workspaceTitle }}</thy-breadcrumb-item>
                     </thy-breadcrumb>
                     <h1>{{ copy().workspaceTitle }}</h1>
@@ -218,14 +253,54 @@ import { DemoWorkspaceService } from './demo-workspace.service';
                   </div>
                 </div>
                 <div class="workspace-layout__summary-grid">
-                  <thy-statistic thyShape="card" thyColor="primary" [thyValue]="workspace.metaModel().tables.length" [thyTitle]="copy().modelTables"></thy-statistic>
-                  <thy-statistic thyShape="card" thyColor="info" [thyValue]="workspace.metaModel().relations.length" [thyTitle]="copy().modelRelations"></thy-statistic>
-                  <thy-statistic thyShape="card" thyColor="warning" [thyValue]="workspace.metaModel().indexes.length" [thyTitle]="copy().modelIndexes"></thy-statistic>
-                  <thy-statistic thyShape="card" thyColor="success" [thyValue]="workspace.datasourceDrafts().length" [thyTitle]="copy().datasourceCount"></thy-statistic>
-                  <thy-statistic thyShape="card" thyColor="primary" [thyValue]="workspace.schema().actions.length" [thyTitle]="copy().pageActions"></thy-statistic>
-                  <thy-statistic thyShape="card" thyColor="info" [thyValue]="workspace.schema().datasources.length" [thyTitle]="copy().pageDatasources"></thy-statistic>
-                  <thy-statistic thyShape="card" thyColor="warning" [thyValue]="workspace.nodeCount()" [thyTitle]="copy().pageNodeCount"></thy-statistic>
-                  <thy-statistic thyShape="card" thyColor="success" [thyValue]="workspace.tenantId()" [thyTitle]="copy().activeTenant"></thy-statistic>
+                  <thy-statistic
+                    thyShape="card"
+                    thyColor="primary"
+                    [thyValue]="workspace.metaModel().tables.length"
+                    [thyTitle]="copy().modelTables"
+                  ></thy-statistic>
+                  <thy-statistic
+                    thyShape="card"
+                    thyColor="info"
+                    [thyValue]="workspace.metaModel().relations.length"
+                    [thyTitle]="copy().modelRelations"
+                  ></thy-statistic>
+                  <thy-statistic
+                    thyShape="card"
+                    thyColor="warning"
+                    [thyValue]="workspace.metaModel().indexes.length"
+                    [thyTitle]="copy().modelIndexes"
+                  ></thy-statistic>
+                  <thy-statistic
+                    thyShape="card"
+                    thyColor="success"
+                    [thyValue]="workspace.datasourceDrafts().length"
+                    [thyTitle]="copy().datasourceCount"
+                  ></thy-statistic>
+                  <thy-statistic
+                    thyShape="card"
+                    thyColor="primary"
+                    [thyValue]="workspace.schema().actions.length"
+                    [thyTitle]="copy().pageActions"
+                  ></thy-statistic>
+                  <thy-statistic
+                    thyShape="card"
+                    thyColor="info"
+                    [thyValue]="workspace.schema().datasources.length"
+                    [thyTitle]="copy().pageDatasources"
+                  ></thy-statistic>
+                  <thy-statistic
+                    thyShape="card"
+                    thyColor="warning"
+                    [thyValue]="workspace.nodeCount()"
+                    [thyTitle]="copy().pageNodeCount"
+                  ></thy-statistic>
+                  <thy-statistic
+                    thyShape="card"
+                    thyColor="success"
+                    [thyValue]="workspace.tenantId()"
+                    [thyTitle]="copy().activeTenant"
+                  ></thy-statistic>
                 </div>
               </thy-card-content>
             </thy-card>

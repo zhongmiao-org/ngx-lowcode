@@ -15,9 +15,7 @@ if (!changesets.length) {
   process.exit(2);
 }
 
-const bumps = changesets
-  .map((c) => c.releases[AGGREGATE])
-  .filter(Boolean);
+const bumps = changesets.map((c) => c.releases[AGGREGATE]).filter(Boolean);
 
 const level = strongestBump(bumps);
 if (!level) {

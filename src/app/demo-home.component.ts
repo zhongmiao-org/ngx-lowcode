@@ -41,25 +41,37 @@ import { DemoWorkspaceService } from './demo-workspace.service';
 
         <div class="demo-home__cards">
           <thy-card thyBordered="false" class="demo-home__card">
-            <thy-card-header [thyTitle]="copy().workspaceNavModel" [thyDescription]="copy().homeModelDescription"></thy-card-header>
+            <thy-card-header
+              [thyTitle]="copy().workspaceNavModel"
+              [thyDescription]="copy().homeModelDescription"
+            ></thy-card-header>
             <thy-card-content>
               <a thyButton="primary" routerLink="/studio/model">{{ copy().workspaceNavModel }}</a>
             </thy-card-content>
           </thy-card>
           <thy-card thyBordered="false" class="demo-home__card">
-            <thy-card-header [thyTitle]="copy().workspaceNavDatasource" [thyDescription]="copy().homeDatasourceDescription"></thy-card-header>
+            <thy-card-header
+              [thyTitle]="copy().workspaceNavDatasource"
+              [thyDescription]="copy().homeDatasourceDescription"
+            ></thy-card-header>
             <thy-card-content>
               <a thyButton="primary" routerLink="/studio/datasource">{{ copy().workspaceNavDatasource }}</a>
             </thy-card-content>
           </thy-card>
           <thy-card thyBordered="false" class="demo-home__card">
-            <thy-card-header [thyTitle]="copy().workspaceNavPermission" [thyDescription]="copy().permissionSectionTitle"></thy-card-header>
+            <thy-card-header
+              [thyTitle]="copy().workspaceNavPermission"
+              [thyDescription]="copy().permissionSectionTitle"
+            ></thy-card-header>
             <thy-card-content>
               <a thyButton="primary" routerLink="/studio/permission">{{ copy().workspaceNavPermission }}</a>
             </thy-card-content>
           </thy-card>
           <thy-card thyBordered="false" class="demo-home__card">
-            <thy-card-header [thyTitle]="copy().workspaceNavPage" [thyDescription]="copy().homePageDescription"></thy-card-header>
+            <thy-card-header
+              [thyTitle]="copy().workspaceNavPage"
+              [thyDescription]="copy().homePageDescription"
+            ></thy-card-header>
             <thy-card-content>
               <a thyButton="primary" routerLink="/studio/page/designer">{{ copy().workspaceNavPage }}</a>
             </thy-card-content>
@@ -97,7 +109,7 @@ import { DemoWorkspaceService } from './demo-workspace.service';
         padding: 20px 22px;
         border-radius: 18px;
         background:
-          linear-gradient(135deg, rgba(255,255,255,0.96), rgba(240,249,255,0.92)),
+          linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(240, 249, 255, 0.92)),
           linear-gradient(135deg, #ffffff, #ecfeff);
         border: 1px solid rgba(148, 163, 184, 0.25);
         box-shadow: 0 12px 36px rgba(15, 23, 42, 0.06);

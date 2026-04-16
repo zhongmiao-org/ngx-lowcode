@@ -9,11 +9,7 @@
 
 @if (!collapsed()) {
   <div class="ngx-lowcode-panel ngx-lowcode-panel--tabs">
-    <thy-tabs
-      thySize="sm"
-      [thyResponsive]="true"
-      [(thyActiveTab)]="activePanelTab"
-    >
+    <thy-tabs thySize="sm" [thyResponsive]="true" [(thyActiveTab)]="activePanelTab">
       <thy-tab [thyTitle]="t().page" id="page">
         <div class="ngx-lowcode-panel__content">
           <div class="ngx-lowcode-prop-row">
@@ -344,10 +340,7 @@
 
                     <div class="ngx-lowcode-prop-row">
                       <span>{{ editorCopy().type }}</span>
-                      <thy-select
-                        [ngModel]="entry.kind"
-                        (ngModelChange)="updateStateEntry($index, { kind: $event })"
-                      >
+                      <thy-select [ngModel]="entry.kind" (ngModelChange)="updateStateEntry($index, { kind: $event })">
                         @for (option of stateTypeOptions; track option.value) {
                           <thy-option [thyValue]="option.value" [thyLabelText]="option.label"></thy-option>
                         }
@@ -402,276 +395,292 @@
       }
 
       @if (supportsSelectedNodeDatasource()) {
-      <thy-tab [thyTitle]="t().datasources" id="datasources">
-        <div class="ngx-lowcode-panel__content">
-          @if (selectedNode()) {
-            <div class="ngx-lowcode-config-list">
-              <div class="ngx-lowcode-config-card">
-                <div class="ngx-lowcode-config-grid">
-                  <div class="ngx-lowcode-prop-row">
-                    <span>ID</span>
-                    <thy-select
-                      [ngModel]="selectedDatasourceBinding()?.datasourceId || null"
-                      (ngModelChange)="updateSelectedNodeDatasourceBinding($event ?? '')"
-                    >
-                      @for (datasourceId of availableDatasourceIds(); track datasourceId) {
-                        <thy-option [thyValue]="datasourceId" [thyLabelText]="datasourceId"></thy-option>
-                      }
-                    </thy-select>
-                  </div>
-                </div>
-                <div class="ngx-lowcode-config-card__actions">
-                  <button [thyButton]="buttonKinds.default" (click)="addBoundDatasource()">
-                    {{ editorCopy().bindDatasource }}
-                  </button>
-                  @if (selectedDatasourceBinding()?.datasourceId) {
-                    <button [thyButton]="buttonKinds.default" (click)="updateSelectedNodeDatasourceBinding('')">
-                      {{ editorCopy().remove }}
-                    </button>
-                  }
-                </div>
-              </div>
-
-              @if (selectedDatasourceBinding()?.datasource; as datasource) {
+        <thy-tab [thyTitle]="t().datasources" id="datasources">
+          <div class="ngx-lowcode-panel__content">
+            @if (selectedNode()) {
+              <div class="ngx-lowcode-config-list">
                 <div class="ngx-lowcode-config-card">
                   <div class="ngx-lowcode-config-grid">
                     <div class="ngx-lowcode-prop-row">
                       <span>ID</span>
-                      <input thyInput [ngModel]="datasource.id" (ngModelChange)="updateSelectedDatasource({ id: $event })" />
-                    </div>
-                    <div class="ngx-lowcode-prop-row">
-                      <span>{{ editorCopy().type }}</span>
-                      <input thyInput [ngModel]="datasource.type" (ngModelChange)="updateSelectedDatasource({ type: $event })" />
-                    </div>
-                    <div class="ngx-lowcode-prop-row">
-                      <span>{{ editorCopy().transport }}</span>
                       <thy-select
-                        [ngModel]="datasource.transport"
-                        (ngModelChange)="updateSelectedDatasource({ transport: $event })"
+                        [ngModel]="selectedDatasourceBinding()?.datasourceId || null"
+                        (ngModelChange)="updateSelectedNodeDatasourceBinding($event ?? '')"
                       >
-                        @for (transport of datasourceTransportOptions; track transport) {
-                          <thy-option [thyValue]="transport" [thyLabelText]="transport"></thy-option>
-                        }
-                      </thy-select>
-                    </div>
-                    <div class="ngx-lowcode-prop-row">
-                      <span>{{ editorCopy().commandName }}</span>
-                      <input
-                        thyInput
-                        [ngModel]="datasource.commandName"
-                        (ngModelChange)="updateSelectedDatasource({ commandName: $event })"
-                      />
-                    </div>
-                    <div class="ngx-lowcode-prop-row">
-                      <span>{{ editorCopy().commandTarget }}</span>
-                      <input
-                        thyInput
-                        [ngModel]="datasource.commandTarget"
-                        (ngModelChange)="updateSelectedDatasource({ commandTarget: $event })"
-                      />
-                    </div>
-                    <div class="ngx-lowcode-prop-row">
-                      <span>{{ editorCopy().timeoutMs }}</span>
-                      <thy-input-number
-                        [ngModel]="datasource.timeoutMs"
-                        (ngModelChange)="updateSelectedDatasource({ timeoutMs: $event })"
-                      >
-                      </thy-input-number>
-                    </div>
-                    <div class="ngx-lowcode-prop-row">
-                      <span>{{ editorCopy().stateKey }}</span>
-                      <input
-                        thyInput
-                        [ngModel]="datasource.stateKey"
-                        (ngModelChange)="updateSelectedDatasource({ stateKey: $event })"
-                      />
-                    </div>
-                    <div class="ngx-lowcode-prop-row ngx-lowcode-prop-row--full">
-                      <span>{{ editorCopy().payloadTemplate }}</span>
-                      <textarea
-                        class="ngx-lowcode-code-input"
-                        [ngModel]="datasource.payloadTemplateText"
-                        (ngModelChange)="updateSelectedDatasource({ payloadTemplateText: $event })"
-                        rows="4"
-                      ></textarea>
-                    </div>
-                  </div>
-                  <div class="ngx-lowcode-config-card__actions">
-                    <button [thyButton]="buttonKinds.default" (click)="removeSelectedDatasource()">
-                      {{ editorCopy().remove }}
-                    </button>
-                  </div>
-                </div>
-              } @else {
-                <p class="ngx-lowcode-empty">{{ editorCopy().noDatasourceBound }}</p>
-              }
-            </div>
-
-            <div class="ngx-lowcode-config-actions">
-              <button [thyButton]="buttonKinds.primaryOutline" (click)="applyDatasourcesForm()">
-                {{ t().applyDatasources }}
-              </button>
-            </div>
-          }
-          @if (datasourcesDraftError(); as error) {
-            <p class="ngx-lowcode-error">{{ error }}</p>
-          }
-        </div>
-      </thy-tab>
-      }
-
-      @if (supportsSelectedNodeActions()) {
-      <thy-tab [thyTitle]="t().actions" id="actions">
-        <div class="ngx-lowcode-panel__content">
-          @if (selectedNode()) {
-            <div class="ngx-lowcode-config-meta">
-              <div class="ngx-lowcode-config-subtitle">{{ editorCopy().eventBindings }}</div>
-            </div>
-
-            <div class="ngx-lowcode-config-list">
-              @for (binding of selectedComponentActionBindings(); track binding.propKey) {
-                <div class="ngx-lowcode-config-card">
-                  <div class="ngx-lowcode-config-grid">
-                    <div class="ngx-lowcode-prop-row">
-                      <span>{{ binding.label }}</span>
-                      <thy-select
-                        [ngModel]="binding.actionId || null"
-                        (ngModelChange)="updateSelectedNodeActionBinding(binding.propKey, $event ?? '')"
-                      >
-                        @for (actionId of availableActionIds(); track actionId) {
-                          <thy-option [thyValue]="actionId" [thyLabelText]="actionId"></thy-option>
+                        @for (datasourceId of availableDatasourceIds(); track datasourceId) {
+                          <thy-option [thyValue]="datasourceId" [thyLabelText]="datasourceId"></thy-option>
                         }
                       </thy-select>
                     </div>
                   </div>
                   <div class="ngx-lowcode-config-card__actions">
-                    <button [thyButton]="buttonKinds.default" (click)="addBoundAction(binding.propKey)">
-                      {{ editorCopy().bindAction }}
+                    <button [thyButton]="buttonKinds.default" (click)="addBoundDatasource()">
+                      {{ editorCopy().bindDatasource }}
                     </button>
-                    @if (binding.actionId) {
-                      <button
-                        [thyButton]="buttonKinds.default"
-                        (click)="updateSelectedNodeActionBinding(binding.propKey, '')"
-                      >
+                    @if (selectedDatasourceBinding()?.datasourceId) {
+                      <button [thyButton]="buttonKinds.default" (click)="updateSelectedNodeDatasourceBinding('')">
                         {{ editorCopy().remove }}
                       </button>
                     }
                   </div>
                 </div>
-              }
-            </div>
 
-            @if (selectedComponentActions().length) {
-              <div class="ngx-lowcode-config-list">
-                @for (action of selectedComponentActions(); track action.id) {
+                @if (selectedDatasourceBinding()?.datasource; as datasource) {
                   <div class="ngx-lowcode-config-card">
                     <div class="ngx-lowcode-config-grid">
                       <div class="ngx-lowcode-prop-row">
                         <span>ID</span>
                         <input
                           thyInput
-                          [ngModel]="action.id"
-                          (ngModelChange)="updateSelectedAction(action.id, { id: $event })"
+                          [ngModel]="datasource.id"
+                          (ngModelChange)="updateSelectedDatasource({ id: $event })"
                         />
                       </div>
                       <div class="ngx-lowcode-prop-row">
-                        <span>{{ editorCopy().trigger }}</span>
+                        <span>{{ editorCopy().type }}</span>
                         <input
                           thyInput
-                          [ngModel]="action.trigger"
-                          (ngModelChange)="updateSelectedAction(action.id, { trigger: $event })"
+                          [ngModel]="datasource.type"
+                          (ngModelChange)="updateSelectedDatasource({ type: $event })"
                         />
                       </div>
+                      <div class="ngx-lowcode-prop-row">
+                        <span>{{ editorCopy().transport }}</span>
+                        <thy-select
+                          [ngModel]="datasource.transport"
+                          (ngModelChange)="updateSelectedDatasource({ transport: $event })"
+                        >
+                          @for (transport of datasourceTransportOptions; track transport) {
+                            <thy-option [thyValue]="transport" [thyLabelText]="transport"></thy-option>
+                          }
+                        </thy-select>
+                      </div>
+                      <div class="ngx-lowcode-prop-row">
+                        <span>{{ editorCopy().commandName }}</span>
+                        <input
+                          thyInput
+                          [ngModel]="datasource.commandName"
+                          (ngModelChange)="updateSelectedDatasource({ commandName: $event })"
+                        />
+                      </div>
+                      <div class="ngx-lowcode-prop-row">
+                        <span>{{ editorCopy().commandTarget }}</span>
+                        <input
+                          thyInput
+                          [ngModel]="datasource.commandTarget"
+                          (ngModelChange)="updateSelectedDatasource({ commandTarget: $event })"
+                        />
+                      </div>
+                      <div class="ngx-lowcode-prop-row">
+                        <span>{{ editorCopy().timeoutMs }}</span>
+                        <thy-input-number
+                          [ngModel]="datasource.timeoutMs"
+                          (ngModelChange)="updateSelectedDatasource({ timeoutMs: $event })"
+                        >
+                        </thy-input-number>
+                      </div>
+                      <div class="ngx-lowcode-prop-row">
+                        <span>{{ editorCopy().stateKey }}</span>
+                        <input
+                          thyInput
+                          [ngModel]="datasource.stateKey"
+                          (ngModelChange)="updateSelectedDatasource({ stateKey: $event })"
+                        />
+                      </div>
+                      <div class="ngx-lowcode-prop-row ngx-lowcode-prop-row--full">
+                        <span>{{ editorCopy().payloadTemplate }}</span>
+                        <textarea
+                          class="ngx-lowcode-code-input"
+                          [ngModel]="datasource.payloadTemplateText"
+                          (ngModelChange)="updateSelectedDatasource({ payloadTemplateText: $event })"
+                          rows="4"
+                        ></textarea>
+                      </div>
                     </div>
+                    <div class="ngx-lowcode-config-card__actions">
+                      <button [thyButton]="buttonKinds.default" (click)="removeSelectedDatasource()">
+                        {{ editorCopy().remove }}
+                      </button>
+                    </div>
+                  </div>
+                } @else {
+                  <p class="ngx-lowcode-empty">{{ editorCopy().noDatasourceBound }}</p>
+                }
+              </div>
 
-                    <div class="ngx-lowcode-config-subtitle">{{ editorCopy().steps }}</div>
-                    @for (step of action.steps; track $index; let stepIndex = $index) {
-                      <div class="ngx-lowcode-config-card ngx-lowcode-config-card--nested">
-                        <div class="ngx-lowcode-config-grid">
-                          <div class="ngx-lowcode-prop-row">
-                            <span>{{ editorCopy().type }}</span>
-                            <thy-select
-                              [ngModel]="step.type"
-                              (ngModelChange)="updateSelectedActionStep(action.id, stepIndex, { type: $event })"
-                            >
-                              @for (type of actionStepTypeOptions; track type) {
-                                <thy-option [thyValue]="type" [thyLabelText]="type"></thy-option>
-                              }
-                            </thy-select>
-                          </div>
+              <div class="ngx-lowcode-config-actions">
+                <button [thyButton]="buttonKinds.primaryOutline" (click)="applyDatasourcesForm()">
+                  {{ t().applyDatasources }}
+                </button>
+              </div>
+            }
+            @if (datasourcesDraftError(); as error) {
+              <p class="ngx-lowcode-error">{{ error }}</p>
+            }
+          </div>
+        </thy-tab>
+      }
 
-                              @if (step.type === 'message') {
-                                <div class="ngx-lowcode-prop-row ngx-lowcode-prop-row--full">
-                                  <span>{{ editorCopy().message }}</span>
-                                  <textarea
-                                    [ngModel]="step.message"
-                                    (ngModelChange)="updateSelectedActionStep(action.id, stepIndex, { message: $event })"
-                                    rows="3"
-                                  ></textarea>
-                                </div>
-                              }
+      @if (supportsSelectedNodeActions()) {
+        <thy-tab [thyTitle]="t().actions" id="actions">
+          <div class="ngx-lowcode-panel__content">
+            @if (selectedNode()) {
+              <div class="ngx-lowcode-config-meta">
+                <div class="ngx-lowcode-config-subtitle">{{ editorCopy().eventBindings }}</div>
+              </div>
 
-                              @if (step.type === 'callDatasource') {
-                                <div class="ngx-lowcode-prop-row">
-                                  <span>ID</span>
-                                  <input
-                                    thyInput
-                                    [ngModel]="step.datasourceId"
-                                    (ngModelChange)="updateSelectedActionStep(action.id, stepIndex, { datasourceId: $event })"
-                                  />
-                                </div>
-                                <div class="ngx-lowcode-prop-row">
-                                  <span>{{ editorCopy().stateKey }}</span>
-                                  <input
-                                    thyInput
-                                    [ngModel]="step.stateKey"
-                                    (ngModelChange)="updateSelectedActionStep(action.id, stepIndex, { stateKey: $event })"
-                                  />
-                                </div>
-                              }
+              <div class="ngx-lowcode-config-list">
+                @for (binding of selectedComponentActionBindings(); track binding.propKey) {
+                  <div class="ngx-lowcode-config-card">
+                    <div class="ngx-lowcode-config-grid">
+                      <div class="ngx-lowcode-prop-row">
+                        <span>{{ binding.label }}</span>
+                        <thy-select
+                          [ngModel]="binding.actionId || null"
+                          (ngModelChange)="updateSelectedNodeActionBinding(binding.propKey, $event ?? '')"
+                        >
+                          @for (actionId of availableActionIds(); track actionId) {
+                            <thy-option [thyValue]="actionId" [thyLabelText]="actionId"></thy-option>
+                          }
+                        </thy-select>
+                      </div>
+                    </div>
+                    <div class="ngx-lowcode-config-card__actions">
+                      <button [thyButton]="buttonKinds.default" (click)="addBoundAction(binding.propKey)">
+                        {{ editorCopy().bindAction }}
+                      </button>
+                      @if (binding.actionId) {
+                        <button
+                          [thyButton]="buttonKinds.default"
+                          (click)="updateSelectedNodeActionBinding(binding.propKey, '')"
+                        >
+                          {{ editorCopy().remove }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
 
-                              @if (step.type === 'setState') {
-                                <div class="ngx-lowcode-prop-row ngx-lowcode-prop-row--full">
-                                  <span>{{ editorCopy().patch }}</span>
-                                  <textarea
-                                    class="ngx-lowcode-code-input"
-                                    [ngModel]="step.patchText"
-                                    (ngModelChange)="updateSelectedActionStep(action.id, stepIndex, { patchText: $event })"
-                                    rows="4"
-                                  ></textarea>
-                                </div>
-                              }
+              @if (selectedComponentActions().length) {
+                <div class="ngx-lowcode-config-list">
+                  @for (action of selectedComponentActions(); track action.id) {
+                    <div class="ngx-lowcode-config-card">
+                      <div class="ngx-lowcode-config-grid">
+                        <div class="ngx-lowcode-prop-row">
+                          <span>ID</span>
+                          <input
+                            thyInput
+                            [ngModel]="action.id"
+                            (ngModelChange)="updateSelectedAction(action.id, { id: $event })"
+                          />
+                        </div>
+                        <div class="ngx-lowcode-prop-row">
+                          <span>{{ editorCopy().trigger }}</span>
+                          <input
+                            thyInput
+                            [ngModel]="action.trigger"
+                            (ngModelChange)="updateSelectedAction(action.id, { trigger: $event })"
+                          />
+                        </div>
+                      </div>
 
-                              @if (step.type === 'openModal') {
-                                <div class="ngx-lowcode-prop-row">
-                                  <span>{{ editorCopy().modalId }}</span>
-                                  <input
-                                    thyInput
-                                    [ngModel]="step.modalId"
-                                    (ngModelChange)="updateSelectedActionStep(action.id, stepIndex, { modalId: $event })"
-                                  />
-                                </div>
-                              }
+                      <div class="ngx-lowcode-config-subtitle">{{ editorCopy().steps }}</div>
+                      @for (step of action.steps; track $index; let stepIndex = $index) {
+                        <div class="ngx-lowcode-config-card ngx-lowcode-config-card--nested">
+                          <div class="ngx-lowcode-config-grid">
+                            <div class="ngx-lowcode-prop-row">
+                              <span>{{ editorCopy().type }}</span>
+                              <thy-select
+                                [ngModel]="step.type"
+                                (ngModelChange)="updateSelectedActionStep(action.id, stepIndex, { type: $event })"
+                              >
+                                @for (type of actionStepTypeOptions; track type) {
+                                  <thy-option [thyValue]="type" [thyLabelText]="type"></thy-option>
+                                }
+                              </thy-select>
+                            </div>
 
-                              @if (step.type === 'startWorkflow') {
-                                <div class="ngx-lowcode-prop-row">
-                                  <span>{{ editorCopy().workflowName }}</span>
-                                  <input
-                                    thyInput
-                                    [ngModel]="step.workflowName"
-                                    (ngModelChange)="updateSelectedActionStep(action.id, stepIndex, { workflowName: $event })"
-                                  />
-                                </div>
-                                <div class="ngx-lowcode-prop-row ngx-lowcode-prop-row--full">
-                                  <span>{{ editorCopy().payloadTemplate }}</span>
-                                  <textarea
-                                    class="ngx-lowcode-code-input"
-                                    [ngModel]="step.payloadTemplateText"
-                                    (ngModelChange)="updateSelectedActionStep(action.id, stepIndex, { payloadTemplateText: $event })"
-                                    rows="4"
-                                  ></textarea>
-                                </div>
-                              }
+                            @if (step.type === 'message') {
+                              <div class="ngx-lowcode-prop-row ngx-lowcode-prop-row--full">
+                                <span>{{ editorCopy().message }}</span>
+                                <textarea
+                                  [ngModel]="step.message"
+                                  (ngModelChange)="updateSelectedActionStep(action.id, stepIndex, { message: $event })"
+                                  rows="3"
+                                ></textarea>
+                              </div>
+                            }
+
+                            @if (step.type === 'callDatasource') {
+                              <div class="ngx-lowcode-prop-row">
+                                <span>ID</span>
+                                <input
+                                  thyInput
+                                  [ngModel]="step.datasourceId"
+                                  (ngModelChange)="
+                                    updateSelectedActionStep(action.id, stepIndex, { datasourceId: $event })
+                                  "
+                                />
+                              </div>
+                              <div class="ngx-lowcode-prop-row">
+                                <span>{{ editorCopy().stateKey }}</span>
+                                <input
+                                  thyInput
+                                  [ngModel]="step.stateKey"
+                                  (ngModelChange)="updateSelectedActionStep(action.id, stepIndex, { stateKey: $event })"
+                                />
+                              </div>
+                            }
+
+                            @if (step.type === 'setState') {
+                              <div class="ngx-lowcode-prop-row ngx-lowcode-prop-row--full">
+                                <span>{{ editorCopy().patch }}</span>
+                                <textarea
+                                  class="ngx-lowcode-code-input"
+                                  [ngModel]="step.patchText"
+                                  (ngModelChange)="
+                                    updateSelectedActionStep(action.id, stepIndex, { patchText: $event })
+                                  "
+                                  rows="4"
+                                ></textarea>
+                              </div>
+                            }
+
+                            @if (step.type === 'openModal') {
+                              <div class="ngx-lowcode-prop-row">
+                                <span>{{ editorCopy().modalId }}</span>
+                                <input
+                                  thyInput
+                                  [ngModel]="step.modalId"
+                                  (ngModelChange)="updateSelectedActionStep(action.id, stepIndex, { modalId: $event })"
+                                />
+                              </div>
+                            }
+
+                            @if (step.type === 'startWorkflow') {
+                              <div class="ngx-lowcode-prop-row">
+                                <span>{{ editorCopy().workflowName }}</span>
+                                <input
+                                  thyInput
+                                  [ngModel]="step.workflowName"
+                                  (ngModelChange)="
+                                    updateSelectedActionStep(action.id, stepIndex, { workflowName: $event })
+                                  "
+                                />
+                              </div>
+                              <div class="ngx-lowcode-prop-row ngx-lowcode-prop-row--full">
+                                <span>{{ editorCopy().payloadTemplate }}</span>
+                                <textarea
+                                  class="ngx-lowcode-code-input"
+                                  [ngModel]="step.payloadTemplateText"
+                                  (ngModelChange)="
+                                    updateSelectedActionStep(action.id, stepIndex, { payloadTemplateText: $event })
+                                  "
+                                  rows="4"
+                                ></textarea>
+                              </div>
+                            }
                           </div>
                           <div class="ngx-lowcode-config-card__actions">
                             <button
@@ -682,34 +691,34 @@
                             </button>
                           </div>
                         </div>
-                    }
+                      }
 
-                    <div class="ngx-lowcode-config-card__actions">
-                      <button [thyButton]="buttonKinds.default" (click)="addSelectedActionStep(action.id)">
-                        {{ editorCopy().addStep }}
-                      </button>
-                      <button [thyButton]="buttonKinds.default" (click)="removeSelectedAction(action.id)">
-                        {{ editorCopy().remove }}
-                      </button>
+                      <div class="ngx-lowcode-config-card__actions">
+                        <button [thyButton]="buttonKinds.default" (click)="addSelectedActionStep(action.id)">
+                          {{ editorCopy().addStep }}
+                        </button>
+                        <button [thyButton]="buttonKinds.default" (click)="removeSelectedAction(action.id)">
+                          {{ editorCopy().remove }}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                }
-              </div>
-            } @else {
-              <p class="ngx-lowcode-empty">{{ editorCopy().noBindings }}</p>
-            }
+                  }
+                </div>
+              } @else {
+                <p class="ngx-lowcode-empty">{{ editorCopy().noBindings }}</p>
+              }
 
-            <div class="ngx-lowcode-config-actions">
-              <button [thyButton]="buttonKinds.primaryOutline" (click)="applyActionsForm()">
-                {{ t().applyActions }}
-              </button>
-            </div>
-          }
-          @if (actionsDraftError(); as error) {
-            <p class="ngx-lowcode-error">{{ error }}</p>
-          }
-        </div>
-      </thy-tab>
+              <div class="ngx-lowcode-config-actions">
+                <button [thyButton]="buttonKinds.primaryOutline" (click)="applyActionsForm()">
+                  {{ t().applyActions }}
+                </button>
+              </div>
+            }
+            @if (actionsDraftError(); as error) {
+              <p class="ngx-lowcode-error">{{ error }}</p>
+            }
+          </div>
+        </thy-tab>
       }
     </thy-tabs>
   </div>

@@ -93,11 +93,7 @@ export class DemoBffDatasourceExecutorService {
 
   constructor(private readonly http: HttpClient) {}
 
-  execute: NgxLowcodeDatasourceExecutor = async ({
-    datasource,
-    state,
-    payload
-  }: NgxLowcodeDatasourceRequest) => {
+  execute: NgxLowcodeDatasourceExecutor = async ({ datasource, state, payload }: NgxLowcodeDatasourceRequest) => {
     if (datasource.type === 'local-payload') {
       return extractPayloadField(payload, String(datasource.request?.params?.['field'] ?? 'id'));
     }
@@ -251,9 +247,7 @@ export class DemoBffDatasourceExecutorService {
   }
 }
 
-function resolveMutationOperation(
-  datasource: NgxLowcodeDatasourceDefinition
-): DemoMutationRequest['operation'] | null {
+function resolveMutationOperation(datasource: NgxLowcodeDatasourceDefinition): DemoMutationRequest['operation'] | null {
   const configured = datasource.request?.params?.['operation'];
   if (configured === 'create' || configured === 'update' || configured === 'delete') {
     return configured;
@@ -301,10 +295,7 @@ function resolveMutationEndpoint(datasource: NgxLowcodeDatasourceDefinition): st
   return `${resolveBaseUrl()}/mutation`;
 }
 
-function toQueryPayload(
-  datasource: NgxLowcodeDatasourceDefinition,
-  state: Record<string, unknown>
-): DemoQueryRequest {
+function toQueryPayload(datasource: NgxLowcodeDatasourceDefinition, state: Record<string, unknown>): DemoQueryRequest {
   const stateKeys = resolveStateKeysConfig(datasource);
   const tenantId = String(state[stateKeys.tenantId] ?? 'tenant-a');
   const userId = String(state[stateKeys.userId] ?? `${tenantId}-user`);
@@ -399,7 +390,8 @@ function resolveFieldStateMap(datasource: NgxLowcodeDatasourceDefinition): Recor
 
 function resolveStateKeysConfig(datasource: NgxLowcodeDatasourceDefinition): Required<DemoDatasourceStateKeysConfig> {
   const raw = datasource.request?.params?.['stateKeys'];
-  const normalized = raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as DemoDatasourceStateKeysConfig) : {};
+  const normalized =
+    raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as DemoDatasourceStateKeysConfig) : {};
   return {
     tenantId: normalized.tenantId?.trim() || 'tenantId',
     userId: normalized.userId?.trim() || 'userId',
@@ -501,11 +493,7 @@ function resolveFilterStateKeys(datasource: NgxLowcodeDatasourceDefinition): Map
   );
 }
 
-function appendFilter(
-  target: Record<string, string | number | boolean>,
-  key: string,
-  value: unknown
-): void {
+function appendFilter(target: Record<string, string | number | boolean>, key: string, value: unknown): void {
   if (typeof value === 'string') {
     const normalized = value.trim();
     if (!normalized || normalized === 'all') {
@@ -548,7 +536,13 @@ function resolveErrorMessage(error: unknown): string {
 
 function resolvePermissionScope(datasource: NgxLowcodeDatasourceDefinition): DemoPermissionScope {
   const raw = datasource.request?.params?.['permissionScope'];
-  if (raw === 'SELF' || raw === 'DEPT' || raw === 'DEPT_AND_CHILDREN' || raw === 'CUSTOM_ORG_SET' || raw === 'TENANT_ALL') {
+  if (
+    raw === 'SELF' ||
+    raw === 'DEPT' ||
+    raw === 'DEPT_AND_CHILDREN' ||
+    raw === 'CUSTOM_ORG_SET' ||
+    raw === 'TENANT_ALL'
+  ) {
     return raw;
   }
   return 'DEPT';
@@ -559,9 +553,7 @@ function resolveCustomOrgIds(datasource: NgxLowcodeDatasourceDefinition): string
   if (!Array.isArray(raw)) {
     return [];
   }
-  return raw
-    .map((item) => String(item).trim())
-    .filter((item) => item.length > 0);
+  return raw.map((item) => String(item).trim()).filter((item) => item.length > 0);
 }
 
 function resolveAllowedOrgIds(
@@ -628,14 +620,15 @@ function evaluateMutationPermission(
 }
 
 function resolveOrgChildren(tenantId: string, orgId: string): string[] {
-  const tree = tenantId === 'tenant-b'
-    ? {
-        'dept-c': ['dept-c-1', 'dept-c-2']
-      }
-    : {
-        'dept-a': ['dept-a-1', 'dept-a-2'],
-        'dept-b': ['dept-b-1']
-      };
+  const tree =
+    tenantId === 'tenant-b'
+      ? {
+          'dept-c': ['dept-c-1', 'dept-c-2']
+        }
+      : {
+          'dept-a': ['dept-a-1', 'dept-a-2'],
+          'dept-b': ['dept-b-1']
+        };
   return tree[orgId as keyof typeof tree] ?? [];
 }
 
@@ -666,7 +659,9 @@ function filterRows(
             .map((item) => String(item).toLowerCase())
             .some((item) => item.includes(String(value).toLowerCase()));
         }
-        return String(row[key] ?? '').toLowerCase().includes(String(value).toLowerCase());
+        return String(row[key] ?? '')
+          .toLowerCase()
+          .includes(String(value).toLowerCase());
       })
     );
   });

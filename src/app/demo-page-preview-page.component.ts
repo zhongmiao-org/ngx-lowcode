@@ -20,16 +20,30 @@ import { DemoWorkspaceService } from './demo-workspace.service';
         </div>
 
         <div class="preview-grid__status-grid">
-          <div><strong>{{ queryStatus().requestId }}</strong><span>{{ copy().requestId }}</span></div>
-          <div><strong>{{ queryStatus().source }}</strong><span>{{ copy().querySource }}</span></div>
-          <div><strong>{{ queryStatus().status }}</strong><span>{{ copy().queryStatus }}</span></div>
-          <div><strong>{{ queryStatus().rowCount }}</strong><span>{{ copy().queryRows }}</span></div>
-          <div><strong>{{ queryStatus().message }}</strong><span>{{ copy().queryMessage }}</span></div>
+          <div>
+            <strong>{{ queryStatus().requestId }}</strong
+            ><span>{{ copy().requestId }}</span>
+          </div>
+          <div>
+            <strong>{{ queryStatus().source }}</strong
+            ><span>{{ copy().querySource }}</span>
+          </div>
+          <div>
+            <strong>{{ queryStatus().status }}</strong
+            ><span>{{ copy().queryStatus }}</span>
+          </div>
+          <div>
+            <strong>{{ queryStatus().rowCount }}</strong
+            ><span>{{ copy().queryRows }}</span>
+          </div>
+          <div>
+            <strong>{{ queryStatus().message }}</strong
+            ><span>{{ copy().queryMessage }}</span>
+          </div>
         </div>
 
         <ngx-lowcode-renderer [schema]="workspace.schema()"></ngx-lowcode-renderer>
       </thy-card>
-
     </div>
   `,
   styles: [

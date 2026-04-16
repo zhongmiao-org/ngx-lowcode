@@ -18,8 +18,6 @@
       "@zhongmiao/ngx-lowcode-testing": ["projects/ngx-lowcode-testing/src/public-api.ts"]
     }
   },
-  "files": [
-    "src/main.ts"
-  ],
+  "files": ["src/main.ts"],
   "include": ["src/**/*.d.ts"]
 }

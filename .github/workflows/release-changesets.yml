@@ -48,8 +48,8 @@ jobs:
         with:
           version: npm run release:version
           publish: npm run release:publish
-          title: "chore(release): version packages"
-          commit: "chore(release): version packages"
+          title: 'chore(release): version packages'
+          commit: 'chore(release): version packages'
           createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -25,16 +25,37 @@ import { DemoWorkspaceService } from './demo-workspace.service';
           </div>
         </div>
         <div class="page-panel__actions">
-          <button thyButton="outline-primary" size="sm" (click)="workspace.generateQueryPage()">{{ copy().generateQueryPage }}</button>
-          <button thyButton="primary" size="sm" (click)="workspace.generateCrudPage()">{{ copy().generateCrudPage }}</button>
-          <button thyButton="outline-primary" size="sm" (click)="workspace.resetWorkspace()">{{ copy().resetWorkspace }}</button>
+          <button thyButton="outline-primary" size="sm" (click)="workspace.generateQueryPage()">
+            {{ copy().generateQueryPage }}
+          </button>
+          <button thyButton="primary" size="sm" (click)="workspace.generateCrudPage()">
+            {{ copy().generateCrudPage }}
+          </button>
+          <button thyButton="outline-primary" size="sm" (click)="workspace.resetWorkspace()">
+            {{ copy().resetWorkspace }}
+          </button>
         </div>
       </div>
 
       <div class="page-panel__stats">
-        <thy-statistic thyShape="card" thyColor="primary" [thyValue]="workspace.schema().datasources.length" [thyTitle]="copy().pageDatasources"></thy-statistic>
-        <thy-statistic thyShape="card" thyColor="info" [thyValue]="workspace.schema().actions.length" [thyTitle]="copy().pageActions"></thy-statistic>
-        <thy-statistic thyShape="card" thyColor="warning" [thyValue]="workspace.nodeCount()" [thyTitle]="copy().pageNodeCount"></thy-statistic>
+        <thy-statistic
+          thyShape="card"
+          thyColor="primary"
+          [thyValue]="workspace.schema().datasources.length"
+          [thyTitle]="copy().pageDatasources"
+        ></thy-statistic>
+        <thy-statistic
+          thyShape="card"
+          thyColor="info"
+          [thyValue]="workspace.schema().actions.length"
+          [thyTitle]="copy().pageActions"
+        ></thy-statistic>
+        <thy-statistic
+          thyShape="card"
+          thyColor="warning"
+          [thyValue]="workspace.nodeCount()"
+          [thyTitle]="copy().pageNodeCount"
+        ></thy-statistic>
       </div>
 
       <thy-card thyBordered="false" class="traceback-panel">
@@ -55,7 +76,9 @@ import { DemoWorkspaceService } from './demo-workspace.service';
             <input type="file" accept="application/json" (change)="onImportFile($event)" />
             <span>{{ copy().importDsl }}</span>
           </label>
-          <button thyButton="outline-default" size="sm" (click)="refreshSnapshots()">{{ copy().refreshSnapshots }}</button>
+          <button thyButton="outline-default" size="sm" (click)="refreshSnapshots()">
+            {{ copy().refreshSnapshots }}
+          </button>
         </div>
         <div class="traceback-panel__list">
           @if (snapshots().length === 0) {
@@ -68,8 +91,12 @@ import { DemoWorkspaceService } from './demo-workspace.service';
                   <p>{{ item.timestamp }} · {{ item.checksum }}</p>
                 </div>
                 <div class="traceback-panel__item-actions">
-                  <button thyButton="outline-primary" size="sm" (click)="restoreSnapshot(item.id)">{{ copy().restoreSnapshot }}</button>
-                  <button thyButton="outline-default" size="sm" (click)="removeSnapshot(item.id)">{{ copy().deleteSnapshot }}</button>
+                  <button thyButton="outline-primary" size="sm" (click)="restoreSnapshot(item.id)">
+                    {{ copy().restoreSnapshot }}
+                  </button>
+                  <button thyButton="outline-default" size="sm" (click)="removeSnapshot(item.id)">
+                    {{ copy().deleteSnapshot }}
+                  </button>
                 </div>
               </div>
             }
