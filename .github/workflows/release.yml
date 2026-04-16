@@ -68,7 +68,7 @@ jobs:
           echo "release_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Upload release metadata artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: release-metadata
           path: |
@@ -167,7 +167,7 @@ jobs:
         run: npm ci
 
       - name: Download release metadata artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: release-metadata
           path: .tmp
