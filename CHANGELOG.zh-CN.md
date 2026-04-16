@@ -9,3 +9,4 @@
 - feat(release): 新增总包 `@zhongmiao/ngx-lowcode`，并强制非空 changeset 必须包含总包。
 - feat(release): Draft 改为基于待发布 changeset 自动按子包分组汇总。
 - chore(ci): 新增 `ci-watchdog` 工作流，确定性故障自动开 lockfile 修复 PR，非确定性故障自动建待排查 issue。
+- fix(ci): 升级 actions 到 Node24 兼容版本，并强化 release 流程（监听 `release` 事件 + 本地 dist 路径发包）。

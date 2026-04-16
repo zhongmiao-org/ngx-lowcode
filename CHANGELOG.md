@@ -9,3 +9,4 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 - feat(release): add aggregate package `@zhongmiao/ngx-lowcode` and enforce aggregate-included changesets policy.
 - feat(release): compose release draft notes from pending changesets with per-package grouping.
 - chore(ci): add `ci-watchdog` workflow for automatic lockfile-fix PRs and fallback triage issue creation.
+- fix(ci): upgrade actions to Node24-compatible versions and harden release publish workflow (`release` listener + local dist publish path).
