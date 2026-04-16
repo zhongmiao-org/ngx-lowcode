@@ -6,6 +6,7 @@ import { DemoPageBuilderPageComponent } from './demo-page-builder-page.component
 import { DemoPageDesignerPageComponent } from './demo-page-designer-page.component';
 import { DemoPagePreviewPageComponent } from './demo-page-preview-page.component';
 import { DemoPageRouteConfigPageComponent } from './demo-page-route-config-page.component';
+import { DemoPermissionApiPageComponent } from './demo-permission-api-page.component';
 import { DemoWorkspaceLayoutComponent } from './demo-workspace-layout.component';
 
 export const routes: Routes = [
@@ -29,6 +30,10 @@ export const routes: Routes = [
       {
         path: 'datasource',
         component: DemoDatasourcePageComponent
+      },
+      {
+        path: 'permission',
+        component: DemoPermissionApiPageComponent
       },
       {
         path: 'page',

@@ -122,6 +122,7 @@ import { DemoWorkspaceService } from './demo-workspace.service';
             <thy-nav thyType="pulled">
               <a thyNavItem [thyNavItemActive]="activeSection() === 'model'" routerLink="/studio/model">{{ copy().workspaceNavModel }}</a>
               <a thyNavItem [thyNavItemActive]="activeSection() === 'datasource'" routerLink="/studio/datasource">{{ copy().workspaceNavDatasource }}</a>
+              <a thyNavItem [thyNavItemActive]="activeSection() === 'permission'" routerLink="/studio/permission">{{ copy().workspaceNavPermission }}</a>
               <a thyNavItem [thyNavItemActive]="activeSection() === 'page'" routerLink="/studio/page/designer">{{ copy().workspaceNavPage }}</a>
             </thy-nav>
             <div class="workspace-layout__header-actions">
@@ -144,6 +145,9 @@ import { DemoWorkspaceService } from './demo-workspace.service';
                 <a thyMenuItem thyIcon="blocks" routerLink="/studio/datasource" routerLinkActive="workspace-layout__menu-item--active">
                   <span thyMenuItemName>{{ copy().workspaceNavDatasource }}</span>
                 </a>
+                <a thyMenuItem thyIcon="lock" routerLink="/studio/permission" routerLinkActive="workspace-layout__menu-item--active">
+                  <span thyMenuItemName>{{ copy().workspaceNavPermission }}</span>
+                </a>
                 <thy-divider></thy-divider>
                 @if (activeSection() === 'model') {
                   <thy-menu-group [thyTitle]="copy().tableListTitle" [thyCollapsible]="true">
@@ -161,6 +165,15 @@ import { DemoWorkspaceService } from './demo-workspace.service';
                         </thy-menu-item-action>
                       </a>
                     }
+                  </thy-menu-group>
+                } @else if (activeSection() === 'permission') {
+                  <thy-menu-group [thyTitle]="copy().workspaceNavPermission" [thyCollapsible]="true">
+                    <a thyMenuItem thyIcon="setting" href="javascript:;">
+                      <span thyMenuItemName>{{ copy().apiDesignerTitle }}</span>
+                    </a>
+                    <a thyMenuItem thyIcon="shield" href="javascript:;">
+                      <span thyMenuItemName>{{ copy().permissionSectionTitle }}</span>
+                    </a>
                   </thy-menu-group>
                 } @else {
                   <thy-menu-group [thyTitle]="copy().datasourceListTitle" [thyCollapsible]="true">
@@ -386,10 +399,13 @@ export class DemoWorkspaceLayoutComponent {
     ),
     { initialValue: this.router.url }
   );
-  protected readonly activeSection = computed<'model' | 'datasource' | 'page'>(() => {
+  protected readonly activeSection = computed<'model' | 'datasource' | 'permission' | 'page'>(() => {
     const url = this.currentUrl();
     if (url.startsWith('/studio/datasource')) {
       return 'datasource';
+    }
+    if (url.startsWith('/studio/permission')) {
+      return 'permission';
     }
     if (url.startsWith('/studio/page')) {
       return 'page';

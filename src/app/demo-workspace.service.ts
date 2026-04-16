@@ -20,6 +20,24 @@ import {
 import { NgxLowcodeDesignerLocale } from 'ngx-lowcode-i18n';
 import { createDemoGeneratedSchema, createOrdersDemoSchema } from './demo-project-schema';
 
+export type DemoPermissionScope = 'SELF' | 'DEPT' | 'DEPT_AND_CHILDREN' | 'CUSTOM_ORG_SET' | 'TENANT_ALL';
+
+export interface DemoPermissionApiConfig {
+  queryEndpoint: string;
+  mutationEndpoint: string;
+  roles: string[];
+  selectedOrgId: string;
+  permissionScope: DemoPermissionScope;
+  customOrgIds: string[];
+  stateKeys: {
+    tenantId: string;
+    userId: string;
+    roles: string;
+    selectedRecordId: string;
+  };
+  orgIdStateKeys: string[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class DemoWorkspaceService {
   readonly projectId = signal<'commerce-core' | 'crm-ops'>('commerce-core');
@@ -51,6 +69,7 @@ export class DemoWorkspaceService {
   readonly selectedDatasource = computed(
     () => this.datasourceDrafts().find((draft) => draft.id === this.selectedDatasourceId()) ?? this.datasourceDrafts()[0] ?? null
   );
+  readonly permissionApiConfig = computed(() => this.readPermissionApiConfig());
   readonly selectedTable = computed(
     () => this.metaModel().tables.find((table) => table.id === this.selectedTableId()) ?? this.metaModel().tables[0] ?? null
   );
@@ -391,12 +410,129 @@ export class DemoWorkspaceService {
     this.lastCommand.set(`query page generated: ${selectedDatasource.tableId}`);
   }
 
+  updatePermissionApiConfig(config: Partial<DemoPermissionApiConfig>): void {
+    this.schema.update((schema) => {
+      const current = this.readPermissionApiConfig(schema);
+      const nextRoles = config.roles ? normalizeRoles(config.roles) : current.roles;
+      const nextSelectedOrgId = config.selectedOrgId ?? current.selectedOrgId;
+      const nextScope = config.permissionScope ?? current.permissionScope;
+      const nextCustomOrgIds = config.customOrgIds ? normalizeOrgIds(config.customOrgIds) : current.customOrgIds;
+      const nextStateKeys = {
+        ...current.stateKeys,
+        ...(config.stateKeys ?? {})
+      };
+      const nextOrgIdStateKeys = config.orgIdStateKeys ? normalizeOrgIdStateKeys(config.orgIdStateKeys) : current.orgIdStateKeys;
+
+      return {
+        ...schema,
+        state: {
+          ...schema.state,
+          roles: nextRoles,
+          selectedOrgId: nextSelectedOrgId
+        },
+        datasources: schema.datasources.map((datasource) =>
+          this.patchDatasourcePermissionApiConfig(
+            datasource,
+            {
+              queryEndpoint: config.queryEndpoint ?? current.queryEndpoint,
+              mutationEndpoint: config.mutationEndpoint ?? current.mutationEndpoint,
+              permissionScope: nextScope,
+              customOrgIds: nextCustomOrgIds,
+              stateKeys: nextStateKeys,
+              orgIdStateKeys: nextOrgIdStateKeys
+            }
+          )
+        )
+      };
+    });
+    this.lastCommand.set('permission/api config updated');
+  }
+
   private countNodes(nodes: NgxLowcodeNodeSchema[]): number {
     return nodes.reduce((total, node) => total + 1 + this.countNodes(node.children ?? []), 0);
   }
 
   private findTableLabel(tableId: string): string {
     return this.metaModel().tables.find((table) => table.id === tableId)?.label ?? tableId;
+  }
+
+  private readPermissionApiConfig(schema = this.schema()): DemoPermissionApiConfig {
+    const queryDatasource =
+      schema.datasources.find((datasource) => datasource.id.endsWith('-query-datasource')) ?? schema.datasources[0];
+    const mutationDatasource =
+      schema.datasources.find((datasource) => datasource.id.endsWith('-update-datasource')) ??
+      schema.datasources.find((datasource) => datasource.id.endsWith('-create-datasource')) ??
+      schema.datasources.find((datasource) => datasource.id.endsWith('-delete-datasource')) ??
+      schema.datasources[0];
+    const queryParams = (queryDatasource?.request?.params as Record<string, unknown> | undefined) ?? {};
+    const mutationParams = (mutationDatasource?.request?.params as Record<string, unknown> | undefined) ?? {};
+    const queryStateKeys = (queryParams['stateKeys'] as Record<string, unknown> | undefined) ?? {};
+    const mutationStateKeys = (mutationParams['stateKeys'] as Record<string, unknown> | undefined) ?? {};
+    const orgIdStateKeys =
+      (mutationParams['orgIdStateKeys'] as string[] | undefined) ??
+      (queryParams['orgIdStateKeys'] as string[] | undefined) ??
+      ['selectedOrgId', 'orgId', 'form_org_id', 'org_id'];
+    const permissionScopeRaw = mutationParams['permissionScope'] ?? queryParams['permissionScope'];
+    const customOrgIdsRaw = mutationParams['customOrgIds'] ?? queryParams['customOrgIds'];
+
+    return {
+      queryEndpoint: String(queryDatasource?.request?.url ?? '/query'),
+      mutationEndpoint: String(mutationDatasource?.request?.url ?? '/mutation'),
+      roles: normalizeRoles(schema.state['roles']),
+      selectedOrgId: String(schema.state['selectedOrgId'] ?? ''),
+      permissionScope: isPermissionScope(permissionScopeRaw) ? permissionScopeRaw : 'DEPT',
+      customOrgIds: normalizeOrgIds(customOrgIdsRaw),
+      stateKeys: {
+        tenantId: String(queryStateKeys['tenantId'] ?? 'tenantId'),
+        userId: String(queryStateKeys['userId'] ?? 'userId'),
+        roles: String(queryStateKeys['roles'] ?? 'roles'),
+        selectedRecordId: String(mutationStateKeys['selectedRecordId'] ?? 'selectedOrderId')
+      },
+      orgIdStateKeys: normalizeOrgIdStateKeys(orgIdStateKeys)
+    };
+  }
+
+  private patchDatasourcePermissionApiConfig(
+    datasource: NgxLowcodePageSchema['datasources'][number],
+    config: Omit<DemoPermissionApiConfig, 'roles' | 'selectedOrgId'>
+  ): NgxLowcodePageSchema['datasources'][number] {
+    const params = {
+      ...(datasource.request?.params ?? {})
+    };
+    const baseRequest = {
+      ...(datasource.request ?? {})
+    };
+    const isQuery = datasource.id.endsWith('-query-datasource');
+    const isMutation =
+      datasource.id.endsWith('-create-datasource') ||
+      datasource.id.endsWith('-update-datasource') ||
+      datasource.id.endsWith('-delete-datasource');
+
+    if (!isQuery && !isMutation) {
+      return datasource;
+    }
+
+    const stateKeys = {
+      tenantId: config.stateKeys.tenantId,
+      userId: config.stateKeys.userId,
+      roles: config.stateKeys.roles,
+      ...(isMutation ? { selectedRecordId: config.stateKeys.selectedRecordId } : {})
+    };
+
+    return {
+      ...datasource,
+      request: {
+        ...baseRequest,
+        url: isQuery ? config.queryEndpoint : config.mutationEndpoint,
+        params: {
+          ...params,
+          stateKeys,
+          orgIdStateKeys: [...config.orgIdStateKeys],
+          permissionScope: config.permissionScope,
+          customOrgIds: [...config.customOrgIds]
+        }
+      }
+    };
   }
 
   private nextRelationId(): string {
@@ -417,4 +553,43 @@ function slugify(input: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '_')
     .replace(/^_+|_+$/g, '');
+}
+
+function normalizeRoles(input: unknown): string[] {
+  if (Array.isArray(input)) {
+    return input
+      .map((item) => String(item).trim())
+      .filter((item) => item.length > 0);
+  }
+  if (typeof input === 'string') {
+    return input
+      .split(',')
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
+  }
+  return ['USER'];
+}
+
+function normalizeOrgIds(input: unknown): string[] {
+  if (Array.isArray(input)) {
+    return input
+      .map((item) => String(item).trim())
+      .filter((item) => item.length > 0);
+  }
+  if (typeof input === 'string') {
+    return input
+      .split(',')
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
+  }
+  return [];
+}
+
+function normalizeOrgIdStateKeys(input: unknown): string[] {
+  const keys = normalizeOrgIds(input);
+  return keys.length > 0 ? keys : ['selectedOrgId', 'orgId', 'form_org_id', 'org_id'];
+}
+
+function isPermissionScope(input: unknown): input is DemoPermissionScope {
+  return input === 'SELF' || input === 'DEPT' || input === 'DEPT_AND_CHILDREN' || input === 'CUSTOM_ORG_SET' || input === 'TENANT_ALL';
 }

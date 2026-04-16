@@ -10,6 +10,7 @@ export interface NgxLowcodeDemoProjectI18n {
   backHome: string;
   workspaceNavModel: string;
   workspaceNavDatasource: string;
+  workspaceNavPermission: string;
   workspaceNavPage: string;
   pageNavDesigner: string;
   pageNavPreview: string;
@@ -20,6 +21,7 @@ export interface NgxLowcodeDemoProjectI18n {
   commandBarTitle: string;
   modelStage: string;
   datasourceStage: string;
+  permissionStage: string;
   bindingStage: string;
   pageStage: string;
   createModel: string;
@@ -57,6 +59,8 @@ export interface NgxLowcodeDemoProjectI18n {
   tableSectionTitle: string;
   datasourceSectionTitle: string;
   bindingSectionTitle: string;
+  permissionSectionTitle: string;
+  apiDesignerTitle: string;
   generatedPageTitle: string;
   routeConfigTitle: string;
   routeConfigDescription: string;

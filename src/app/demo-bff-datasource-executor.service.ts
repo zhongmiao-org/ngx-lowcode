@@ -46,8 +46,26 @@ interface DemoDatasourceStateKeysConfig {
 }
 
 type DemoQuerySource = 'bff' | 'fallback';
-type DemoQueryStatus = 'success' | 'fallback' | 'error';
+type DemoQueryStatus = 'success' | 'fallback' | 'error' | 'denied';
 type DemoRecordRow = Record<string, string>;
+type DemoPermissionScope = 'SELF' | 'DEPT' | 'DEPT_AND_CHILDREN' | 'CUSTOM_ORG_SET' | 'TENANT_ALL';
+
+interface DemoPermissionDecision {
+  allowed: boolean;
+  scope: DemoPermissionScope;
+  allowedOrgIds: string[];
+  targetOrgId: string;
+  reason: string;
+}
+
+class PermissionDeniedError extends Error {
+  readonly status = 403;
+
+  constructor(message: string) {
+    super(message);
+    this.name = 'PermissionDeniedError';
+  }
+}
 
 export interface DemoQueryExecutionSnapshot {
   requestId: string;
@@ -155,6 +173,21 @@ export class DemoBffDatasourceExecutorService {
     const endpoint = resolveMutationEndpoint(datasource);
     const payload = toMutationPayload(datasource, state, operation);
     const requestId = crypto.randomUUID();
+    const permissionDecision = evaluateMutationPermission(datasource, state, payload);
+    if (!permissionDecision.allowed) {
+      const error = new PermissionDeniedError(
+        `permission denied: ${permissionDecision.reason} (scope=${permissionDecision.scope}, targetOrgId=${permissionDecision.targetOrgId})`
+      );
+      this.recordExecution({
+        requestId,
+        source: 'bff',
+        status: 'denied',
+        tenantId: payload.tenantId,
+        rowCount: 0,
+        message: error.message
+      });
+      throw error;
+    }
 
     try {
       const response = await firstValueFrom(
@@ -182,7 +215,7 @@ export class DemoBffDatasourceExecutorService {
       this.recordExecution({
         requestId,
         source: 'bff',
-        status: 'error',
+        status: isPermissionDenied(error) ? 'denied' : 'error',
         tenantId: payload.tenantId,
         rowCount: 0,
         message: resolveErrorMessage(error)
@@ -276,11 +309,19 @@ function toQueryPayload(
   const tenantId = String(state[stateKeys.tenantId] ?? 'tenant-a');
   const userId = String(state[stateKeys.userId] ?? `${tenantId}-user`);
   const roles = normalizeRoles(state[stateKeys.roles]);
+  const permissionScope = resolvePermissionScope(datasource);
+  const selectedOrgId = resolveOrgId(datasource, state, tenantId);
+  const customOrgIds = resolveCustomOrgIds(datasource);
+  const allowedOrgIds = resolveAllowedOrgIds(permissionScope, selectedOrgId, customOrgIds, tenantId, roles);
 
   return {
     table: resolveTable(datasource),
     fields: resolveFields(datasource),
-    filters: resolveFilters(datasource, state),
+    filters: resolveFilters(datasource, state, {
+      permissionScope,
+      selectedOrgId,
+      allowedOrgIds
+    }),
     tenantId,
     userId,
     roles,
@@ -401,7 +442,12 @@ function resolveFields(datasource: NgxLowcodeDatasourceDefinition): string[] {
 
 function resolveFilters(
   datasource: NgxLowcodeDatasourceDefinition,
-  state: Record<string, unknown>
+  state: Record<string, unknown>,
+  orgScope?: {
+    permissionScope: DemoPermissionScope;
+    selectedOrgId: string;
+    allowedOrgIds: string[];
+  }
 ): Record<string, string | number | boolean> {
   const filters: Record<string, string | number | boolean> = {};
   const prefix = resolveFilterStatePrefix(datasource);
@@ -421,6 +467,16 @@ function resolveFilters(
   ['keyword', 'owner', 'channel', 'priority', 'status', 'org_id'].forEach((legacyKey) => {
     appendFilter(filters, legacyKey, state[legacyKey]);
   });
+
+  if (orgScope && orgScope.permissionScope !== 'TENANT_ALL') {
+    if (orgScope.selectedOrgId) {
+      filters['org_id'] = orgScope.selectedOrgId;
+    }
+    if (orgScope.allowedOrgIds.length > 0) {
+      filters['org_scope'] = orgScope.permissionScope;
+      filters['org_ids'] = orgScope.allowedOrgIds.join(',');
+    }
+  }
 
   return filters;
 }
@@ -475,6 +531,9 @@ function shouldFallback(error: unknown): boolean {
 }
 
 function resolveErrorMessage(error: unknown): string {
+  if (isPermissionDenied(error)) {
+    return error.message;
+  }
   if (error instanceof HttpErrorResponse) {
     if (typeof error.error === 'string' && error.error.trim()) {
       return error.error.trim();
@@ -485,6 +544,107 @@ function resolveErrorMessage(error: unknown): string {
     return error.message;
   }
   return String(error ?? 'unknown error');
+}
+
+function resolvePermissionScope(datasource: NgxLowcodeDatasourceDefinition): DemoPermissionScope {
+  const raw = datasource.request?.params?.['permissionScope'];
+  if (raw === 'SELF' || raw === 'DEPT' || raw === 'DEPT_AND_CHILDREN' || raw === 'CUSTOM_ORG_SET' || raw === 'TENANT_ALL') {
+    return raw;
+  }
+  return 'DEPT';
+}
+
+function resolveCustomOrgIds(datasource: NgxLowcodeDatasourceDefinition): string[] {
+  const raw = datasource.request?.params?.['customOrgIds'];
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+  return raw
+    .map((item) => String(item).trim())
+    .filter((item) => item.length > 0);
+}
+
+function resolveAllowedOrgIds(
+  scope: DemoPermissionScope,
+  selectedOrgId: string,
+  customOrgIds: string[],
+  tenantId: string,
+  roles: string[]
+): string[] {
+  if (scope === 'TENANT_ALL' || roles.includes('SUPER_ADMIN')) {
+    return [];
+  }
+  if (scope === 'CUSTOM_ORG_SET') {
+    return customOrgIds;
+  }
+
+  const baseOrgId = selectedOrgId || defaultTenantOrgId(tenantId);
+  if (scope === 'DEPT_AND_CHILDREN') {
+    return [baseOrgId, ...resolveOrgChildren(tenantId, baseOrgId)];
+  }
+  return [baseOrgId];
+}
+
+function evaluateMutationPermission(
+  datasource: NgxLowcodeDatasourceDefinition,
+  state: Record<string, unknown>,
+  payload: DemoMutationRequest
+): DemoPermissionDecision {
+  const scope = resolvePermissionScope(datasource);
+  const customOrgIds = resolveCustomOrgIds(datasource);
+  const selectedOrgId =
+    (typeof state['selectedOrgId'] === 'string' && state['selectedOrgId'].trim()) ||
+    resolveOrgId(datasource, state, payload.tenantId);
+  const allowedOrgIds = resolveAllowedOrgIds(scope, selectedOrgId, customOrgIds, payload.tenantId, payload.roles);
+  const targetOrgId = (payload.orgId?.trim() || resolveOrgId(datasource, state, payload.tenantId)).trim();
+
+  if (scope === 'TENANT_ALL' || payload.roles.includes('SUPER_ADMIN')) {
+    return {
+      allowed: true,
+      scope,
+      allowedOrgIds,
+      targetOrgId,
+      reason: 'scope-tenant-all'
+    };
+  }
+
+  if (allowedOrgIds.includes(targetOrgId)) {
+    return {
+      allowed: true,
+      scope,
+      allowedOrgIds,
+      targetOrgId,
+      reason: 'org-allowed'
+    };
+  }
+
+  return {
+    allowed: false,
+    scope,
+    allowedOrgIds,
+    targetOrgId,
+    reason: 'org-out-of-scope'
+  };
+}
+
+function resolveOrgChildren(tenantId: string, orgId: string): string[] {
+  const tree = tenantId === 'tenant-b'
+    ? {
+        'dept-c': ['dept-c-1', 'dept-c-2']
+      }
+    : {
+        'dept-a': ['dept-a-1', 'dept-a-2'],
+        'dept-b': ['dept-b-1']
+      };
+  return tree[orgId as keyof typeof tree] ?? [];
+}
+
+function defaultTenantOrgId(tenantId: string): string {
+  return tenantId === 'tenant-b' ? 'dept-c' : 'dept-a';
+}
+
+function isPermissionDenied(error: unknown): error is PermissionDeniedError {
+  return error instanceof PermissionDeniedError;
 }
 
 function filterRows(

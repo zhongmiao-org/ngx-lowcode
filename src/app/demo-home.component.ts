@@ -34,6 +34,7 @@ import { DemoWorkspaceService } from './demo-workspace.service';
           <p>{{ copy().heroDescription }}</p>
           <div class="demo-home__hero-actions">
             <a thyButton="primary" routerLink="/studio/model">{{ copy().workspaceNavModel }}</a>
+            <a thyButton="outline-primary" routerLink="/studio/permission">{{ copy().workspaceNavPermission }}</a>
             <a thyButton="outline-primary" routerLink="/studio/page/designer">{{ copy().workspaceNavPage }}</a>
           </div>
         </div>
@@ -49,6 +50,12 @@ import { DemoWorkspaceService } from './demo-workspace.service';
             <thy-card-header [thyTitle]="copy().workspaceNavDatasource" [thyDescription]="copy().homeDatasourceDescription"></thy-card-header>
             <thy-card-content>
               <a thyButton="primary" routerLink="/studio/datasource">{{ copy().workspaceNavDatasource }}</a>
+            </thy-card-content>
+          </thy-card>
+          <thy-card thyBordered="false" class="demo-home__card">
+            <thy-card-header [thyTitle]="copy().workspaceNavPermission" [thyDescription]="copy().permissionSectionTitle"></thy-card-header>
+            <thy-card-content>
+              <a thyButton="primary" routerLink="/studio/permission">{{ copy().workspaceNavPermission }}</a>
             </thy-card-content>
           </thy-card>
           <thy-card thyBordered="false" class="demo-home__card">
@@ -127,7 +134,7 @@ import { DemoWorkspaceService } from './demo-workspace.service';
       }
       .demo-home__cards {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 12px;
       }
       .demo-home__card {

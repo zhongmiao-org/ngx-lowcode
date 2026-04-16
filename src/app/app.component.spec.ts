@@ -40,7 +40,7 @@ describe('demo app routing shell', () => {
     expect(links.length).toBeGreaterThanOrEqual(3);
   });
 
-  it('navigates to separate studio routes for model, datasource, designer, preview and route config', async () => {
+  it('navigates to separate studio routes for model, datasource, permission, designer, preview and route config', async () => {
     const router = TestBed.inject(Router);
     const fixture = TestBed.createComponent(AppComponent);
 
@@ -53,6 +53,11 @@ describe('demo app routing shell', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     expect(fixture.nativeElement.textContent).toContain('数据源列表');
+
+    await router.navigateByUrl('/studio/permission');
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(fixture.nativeElement.textContent).toContain('权限策略设计');
 
     await router.navigateByUrl('/studio/page/designer');
     fixture.detectChanges();
