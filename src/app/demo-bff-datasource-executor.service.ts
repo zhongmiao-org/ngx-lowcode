@@ -28,6 +28,7 @@ interface DemoMutationRequest {
   tenantId: string;
   userId: string;
   roles: string[];
+  orgId?: string;
   key?: Record<string, string>;
   data?: Record<string, string>;
 }
@@ -241,7 +242,7 @@ function resolveBaseUrl(): string {
   if (typeof runtimeValue === 'string' && runtimeValue.trim()) {
     return runtimeValue.trim().replace(/\/+$/, '');
   }
-  return 'http://localhost:3000';
+  return 'http://localhost:6000';
 }
 
 function resolveMutationEndpoint(datasource: NgxLowcodeDatasourceDefinition): string {
@@ -286,6 +287,7 @@ function toMutationPayload(
   const keyField = String(datasource.request?.params?.['keyField'] ?? 'id');
   const fieldStateMap = resolveFieldStateMap(datasource);
   const keyValue = String(state[fieldStateMap[keyField] ?? `form_${keyField}`] ?? state['selectedRecordId'] ?? '').trim();
+  const orgId = resolveOrgId(state, tenantId);
 
   const data =
     operation === 'delete'
@@ -301,11 +303,22 @@ function toMutationPayload(
     tenantId,
     userId,
     roles,
+    orgId,
     key: {
       [keyField]: keyValue
     },
     data
   };
+}
+
+function resolveOrgId(state: Record<string, unknown>, tenantId: string): string {
+  const candidates = [state['orgId'], state['form_org_id'], state['org_id'], state['selectedOrgId']];
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+  return tenantId === 'tenant-b' ? 'dept-c' : 'dept-a';
 }
 
 function resolveFieldStateMap(datasource: NgxLowcodeDatasourceDefinition): Record<string, string> {

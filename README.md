@@ -109,22 +109,22 @@ npm test
 npm start
 ```
 
-## Demo Integration with `meta-lc-bff`
+## Demo Integration with `meta-lc-platform`
 
-The root `src` demo is wired to BFF `/query` and supports tenant switching.
+The root `src` demo is wired to BFF `/query + /mutation` and supports tenant switching.
 
-- default BFF endpoint: `http://localhost:3000/query`
+- default BFF endpoint: `http://localhost:6000/query`
 - runtime override:
-  - `window.__LC_BFF_URL__ = "http://<host>:3000"` before app bootstrap
+  - `window.__LC_BFF_URL__ = "http://<host>:6000"` before app bootstrap
   - or set datasource `request.url` to absolute URL
 
 Demo verification path:
 
-1. Start `meta-lc-bff` with PostgreSQL/Redis.
+1. Start `meta-lc-platform/apps/bff-server` with PostgreSQL/Redis.
 2. Open demo and switch `Tenant A` / `Tenant B`.
 3. In `Query Filters`, trigger query via `Search` button or linked `status/channel/priority` changes.
 4. In `Order CRUD Editor`, run full CRUD flow:
-   - Create: fill `formOrderId/formOwner/formChannel/formPriority/formStatus`, then click `Create`
+   - Create: fill `formOrderId/formOwner/formChannel/formPriority/formStatus` (optional `form_org_id`), then click `Create`
    - Update: click a table row to populate editor, change fields, then click `Update`
    - Delete: select a row or input `formOrderId`, then click `Delete`
 5. Verify widget linkage:

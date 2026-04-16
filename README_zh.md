@@ -63,22 +63,22 @@ npm test
 npm start
 ```
 
-## 与 `meta-lc-bff` 的演示联调
+## 与 `meta-lc-platform` 的演示联调
 
-根目录 `src` 下的 demo 已接入 BFF `/query`，并支持租户切换演示。
+根目录 `src` 下的 demo 已接入 BFF `/query + /mutation`，并支持租户切换演示。
 
-- 默认 BFF 地址：`http://localhost:3000/query`
+- 默认 BFF 地址：`http://localhost:6000/query`
 - 运行时覆盖方式：
-  - 应用启动前设置 `window.__LC_BFF_URL__ = "http://<host>:3000"`
+  - 应用启动前设置 `window.__LC_BFF_URL__ = "http://<host>:6000"`
   - 或在 datasource `request.url` 中写绝对地址
 
 演示建议路径：
 
-1. 启动 `meta-lc-bff` 与 PostgreSQL/Redis。
+1. 启动 `meta-lc-platform/apps/bff-server` 与 PostgreSQL/Redis。
 2. 打开 demo，在 `Tenant A` 与 `Tenant B` 间切换。
 3. 在 `Query Filters` 中触发查询（`Search` 或 `status/channel/priority` 变更自动触发），验证 table 回填。
 4. 在 `Order CRUD Editor` 中执行完整 CRUD：
-   - Create：填写 `formOrderId/formOwner/formChannel/formPriority/formStatus` 后点 `Create`
+   - Create：填写 `formOrderId/formOwner/formChannel/formPriority/formStatus`（可选 `form_org_id`）后点 `Create`
    - Update：点击 table 行回填编辑器后修改字段并点 `Update`
    - Delete：选择行或输入 `formOrderId` 后点 `Delete`
 5. 验证控件联动：
