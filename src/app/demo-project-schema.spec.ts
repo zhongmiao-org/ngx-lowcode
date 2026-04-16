@@ -1,4 +1,8 @@
-import { createDemoMetaModelPreset, createDemoDatasourceDrafts, createDemoGeneratedSchema } from './demo-project-schema';
+import {
+  createDemoMetaModelPreset,
+  createDemoDatasourceDrafts,
+  createDemoGeneratedSchema
+} from './demo-project-schema';
 
 describe('demo-project-schema orchestration', () => {
   it('hydrates schema with stable demo state keys and datasource orchestration params', () => {
@@ -47,6 +51,8 @@ describe('demo-project-schema orchestration', () => {
     );
 
     expect(selectAction?.steps[0]?.stateKey).toBe('selectedOrderId');
-    expect(clearAction?.steps.some((step) => step.type === 'setState' && step.patch?.['selectedOrderId'] === '')).toBeTrue();
+    expect(
+      clearAction?.steps.some((step) => step.type === 'setState' && step.patch?.['selectedOrderId'] === '')
+    ).toBeTrue();
   });
 });

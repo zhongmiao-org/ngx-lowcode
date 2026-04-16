@@ -1,6 +1,10 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import type { NgxLowcodeNodeSchema, NgxLowcodePageSchema } from '@zhongmiao/ngx-lowcode-core-types';
-import { bindDatasourceToNode, createDatasourceDraftsFromModel, type NgxLowcodeDatasourceDraft } from '@zhongmiao/ngx-lowcode-datasource';
+import {
+  bindDatasourceToNode,
+  createDatasourceDraftsFromModel,
+  type NgxLowcodeDatasourceDraft
+} from '@zhongmiao/ngx-lowcode-datasource';
 import {
   appendColumnDraft,
   appendIndexDraft,
@@ -83,7 +87,10 @@ export class DemoWorkspaceService {
     )
   );
   readonly selectedDatasource = computed(
-    () => this.datasourceDrafts().find((draft) => draft.id === this.selectedDatasourceId()) ?? this.datasourceDrafts()[0] ?? null
+    () =>
+      this.datasourceDrafts().find((draft) => draft.id === this.selectedDatasourceId()) ??
+      this.datasourceDrafts()[0] ??
+      null
   );
   readonly snapshotFingerprint = computed(() =>
     stableStringify({
@@ -94,7 +101,8 @@ export class DemoWorkspaceService {
   );
   readonly permissionApiConfig = computed(() => this.readPermissionApiConfig());
   readonly selectedTable = computed(
-    () => this.metaModel().tables.find((table) => table.id === this.selectedTableId()) ?? this.metaModel().tables[0] ?? null
+    () =>
+      this.metaModel().tables.find((table) => table.id === this.selectedTableId()) ?? this.metaModel().tables[0] ?? null
   );
 
   switchTenant(tenantId: 'tenant-a' | 'tenant-b'): void {
@@ -162,7 +170,13 @@ export class DemoWorkspaceService {
     const childId = `${parentTableId}_detail_${this.metaModel().tables.filter((table) => table.parentTableId === parentTableId).length + 1}`;
     this.metaModel.set(
       appendTableDraft(this.metaModel(), {
-        ...createMetaTableDraft(childId, childId, `${this.findTableLabel(parentTableId)} Detail`, 'child', parentTableId),
+        ...createMetaTableDraft(
+          childId,
+          childId,
+          `${this.findTableLabel(parentTableId)} Detail`,
+          'child',
+          parentTableId
+        ),
         columns: [
           createMetaColumnDraft('id', 'id', 'string', { primary: true, required: true }),
           createMetaColumnDraft(`${parentTableId}_id`, `${parentTableId}_id`, 'string', { required: true }),
@@ -195,8 +209,12 @@ export class DemoWorkspaceService {
     if (!fromTableId || !fromColumnId || !toTableId || !toColumnId) {
       return;
     }
-    const fromExists = model.tables.some((table) => table.id === fromTableId && table.columns.some((column) => column.id === fromColumnId));
-    const toExists = model.tables.some((table) => table.id === toTableId && table.columns.some((column) => column.id === toColumnId));
+    const fromExists = model.tables.some(
+      (table) => table.id === fromTableId && table.columns.some((column) => column.id === fromColumnId)
+    );
+    const toExists = model.tables.some(
+      (table) => table.id === toTableId && table.columns.some((column) => column.id === toColumnId)
+    );
     if (!fromExists || !toExists) {
       return;
     }
@@ -204,7 +222,15 @@ export class DemoWorkspaceService {
     this.metaModel.set(
       appendRelationDraft(
         model,
-        createMetaRelationDraft(relationId, `${fromTableId}.${fromColumnId} -> ${toTableId}.${toColumnId}`, fromTableId, fromColumnId, toTableId, toColumnId, kind)
+        createMetaRelationDraft(
+          relationId,
+          `${fromTableId}.${fromColumnId} -> ${toTableId}.${toColumnId}`,
+          fromTableId,
+          fromColumnId,
+          toTableId,
+          toColumnId,
+          kind
+        )
       )
     );
     this.lastCommand.set(`relation added: ${relationId}`);
@@ -344,11 +370,15 @@ export class DemoWorkspaceService {
     this.metaModel.update((model) => ({
       ...model,
       tables: model.tables.filter((table) => table.id !== tableId && table.parentTableId !== tableId),
-      relations: model.relations.filter((relation) => relation.fromTableId !== tableId && relation.toTableId !== tableId),
+      relations: model.relations.filter(
+        (relation) => relation.fromTableId !== tableId && relation.toTableId !== tableId
+      ),
       indexes: model.indexes.filter((index) => index.tableId !== tableId)
     }));
     if (this.selectedTableId() === tableId) {
-      const nextTable = this.metaModel().tables.find((table) => table.id !== tableId && table.parentTableId !== tableId);
+      const nextTable = this.metaModel().tables.find(
+        (table) => table.id !== tableId && table.parentTableId !== tableId
+      );
       this.selectedTableId.set(nextTable?.id ?? '');
     }
     this.lastCommand.set(`table removed: ${tableId}`);
@@ -444,7 +474,9 @@ export class DemoWorkspaceService {
         ...current.stateKeys,
         ...(config.stateKeys ?? {})
       };
-      const nextOrgIdStateKeys = config.orgIdStateKeys ? normalizeOrgIdStateKeys(config.orgIdStateKeys) : current.orgIdStateKeys;
+      const nextOrgIdStateKeys = config.orgIdStateKeys
+        ? normalizeOrgIdStateKeys(config.orgIdStateKeys)
+        : current.orgIdStateKeys;
 
       return {
         ...schema,
@@ -454,17 +486,14 @@ export class DemoWorkspaceService {
           selectedOrgId: nextSelectedOrgId
         },
         datasources: schema.datasources.map((datasource) =>
-          this.patchDatasourcePermissionApiConfig(
-            datasource,
-            {
-              queryEndpoint: config.queryEndpoint ?? current.queryEndpoint,
-              mutationEndpoint: config.mutationEndpoint ?? current.mutationEndpoint,
-              permissionScope: nextScope,
-              customOrgIds: nextCustomOrgIds,
-              stateKeys: nextStateKeys,
-              orgIdStateKeys: nextOrgIdStateKeys
-            }
-          )
+          this.patchDatasourcePermissionApiConfig(datasource, {
+            queryEndpoint: config.queryEndpoint ?? current.queryEndpoint,
+            mutationEndpoint: config.mutationEndpoint ?? current.mutationEndpoint,
+            permissionScope: nextScope,
+            customOrgIds: nextCustomOrgIds,
+            stateKeys: nextStateKeys,
+            orgIdStateKeys: nextOrgIdStateKeys
+          })
         )
       };
     });
@@ -560,10 +589,8 @@ export class DemoWorkspaceService {
     const mutationParams = (mutationDatasource?.request?.params as Record<string, unknown> | undefined) ?? {};
     const queryStateKeys = (queryParams['stateKeys'] as Record<string, unknown> | undefined) ?? {};
     const mutationStateKeys = (mutationParams['stateKeys'] as Record<string, unknown> | undefined) ?? {};
-    const orgIdStateKeys =
-      (mutationParams['orgIdStateKeys'] as string[] | undefined) ??
-      (queryParams['orgIdStateKeys'] as string[] | undefined) ??
-      ['selectedOrgId', 'orgId', 'form_org_id', 'org_id'];
+    const orgIdStateKeys = (mutationParams['orgIdStateKeys'] as string[] | undefined) ??
+      (queryParams['orgIdStateKeys'] as string[] | undefined) ?? ['selectedOrgId', 'orgId', 'form_org_id', 'org_id'];
     const permissionScopeRaw = mutationParams['permissionScope'] ?? queryParams['permissionScope'];
     const customOrgIdsRaw = mutationParams['customOrgIds'] ?? queryParams['customOrgIds'];
 
@@ -686,9 +713,7 @@ function slugify(input: string): string {
 
 function normalizeRoles(input: unknown): string[] {
   if (Array.isArray(input)) {
-    return input
-      .map((item) => String(item).trim())
-      .filter((item) => item.length > 0);
+    return input.map((item) => String(item).trim()).filter((item) => item.length > 0);
   }
   if (typeof input === 'string') {
     return input
@@ -701,9 +726,7 @@ function normalizeRoles(input: unknown): string[] {
 
 function normalizeOrgIds(input: unknown): string[] {
   if (Array.isArray(input)) {
-    return input
-      .map((item) => String(item).trim())
-      .filter((item) => item.length > 0);
+    return input.map((item) => String(item).trim()).filter((item) => item.length > 0);
   }
   if (typeof input === 'string') {
     return input
@@ -720,7 +743,13 @@ function normalizeOrgIdStateKeys(input: unknown): string[] {
 }
 
 function isPermissionScope(input: unknown): input is DemoPermissionScope {
-  return input === 'SELF' || input === 'DEPT' || input === 'DEPT_AND_CHILDREN' || input === 'CUSTOM_ORG_SET' || input === 'TENANT_ALL';
+  return (
+    input === 'SELF' ||
+    input === 'DEPT' ||
+    input === 'DEPT_AND_CHILDREN' ||
+    input === 'CUSTOM_ORG_SET' ||
+    input === 'TENANT_ALL'
+  );
 }
 
 function stableStringify(input: unknown): string {

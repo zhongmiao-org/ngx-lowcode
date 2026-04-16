@@ -1,5 +1,11 @@
 import type { NgxLowcodeDatasourceDefinition, NgxLowcodePageSchema } from '@zhongmiao/ngx-lowcode-core-types';
-import { bindDatasourceToNode, createCrudPageSchema, createDatasourceDraftsFromModel, createQueryPageSchema, type NgxLowcodeDatasourceDraft } from '@zhongmiao/ngx-lowcode-datasource';
+import {
+  bindDatasourceToNode,
+  createCrudPageSchema,
+  createDatasourceDraftsFromModel,
+  createQueryPageSchema,
+  type NgxLowcodeDatasourceDraft
+} from '@zhongmiao/ngx-lowcode-datasource';
 import { createCommerceModelPreset, type NgxLowcodeMetaModelDraft } from '@zhongmiao/ngx-lowcode-meta-model';
 
 const DEMO_SELECTED_ORDER_STATE_KEY = 'selectedOrderId';
@@ -63,7 +69,10 @@ export function createDemoGeneratedSchema(
       datasource.id === `${draft.tableId}-query-datasource`
         ? {
             ...datasource,
-            mockData: [...createTenantSeedRows(draft.tableId, 'tenant-a'), ...createTenantSeedRows(draft.tableId, 'tenant-b')]
+            mockData: [
+              ...createTenantSeedRows(draft.tableId, 'tenant-a'),
+              ...createTenantSeedRows(draft.tableId, 'tenant-b')
+            ]
           }
         : datasource
     )
@@ -140,7 +149,9 @@ function withDatasourceOrchestrationConfig(
   return datasource;
 }
 
-function withActionOrchestrationConfig(action: NgxLowcodePageSchema['actions'][number]): NgxLowcodePageSchema['actions'][number] {
+function withActionOrchestrationConfig(
+  action: NgxLowcodePageSchema['actions'][number]
+): NgxLowcodePageSchema['actions'][number] {
   if (action.id === 'select-row-action') {
     return {
       ...action,
@@ -176,7 +187,9 @@ function withActionOrchestrationConfig(action: NgxLowcodePageSchema['actions'][n
   return action;
 }
 
-function withLayoutOrchestrationConfig(node: NgxLowcodePageSchema['layoutTree'][number]): NgxLowcodePageSchema['layoutTree'][number] {
+function withLayoutOrchestrationConfig(
+  node: NgxLowcodePageSchema['layoutTree'][number]
+): NgxLowcodePageSchema['layoutTree'][number] {
   const currentText = typeof node.props['text'] === 'string' ? node.props['text'] : null;
   const patchedText =
     node.id === 'crud-hint' && currentText

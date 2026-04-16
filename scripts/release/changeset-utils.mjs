@@ -27,9 +27,7 @@ function parseFrontmatter(raw) {
 
 export function readChangesets() {
   if (!fs.existsSync(CHANGESET_DIR)) return [];
-  const files = fs
-    .readdirSync(CHANGESET_DIR)
-    .filter((f) => f.endsWith('.md') && !SKIP_FILES.has(f));
+  const files = fs.readdirSync(CHANGESET_DIR).filter((f) => f.endsWith('.md') && !SKIP_FILES.has(f));
 
   return files.map((file) => {
     const filepath = path.join(CHANGESET_DIR, file);

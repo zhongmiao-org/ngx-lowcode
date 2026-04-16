@@ -270,8 +270,16 @@ export class NgxLowcodeDesignerPropsComponent {
       index
     };
   });
-  readonly availableDatasourceIds = computed(() => this.datasourcesFormDraft().map((datasource) => datasource.id).filter(Boolean));
-  readonly availableActionIds = computed(() => this.actionsFormDraft().map((action) => action.id).filter(Boolean));
+  readonly availableDatasourceIds = computed(() =>
+    this.datasourcesFormDraft()
+      .map((datasource) => datasource.id)
+      .filter(Boolean)
+  );
+  readonly availableActionIds = computed(() =>
+    this.actionsFormDraft()
+      .map((action) => action.id)
+      .filter(Boolean)
+  );
   readonly editorCopy = computed(() =>
     this.locale() === 'zh-CN'
       ? {
@@ -939,7 +947,10 @@ export class NgxLowcodeDesignerPropsComponent {
         : undefined;
       const mockData = draft.mockDataText.trim() ? this.parseJson<unknown>(draft.mockDataText) : undefined;
 
-      if ((draft.payloadTemplateText.trim() && payloadTemplate === null) || (draft.mockDataText.trim() && mockData === null)) {
+      if (
+        (draft.payloadTemplateText.trim() && payloadTemplate === null) ||
+        (draft.mockDataText.trim() && mockData === null)
+      ) {
         this.datasourcesDraftError.set(this.editorCopy().invalidDatasourceJson);
         return null;
       }
@@ -1043,7 +1054,9 @@ export class NgxLowcodeDesignerPropsComponent {
       if (!setter.layoutModes?.length) {
         return !this.isManagedInDedicatedPanel(setter.key);
       }
-      return !this.isManagedInDedicatedPanel(setter.key) && (layoutMode ? setter.layoutModes.includes(layoutMode) : false);
+      return (
+        !this.isManagedInDedicatedPanel(setter.key) && (layoutMode ? setter.layoutModes.includes(layoutMode) : false)
+      );
     });
   }
 

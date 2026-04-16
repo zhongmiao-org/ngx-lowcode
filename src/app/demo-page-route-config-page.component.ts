@@ -19,8 +19,14 @@ import { DemoWorkspaceService } from './demo-workspace.service';
         </div>
 
         <div class="route-config__meta">
-          <div><strong>{{ workspace.previewRoutePath() }}</strong><span>{{ copy().routeConfigPathLabel }}</span></div>
-          <div><strong>{{ workspace.routeMenuTitle() }}</strong><span>{{ copy().routeConfigMenuLabel }}</span></div>
+          <div>
+            <strong>{{ workspace.previewRoutePath() }}</strong
+            ><span>{{ copy().routeConfigPathLabel }}</span>
+          </div>
+          <div>
+            <strong>{{ workspace.routeMenuTitle() }}</strong
+            ><span>{{ copy().routeConfigMenuLabel }}</span>
+          </div>
         </div>
 
         <pre class="route-config__code">{{ workspace.previewRouteConfig() }}</pre>

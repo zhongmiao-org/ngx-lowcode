@@ -1,4 +1,13 @@
-import type { NgxLowcodeMetaColumnDraft, NgxLowcodeMetaColumnType, NgxLowcodeMetaIndexDraft, NgxLowcodeMetaModelDraft, NgxLowcodeMetaModelValidationIssue, NgxLowcodeMetaRelationDraft, NgxLowcodeMetaTableDraft, NgxLowcodeMetaTableKind } from './meta-model.types';
+import type {
+  NgxLowcodeMetaColumnDraft,
+  NgxLowcodeMetaColumnType,
+  NgxLowcodeMetaIndexDraft,
+  NgxLowcodeMetaModelDraft,
+  NgxLowcodeMetaModelValidationIssue,
+  NgxLowcodeMetaRelationDraft,
+  NgxLowcodeMetaTableDraft,
+  NgxLowcodeMetaTableKind
+} from './meta-model.types';
 
 export function createMetaModelDraft(
   id = 'commerce-workspace',
@@ -149,10 +158,16 @@ export function validateMetaModelDraft(model: NgxLowcodeMetaModelDraft): NgxLowc
     tableIds.add(table.id);
 
     if (table.kind === 'child' && !table.parentTableId) {
-      issues.push({ path: `tables.${tableIndex}.parentTableId`, message: 'Child tables must point to a parent table.' });
+      issues.push({
+        path: `tables.${tableIndex}.parentTableId`,
+        message: 'Child tables must point to a parent table.'
+      });
     }
     if (table.parentTableId && !model.tables.some((candidate) => candidate.id === table.parentTableId)) {
-      issues.push({ path: `tables.${tableIndex}.parentTableId`, message: `Unknown parent table "${table.parentTableId}".` });
+      issues.push({
+        path: `tables.${tableIndex}.parentTableId`,
+        message: `Unknown parent table "${table.parentTableId}".`
+      });
     }
 
     const columnNames = new Set<string>();
@@ -177,10 +192,16 @@ export function validateMetaModelDraft(model: NgxLowcodeMetaModelDraft): NgxLowc
     const fromColumns = listTableColumns(model, relation.fromTableId);
     const toColumns = listTableColumns(model, relation.toTableId);
     if (fromColumns.length === 0) {
-      issues.push({ path: `relations.${relationIndex}.fromTableId`, message: `Unknown relation source table "${relation.fromTableId}".` });
+      issues.push({
+        path: `relations.${relationIndex}.fromTableId`,
+        message: `Unknown relation source table "${relation.fromTableId}".`
+      });
     }
     if (toColumns.length === 0) {
-      issues.push({ path: `relations.${relationIndex}.toTableId`, message: `Unknown relation target table "${relation.toTableId}".` });
+      issues.push({
+        path: `relations.${relationIndex}.toTableId`,
+        message: `Unknown relation target table "${relation.toTableId}".`
+      });
     }
     if (!fromColumns.some((column) => column.id === relation.fromColumnId)) {
       issues.push({
@@ -293,15 +314,38 @@ export function createCommerceModelPreset(): NgxLowcodeMetaModelDraft {
 
   model = appendRelationDraft(
     model,
-    createMetaRelationDraft('orders-customer-fk', 'orders.customer_id -> customers.id', 'orders', 'customer_id', 'customers', 'id')
+    createMetaRelationDraft(
+      'orders-customer-fk',
+      'orders.customer_id -> customers.id',
+      'orders',
+      'customer_id',
+      'customers',
+      'id'
+    )
   );
   model = appendRelationDraft(
     model,
-    createMetaRelationDraft('order-items-parent-fk', 'order_items.order_id -> orders.id', 'order_items', 'order_id', 'orders', 'id')
+    createMetaRelationDraft(
+      'order-items-parent-fk',
+      'order_items.order_id -> orders.id',
+      'order_items',
+      'order_id',
+      'orders',
+      'id'
+    )
   );
-  model = appendIndexDraft(model, createMetaIndexDraft('orders-owner-status-idx', 'orders_owner_status_idx', 'orders', ['owner', 'status']));
-  model = appendIndexDraft(model, createMetaIndexDraft('orders-customer-idx', 'orders_customer_id_idx', 'orders', ['customer_id']));
-  model = appendIndexDraft(model, createMetaIndexDraft('order-items-order-idx', 'order_items_order_id_idx', 'order_items', ['order_id']));
+  model = appendIndexDraft(
+    model,
+    createMetaIndexDraft('orders-owner-status-idx', 'orders_owner_status_idx', 'orders', ['owner', 'status'])
+  );
+  model = appendIndexDraft(
+    model,
+    createMetaIndexDraft('orders-customer-idx', 'orders_customer_id_idx', 'orders', ['customer_id'])
+  );
+  model = appendIndexDraft(
+    model,
+    createMetaIndexDraft('order-items-order-idx', 'order_items_order_id_idx', 'order_items', ['order_id'])
+  );
 
   return model;
 }
