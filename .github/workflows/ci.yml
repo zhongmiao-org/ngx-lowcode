@@ -34,9 +34,15 @@ jobs:
       - name: Pin npm version
         run: npm i -g npm@11.4.2
 
-      - name: Setup Chrome
-        id: setup-chrome
-        uses: browser-actions/setup-chrome@v1
+      - name: Resolve Chrome binary from runner
+        id: chrome
+        run: |
+          CHROME_BIN_REAL="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [[ -z "${CHROME_BIN_REAL}" ]]; then
+            echo "Chrome binary not found on runner."
+            exit 1
+          fi
+          echo "chrome_bin=${CHROME_BIN_REAL}" >> "$GITHUB_OUTPUT"
 
       - name: Install dependencies
         run: npm ci
@@ -49,7 +55,7 @@ jobs:
 
       - name: Test
         env:
-          CHROME_BIN_REAL: ${{ steps.setup-chrome.outputs.chrome-path }}
+          CHROME_BIN_REAL: ${{ steps.chrome.outputs.chrome_bin }}
         run: |
           cat > /tmp/chrome-no-sandbox <<EOF
           #!/usr/bin/env bash
