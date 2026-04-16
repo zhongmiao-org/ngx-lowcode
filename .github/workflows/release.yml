@@ -180,7 +180,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if git diff --quiet -- CHANGELOG.md CHANGELOG.zh-CN.md projects/*/CHANGELOG.md; then
+          if git diff --quiet -- CHANGELOG.md CHANGELOG.zh-CN.md projects/*/CHANGELOG.md projects/*/CHANGELOG.zh-CN.md; then
             echo "No changelog changes detected."
             exit 0
           fi
@@ -191,7 +191,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "${BRANCH}"
-          git add CHANGELOG.md CHANGELOG.zh-CN.md projects/*/CHANGELOG.md
+          git add CHANGELOG.md CHANGELOG.zh-CN.md projects/*/CHANGELOG.md projects/*/CHANGELOG.zh-CN.md
           git commit -m "chore(changelog): finalize ${VERSION} release logs"
           git push --set-upstream origin "${BRANCH}"
 

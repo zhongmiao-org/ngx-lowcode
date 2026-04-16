@@ -54,8 +54,18 @@ lines.push('## Package Changes');
 lines.push('');
 
 for (const pkg of packages) {
+  if (!pkg.unreleasedEn || !pkg.unreleasedZh) {
+    throw new Error(
+      `Package ${pkg.name} must provide both English and Chinese Unreleased content (CHANGELOG.md + CHANGELOG.zh-CN.md).`
+    );
+  }
   lines.push(`### ${pkg.name} -> ${pkg.version}`);
-  lines.push(pkg.unreleased);
+  lines.push('');
+  lines.push('#### Chinese');
+  lines.push(pkg.unreleasedZh);
+  lines.push('');
+  lines.push('#### English');
+  lines.push(pkg.unreleasedEn);
   lines.push('');
 }
 
