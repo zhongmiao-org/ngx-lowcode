@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { getDemoProjectI18n } from 'ngx-lowcode-i18n';
+import { getDemoProjectI18n } from '@zhongmiao/ngx-lowcode-i18n';
 import { ThyBreadcrumbModule } from 'ngx-tethys/breadcrumb';
 import { ThyButtonModule } from 'ngx-tethys/button';
 import { ThyCardModule } from 'ngx-tethys/card';

@@ -1,4 +1,4 @@
-import { NgxLowcodeActionExecutionRequest, NgxLowcodeDatasourceRequest } from 'ngx-lowcode-core-types';
+import { NgxLowcodeActionExecutionRequest, NgxLowcodeDatasourceRequest } from '@zhongmiao/ngx-lowcode-core-types';
 
 export async function mockDatasourceExecutor({ datasource, state }: NgxLowcodeDatasourceRequest): Promise<unknown> {
   const rows = Array.isArray(datasource.mockData) ? datasource.mockData : [];

@@ -1,6 +1,6 @@
 import { EnvironmentProviders, InjectionToken, makeEnvironmentProviders } from '@angular/core';
-import { registerLowcodeMaterials } from 'ngx-lowcode-core';
-import { NgxLowcodeComponentDefinition, NgxLowcodeExternalMaterialAdapter } from 'ngx-lowcode-core-types';
+import { registerLowcodeMaterials } from '@zhongmiao/ngx-lowcode-core';
+import { NgxLowcodeComponentDefinition, NgxLowcodeExternalMaterialAdapter } from '@zhongmiao/ngx-lowcode-core-types';
 
 export interface NgxLowcodePuzzleAdapterConfig {
   materials?: NgxLowcodeComponentDefinition[];

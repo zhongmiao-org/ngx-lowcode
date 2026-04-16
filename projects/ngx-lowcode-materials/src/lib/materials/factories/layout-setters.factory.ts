@@ -1,5 +1,5 @@
-import { NgxLowcodeSetterDefinition } from 'ngx-lowcode-core-types';
-import { getMaterialsI18n, NgxLowcodeLocale } from 'ngx-lowcode-i18n';
+import { NgxLowcodeSetterDefinition } from '@zhongmiao/ngx-lowcode-core-types';
+import { getMaterialsI18n, NgxLowcodeLocale } from '@zhongmiao/ngx-lowcode-i18n';
 import { selectOption } from '../../core';
 
 export function getPageLayoutSetters(locale: NgxLowcodeLocale): NgxLowcodeSetterDefinition[] {

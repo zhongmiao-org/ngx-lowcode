@@ -1,8 +1,8 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { NgxLowcodeComponentDefinition, NgxLowcodeNodeSchema } from 'ngx-lowcode-core-types';
-import { getDesignerI18n, getMaterialsI18n } from 'ngx-lowcode-i18n';
-import { mockPageSchema } from 'ngx-lowcode-testing';
+import { NgxLowcodeComponentDefinition, NgxLowcodeNodeSchema } from '@zhongmiao/ngx-lowcode-core-types';
+import { getDesignerI18n, getMaterialsI18n } from '@zhongmiao/ngx-lowcode-i18n';
+import { mockPageSchema } from '@zhongmiao/ngx-lowcode-testing';
 import { NgxLowcodeDesignerSidebarComponent } from './ngx-lowcode-designer-sidebar.component';
 
 class DummyMaterialComponent {}

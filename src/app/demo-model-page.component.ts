@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { getDemoProjectI18n } from 'ngx-lowcode-i18n';
+import { getDemoProjectI18n } from '@zhongmiao/ngx-lowcode-i18n';
 import { ThyButtonModule } from 'ngx-tethys/button';
 import { ThyCardModule } from 'ngx-tethys/card';
 import { ThyEmptyModule } from 'ngx-tethys/empty';
 import { ThyResultModule } from 'ngx-tethys/result';
 import { ThyTagModule } from 'ngx-tethys/tag';
-import type { NgxLowcodeMetaColumnType } from 'ngx-lowcode-meta-model';
+import type { NgxLowcodeMetaColumnType } from '@zhongmiao/ngx-lowcode-meta-model';
 import { DemoWorkspaceService } from './demo-workspace.service';
 
 @Component({

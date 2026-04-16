@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { getDemoProjectI18n } from 'ngx-lowcode-i18n';
+import { getDemoProjectI18n } from '@zhongmiao/ngx-lowcode-i18n';
 import { ThyCardModule } from 'ngx-tethys/card';
 import { ThyNavModule } from 'ngx-tethys/nav';
 import { DemoWorkspaceService } from './demo-workspace.service';

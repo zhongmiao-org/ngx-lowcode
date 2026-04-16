@@ -1,5 +1,5 @@
-import type { NgxLowcodeActionDefinition, NgxLowcodeDatasourceDefinition, NgxLowcodeNodeSchema, NgxLowcodePageSchema } from 'ngx-lowcode-core-types';
-import type { NgxLowcodeMetaColumnDraft, NgxLowcodeMetaModelDraft, NgxLowcodeMetaTableDraft } from 'ngx-lowcode-meta-model';
+import type { NgxLowcodeActionDefinition, NgxLowcodeDatasourceDefinition, NgxLowcodeNodeSchema, NgxLowcodePageSchema } from '@zhongmiao/ngx-lowcode-core-types';
+import type { NgxLowcodeMetaColumnDraft, NgxLowcodeMetaModelDraft, NgxLowcodeMetaTableDraft } from '@zhongmiao/ngx-lowcode-meta-model';
 import type { NgxLowcodeBindingDraft, NgxLowcodeDatasourceDraft, NgxLowcodeDatasourceFieldDraft } from './datasource.types';
 
 export function createDatasourceDraftFromTable(

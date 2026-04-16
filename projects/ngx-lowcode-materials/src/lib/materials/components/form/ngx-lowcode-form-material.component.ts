@@ -6,11 +6,11 @@ import {
   NgxLowcodeFormLayout,
   NgxLowcodeNodeSchema,
   NgxLowcodeRuntimeContext
-} from 'ngx-lowcode-core-types';
-import { getMaterialsI18n } from 'ngx-lowcode-i18n';
+} from '@zhongmiao/ngx-lowcode-core-types';
+import { getMaterialsI18n } from '@zhongmiao/ngx-lowcode-i18n';
 import { ThyFormModule } from 'ngx-tethys/form';
 import { ThyGridModule } from 'ngx-tethys/grid';
-import { NgxLowcodeNodeRendererComponent } from 'ngx-lowcode-renderer';
+import { NgxLowcodeNodeRendererComponent } from '@zhongmiao/ngx-lowcode-renderer';
 type DropListOrientation = 'horizontal' | 'vertical' | 'mixed';
 
 const defaultMaterialsI18n = getMaterialsI18n('zh-CN');

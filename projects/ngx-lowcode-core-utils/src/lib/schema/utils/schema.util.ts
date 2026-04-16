@@ -5,8 +5,8 @@ import {
   NgxLowcodeDropTarget,
   NgxLowcodeNodeSchema,
   NgxLowcodePageSchema
-} from 'ngx-lowcode-core-types';
-import { getCoreI18n, NgxLowcodeLocale } from 'ngx-lowcode-i18n';
+} from '@zhongmiao/ngx-lowcode-core-types';
+import { getCoreI18n, NgxLowcodeLocale } from '@zhongmiao/ngx-lowcode-i18n';
 export { createNodeId } from '../../core';
 import { createNodeId } from '../../core';
 

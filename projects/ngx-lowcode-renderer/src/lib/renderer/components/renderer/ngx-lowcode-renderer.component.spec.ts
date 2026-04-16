@@ -4,13 +4,13 @@ import {
   NGX_LOWCODE_ACTION_MANAGER,
   NGX_LOWCODE_DATASOURCE_MANAGER,
   NGX_LOWCODE_WEBSOCKET_MANAGER
-} from 'ngx-lowcode-core';
+} from '@zhongmiao/ngx-lowcode-core';
 import type {
   NgxLowcodeActionManager,
   NgxLowcodeDataSourceManager,
   NgxLowcodeWebSocketManager
-} from 'ngx-lowcode-core-types';
-import { mockPageSchema } from 'ngx-lowcode-testing';
+} from '@zhongmiao/ngx-lowcode-core-types';
+import { mockPageSchema } from '@zhongmiao/ngx-lowcode-testing';
 import { NgxLowcodeRendererComponent } from './ngx-lowcode-renderer.component';
 
 describe('NgxLowcodeRendererComponent', () => {

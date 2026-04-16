@@ -1,4 +1,4 @@
-import { NgxLowcodePageSchema } from 'ngx-lowcode-core-types';
+import { NgxLowcodePageSchema } from '@zhongmiao/ngx-lowcode-core-types';
 
 export const mockPageSchema: NgxLowcodePageSchema = {
   schemaVersion: '1.0.0',

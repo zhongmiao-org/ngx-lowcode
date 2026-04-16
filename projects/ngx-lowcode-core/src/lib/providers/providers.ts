@@ -11,7 +11,7 @@ import {
   NgxLowcodeDataSourceManager,
   NgxLowcodeDatasourceExecutor,
   NgxLowcodeWebSocketManager
-} from 'ngx-lowcode-core-types';
+} from '@zhongmiao/ngx-lowcode-core-types';
 import { NgxLowcodeMaterialRegistry } from '../material-registry';
 
 export function defaultDataSourceManager(): NgxLowcodeDataSourceManager {

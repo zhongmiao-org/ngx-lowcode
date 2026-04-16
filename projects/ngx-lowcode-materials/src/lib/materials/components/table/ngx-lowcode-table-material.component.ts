@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
+import { NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from '@zhongmiao/ngx-lowcode-core-types';
 
 @Component({
   selector: 'ngx-lowcode-table-material',

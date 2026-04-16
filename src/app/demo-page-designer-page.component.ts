@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgxLowcodeDesignerComponent } from 'ngx-lowcode-designer';
-import { getDemoProjectI18n } from 'ngx-lowcode-i18n';
+import { NgxLowcodeDesignerComponent } from '@zhongmiao/ngx-lowcode-designer';
+import { getDemoProjectI18n } from '@zhongmiao/ngx-lowcode-i18n';
 import { ThyButtonModule } from 'ngx-tethys/button';
 import { ThyCardModule } from 'ngx-tethys/card';
 import { ThyStatisticModule } from 'ngx-tethys/statistic';

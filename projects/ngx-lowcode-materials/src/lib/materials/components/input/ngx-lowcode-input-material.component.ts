@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
+import { NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from '@zhongmiao/ngx-lowcode-core-types';
 import { ThyFormModule } from 'ngx-tethys/form';
 import { ThyInputModule } from 'ngx-tethys/input';
 

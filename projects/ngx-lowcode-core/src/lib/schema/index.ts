@@ -1,1 +1,1 @@
-export * from 'ngx-lowcode-core-utils';
+export * from '@zhongmiao/ngx-lowcode-core-utils';

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from 'ngx-lowcode-core-types';
-import { getMaterialsI18n } from 'ngx-lowcode-i18n';
+import { NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from '@zhongmiao/ngx-lowcode-core-types';
+import { getMaterialsI18n } from '@zhongmiao/ngx-lowcode-i18n';
 import { ThyAlertModule } from 'ngx-tethys/alert';
 import { ThyAnchorModule } from 'ngx-tethys/anchor';
 import { ThyAvatarModule } from 'ngx-tethys/avatar';

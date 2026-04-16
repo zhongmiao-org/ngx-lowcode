@@ -1,14 +1,14 @@
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 
 import { Component, OnChanges, OnDestroy, SimpleChanges, computed, inject, input, output, signal } from '@angular/core';
-import { NgxLowcodeEditorStore, NgxLowcodeMaterialRegistry } from 'ngx-lowcode-core';
+import { NgxLowcodeEditorStore, NgxLowcodeMaterialRegistry } from '@zhongmiao/ngx-lowcode-core';
 import {
   cloneSchema,
   createDefaultPageSchema,
   createNodeId,
   findNodeById,
   resolveDropTargetInsertion
-} from 'ngx-lowcode-core-utils';
+} from '@zhongmiao/ngx-lowcode-core-utils';
 import {
   NgxLowcodeActionDefinition,
   NgxLowcodeComponentDefinition,
@@ -18,9 +18,9 @@ import {
   NgxLowcodeDropTarget,
   NgxLowcodeNodeSchema,
   NgxLowcodePageSchema
-} from 'ngx-lowcode-core-types';
-import { getDesignerI18n, NgxLowcodeDesignerLocale } from 'ngx-lowcode-i18n';
-import { NgxLowcodeRendererComponent } from 'ngx-lowcode-renderer';
+} from '@zhongmiao/ngx-lowcode-core-types';
+import { getDesignerI18n, NgxLowcodeDesignerLocale } from '@zhongmiao/ngx-lowcode-i18n';
+import { NgxLowcodeRendererComponent } from '@zhongmiao/ngx-lowcode-renderer';
 import { NgxLowcodeDesignerPropsComponent } from '../props/ngx-lowcode-designer-props.component';
 import { NgxLowcodeDesignerSidebarComponent } from '../sidebar/ngx-lowcode-designer-sidebar.component';
 import { ThyButtonModule } from 'ngx-tethys/button';

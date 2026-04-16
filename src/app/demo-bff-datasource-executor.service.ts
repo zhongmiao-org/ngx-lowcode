@@ -5,7 +5,7 @@ import {
   NgxLowcodeDatasourceDefinition,
   NgxLowcodeDatasourceExecutor,
   NgxLowcodeDatasourceRequest
-} from 'ngx-lowcode-core-types';
+} from '@zhongmiao/ngx-lowcode-core-types';
 import { createTenantSeedRows } from './demo-project-schema';
 
 interface DemoQueryRequest {

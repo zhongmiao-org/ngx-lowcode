@@ -1,6 +1,6 @@
-import type { NgxLowcodeDatasourceDefinition, NgxLowcodePageSchema } from 'ngx-lowcode-core-types';
-import { bindDatasourceToNode, createCrudPageSchema, createDatasourceDraftsFromModel, createQueryPageSchema, type NgxLowcodeDatasourceDraft } from 'ngx-lowcode-datasource';
-import { createCommerceModelPreset, type NgxLowcodeMetaModelDraft } from 'ngx-lowcode-meta-model';
+import type { NgxLowcodeDatasourceDefinition, NgxLowcodePageSchema } from '@zhongmiao/ngx-lowcode-core-types';
+import { bindDatasourceToNode, createCrudPageSchema, createDatasourceDraftsFromModel, createQueryPageSchema, type NgxLowcodeDatasourceDraft } from '@zhongmiao/ngx-lowcode-datasource';
+import { createCommerceModelPreset, type NgxLowcodeMetaModelDraft } from '@zhongmiao/ngx-lowcode-meta-model';
 
 const DEMO_SELECTED_ORDER_STATE_KEY = 'selectedOrderId';
 const DEMO_ORG_ID_STATE_KEYS = ['orgId', 'form_org_id', 'org_id', 'selectedOrgId'] as const;

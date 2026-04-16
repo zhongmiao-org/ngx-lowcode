@@ -9,8 +9,8 @@ import {
   NGX_LOWCODE_CONFIG,
   NGX_LOWCODE_DATASOURCE_MANAGER,
   NGX_LOWCODE_WEBSOCKET_MANAGER
-} from 'ngx-lowcode-core';
-import { provideNgxLowcodeMaterials } from 'ngx-lowcode-materials';
+} from '@zhongmiao/ngx-lowcode-core';
+import { provideNgxLowcodeMaterials } from '@zhongmiao/ngx-lowcode-materials';
 import { DemoBffDatasourceExecutorService } from './demo-bff-datasource-executor.service';
 
 import { routes } from './app.routes';

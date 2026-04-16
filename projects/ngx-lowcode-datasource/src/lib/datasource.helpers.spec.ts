@@ -1,4 +1,4 @@
-import type { NgxLowcodeMetaTableDraft } from 'ngx-lowcode-meta-model';
+import type { NgxLowcodeMetaTableDraft } from '@zhongmiao/ngx-lowcode-meta-model';
 import { bindDatasourceToNode, createCrudPageSchema, createDatasourceDraftFromTable, createQueryPageSchema, labelizeField, validateDatasourceDraft } from './datasource.helpers';
 
 describe('ngx-lowcode-datasource', () => {

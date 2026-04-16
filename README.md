@@ -155,10 +155,32 @@ ng build demo
 
 ## Publishing Direction
 
-Current internal form is multi-package. Recommended external evolution:
+Current internal form is multi-package. Public npm scope is fixed as `@zhongmiao/*`.
 
-- default install path: `ngx-lowcode`
-- advanced install paths: `ngx-lowcode-core`, `ngx-lowcode-renderer`, `ngx-lowcode-designer`, `ngx-lowcode-materials`
-- optional adapter package: `ngx-lowcode-puzzle-adapter`
+- core package chain:
+  - `@zhongmiao/ngx-lowcode-core-types`
+  - `@zhongmiao/ngx-lowcode-i18n`
+  - `@zhongmiao/ngx-lowcode-core-utils`
+  - `@zhongmiao/ngx-lowcode-meta-model`
+  - `@zhongmiao/ngx-lowcode-datasource`
+  - `@zhongmiao/ngx-lowcode-core`
+- runtime/designer:
+  - `@zhongmiao/ngx-lowcode-renderer`
+  - `@zhongmiao/ngx-lowcode-materials`
+  - `@zhongmiao/ngx-lowcode-designer`
+- support packages:
+  - `@zhongmiao/ngx-lowcode-testing`
+  - `@zhongmiao/ngx-lowcode-puzzle-adapter`
 
-The aggregate package should re-export stable public APIs while internal package boundaries remain explicit.
+## Release Flow
+
+- CI: `.github/workflows/ci.yml` runs lint + test + build + changelog gate on PR.
+- Draft: `.github/workflows/release-draft.yml` runs on `main` and upserts draft release from `CHANGELOG.md`.
+- Empty draft window: if `## [Unreleased]` is empty, draft workflow exits successfully with skip (no red build).
+- Publish: manually click **Publish release** on draft, then `.github/workflows/release-publish.yml` publishes all 11 packages.
+
+Release prerequisites:
+
+- repository/organization secret: `NPM_TOKEN`
+- all package versions aligned (checked by `npm run version:check`)
+- build artifacts generated (done in workflow via `npm run build:libs`)

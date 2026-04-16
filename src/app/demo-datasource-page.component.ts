@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { getDemoProjectI18n } from 'ngx-lowcode-i18n';
+import { getDemoProjectI18n } from '@zhongmiao/ngx-lowcode-i18n';
 import { ThyButtonModule } from 'ngx-tethys/button';
 import { ThyCardModule } from 'ngx-tethys/card';
 import { ThyEmptyModule } from 'ngx-tethys/empty';
