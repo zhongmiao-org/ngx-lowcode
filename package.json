@@ -21,8 +21,10 @@
     "release:version": "changeset version",
     "release:publish": "bash scripts/publish-all.sh",
     "release:status": "changeset status --verbose",
-    "release:draft-notes": "node scripts/release/compose-draft-notes.mjs",
-    "release:next-version": "node scripts/release/next-aggregate-version.mjs"
+    "release:draft-notes": "node scripts/release/compose-draft-from-unreleased.mjs",
+    "release:draft-notes:json": "node scripts/release/compose-draft-from-unreleased.mjs --json",
+    "release:finalize-unreleased": "node scripts/release/finalize-unreleased-changelogs.mjs",
+    "release:next-version": "node -p \"require('./projects/ngx-lowcode/package.json').version\""
   },
   "private": true,
   "dependencies": {
