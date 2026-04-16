@@ -2,7 +2,14 @@ import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core
 import { provideHttpClient } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
-import { defaultActionExecutor, NGX_LOWCODE_CONFIG } from 'ngx-lowcode-core';
+import {
+  defaultActionManager,
+  defaultWebSocketManager,
+  NGX_LOWCODE_ACTION_MANAGER,
+  NGX_LOWCODE_CONFIG,
+  NGX_LOWCODE_DATASOURCE_MANAGER,
+  NGX_LOWCODE_WEBSOCKET_MANAGER
+} from 'ngx-lowcode-core';
 import { provideNgxLowcodeMaterials } from 'ngx-lowcode-materials';
 import { DemoBffDatasourceExecutorService } from './demo-bff-datasource-executor.service';
 
@@ -15,12 +22,32 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideRouter(routes),
     {
-      provide: NGX_LOWCODE_CONFIG,
+      provide: NGX_LOWCODE_ACTION_MANAGER,
+      useValue: defaultActionManager()
+    },
+    {
+      provide: NGX_LOWCODE_DATASOURCE_MANAGER,
       useFactory: (executor: DemoBffDatasourceExecutorService) => ({
-        actionExecutor: defaultActionExecutor(),
-        datasourceExecutor: executor.execute
+        execute: executor.execute
       }),
       deps: [DemoBffDatasourceExecutorService]
+    },
+    {
+      provide: NGX_LOWCODE_WEBSOCKET_MANAGER,
+      useValue: defaultWebSocketManager()
+    },
+    {
+      provide: NGX_LOWCODE_CONFIG,
+      useFactory: (
+        actionManager: ReturnType<typeof defaultActionManager>,
+        dataSourceManager: { execute: DemoBffDatasourceExecutorService['execute'] },
+        webSocketManager: ReturnType<typeof defaultWebSocketManager>
+      ) => ({
+        actionManager,
+        dataSourceManager,
+        webSocketManager
+      }),
+      deps: [NGX_LOWCODE_ACTION_MANAGER, NGX_LOWCODE_DATASOURCE_MANAGER, NGX_LOWCODE_WEBSOCKET_MANAGER]
     },
     provideNgxLowcodeMaterials()
   ]

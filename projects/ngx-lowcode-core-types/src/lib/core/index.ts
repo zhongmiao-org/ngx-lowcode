@@ -140,6 +140,23 @@ export interface NgxLowcodeActionExecutionRequest {
 export type NgxLowcodeDatasourceExecutor = (request: NgxLowcodeDatasourceRequest) => Promise<unknown>;
 export type NgxLowcodeActionExecutor = (request: NgxLowcodeActionExecutionRequest) => void | Promise<void>;
 
+export interface NgxLowcodeDataSourceManager {
+  execute: (request: NgxLowcodeDatasourceRequest) => Promise<unknown>;
+}
+
+export interface NgxLowcodeActionManager {
+  execute: (request: NgxLowcodeActionExecutionRequest) => void | Promise<void>;
+}
+
+export type NgxLowcodeWebSocketEventHandler = (event: unknown) => void;
+
+export interface NgxLowcodeWebSocketManager {
+  connect: () => void | Promise<void>;
+  subscribe: (channel: string, handler: NgxLowcodeWebSocketEventHandler) => void | Promise<void>;
+  unsubscribe: (channel: string, handler: NgxLowcodeWebSocketEventHandler) => void | Promise<void>;
+  disconnect: () => void | Promise<void>;
+}
+
 export interface NgxLowcodeRuntimeContext {
   mode: 'design' | 'runtime';
   state: Signal<Record<string, unknown>>;
@@ -259,8 +276,16 @@ export interface NgxLowcodeExternalMaterialAdapter {
 }
 
 export interface NgxLowcodeConfig {
-  actionExecutor?: NgxLowcodeActionExecutor;
-  datasourceExecutor?: NgxLowcodeDatasourceExecutor;
+  actionManager?: NgxLowcodeActionManager;
+  dataSourceManager?: NgxLowcodeDataSourceManager;
+  webSocketManager?: NgxLowcodeWebSocketManager;
 }
 
 export const NGX_LOWCODE_CONFIG = new InjectionToken<NgxLowcodeConfig>('NGX_LOWCODE_CONFIG');
+export const NGX_LOWCODE_ACTION_MANAGER = new InjectionToken<NgxLowcodeActionManager>('NGX_LOWCODE_ACTION_MANAGER');
+export const NGX_LOWCODE_DATASOURCE_MANAGER = new InjectionToken<NgxLowcodeDataSourceManager>(
+  'NGX_LOWCODE_DATASOURCE_MANAGER'
+);
+export const NGX_LOWCODE_WEBSOCKET_MANAGER = new InjectionToken<NgxLowcodeWebSocketManager>(
+  'NGX_LOWCODE_WEBSOCKET_MANAGER'
+);

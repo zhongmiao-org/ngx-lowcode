@@ -1,16 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, input, linkedSignal, output } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { NGX_LOWCODE_CONFIG } from 'ngx-lowcode-core';
 import {
+  NGX_LOWCODE_ACTION_MANAGER,
+  NGX_LOWCODE_CONFIG,
+  NGX_LOWCODE_DATASOURCE_MANAGER,
+  NGX_LOWCODE_WEBSOCKET_MANAGER,
   NgxLowcodeActionDefinition,
   NgxLowcodeActionExecutionRequest,
-  NgxLowcodeActionExecutor,
+  NgxLowcodeActionManager,
   NgxLowcodeActionStep,
   NgxLowcodeConfig,
-  NgxLowcodeDatasourceExecutor,
+  NgxLowcodeDataSourceManager,
   NgxLowcodeDropTarget,
   NgxLowcodePageSchema,
-  NgxLowcodeRuntimeContext
+  NgxLowcodeRuntimeContext,
+  NgxLowcodeWebSocketManager
 } from 'ngx-lowcode-core-types';
 import { NgxLowcodeRenderChildrenComponent } from '../render-children/ngx-lowcode-render-children.component';
 import { NgxLowcodeDropListRegistryService } from '../../services/drop-list-registry.service';
@@ -23,15 +27,32 @@ import { NgxLowcodeDropListRegistryService } from '../../services/drop-list-regi
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [NgxLowcodeDropListRegistryService]
 })
-export class NgxLowcodeRendererComponent {
+export class NgxLowcodeRendererComponent implements OnInit, OnDestroy {
   private static readonly runtimeDatasourceErrorsKey = '__runtimeDatasourceErrors';
 
   private readonly config = inject(NGX_LOWCODE_CONFIG, { optional: true }) as NgxLowcodeConfig | null;
+  private readonly configuredActionManager = inject(NGX_LOWCODE_ACTION_MANAGER, { optional: true });
+  private readonly configuredDataSourceManager = inject(NGX_LOWCODE_DATASOURCE_MANAGER, { optional: true });
+  private readonly configuredWebSocketManager = inject(NGX_LOWCODE_WEBSOCKET_MANAGER, { optional: true });
+  private readonly actionManager: NgxLowcodeActionManager = this.configuredActionManager ?? this.config?.actionManager ?? {
+    execute: () => undefined
+  };
+  private readonly dataSourceManager: NgxLowcodeDataSourceManager =
+    this.configuredDataSourceManager ??
+    this.config?.dataSourceManager ?? {
+      execute: async ({ datasource }) => datasource.mockData
+    };
+  private readonly webSocketManager: NgxLowcodeWebSocketManager =
+    this.configuredWebSocketManager ??
+    this.config?.webSocketManager ?? {
+      connect: () => undefined,
+      subscribe: () => undefined,
+      unsubscribe: () => undefined,
+      disconnect: () => undefined
+    };
 
   readonly schema = input.required<NgxLowcodePageSchema>();
   readonly context = input<Record<string, unknown>>({});
-  readonly datasourceExecutor = input<NgxLowcodeDatasourceExecutor | undefined>(undefined);
-  readonly actionExecutor = input<NgxLowcodeActionExecutor | undefined>(undefined);
   readonly mode = input<'design' | 'runtime'>('runtime');
   readonly selectedNodeId = input<string | null>(null);
   readonly paletteDragging = input(false);
@@ -42,6 +63,10 @@ export class NgxLowcodeRendererComponent {
   readonly nodeAddRequest = output<{ componentType: string; target: NgxLowcodeDropTarget }>();
   readonly nodeMoveRequest = output<{ nodeId: string; target: NgxLowcodeDropTarget }>();
   readonly nodeDeleteRequest = output<string>();
+  private readonly webSocketSubscriptions: Array<{
+    channel: string;
+    handler: (event: unknown) => void;
+  }> = [];
 
   private readonly stateSignal = linkedSignal<Record<string, unknown>>(() => ({
     ...this.schema().state,
@@ -109,12 +134,7 @@ export class NgxLowcodeRendererComponent {
           return undefined;
         }
 
-        const executor = this.datasourceExecutor() ?? this.config?.datasourceExecutor;
-        if (!executor) {
-          return datasource.mockData;
-        }
-
-        return executor({
+        return this.dataSourceManager.execute({
           datasource,
           payload,
           state: this.stateSignal()
@@ -122,6 +142,29 @@ export class NgxLowcodeRendererComponent {
       }
     };
   });
+
+  ngOnInit(): void {
+    void this.webSocketManager.connect();
+    for (const datasource of this.schema().datasources) {
+      if (datasource.command?.transport !== 'websocket') {
+        continue;
+      }
+      const channel = String(datasource.command.target ?? datasource.id).trim();
+      if (!channel) {
+        continue;
+      }
+      const handler = (_event: unknown) => undefined;
+      this.webSocketSubscriptions.push({ channel, handler });
+      void this.webSocketManager.subscribe(channel, handler);
+    }
+  }
+
+  ngOnDestroy(): void {
+    for (const subscription of this.webSocketSubscriptions) {
+      void this.webSocketManager.unsubscribe(subscription.channel, subscription.handler);
+    }
+    void this.webSocketManager.disconnect();
+  }
 
   private async executeStep(
     schema: NgxLowcodePageSchema,
@@ -139,7 +182,7 @@ export class NgxLowcodeRendererComponent {
 
     if (step.type === 'message' && step.message) {
       console.info(step.message);
-      await this.runExternalActionExecutor(schema, action, step, payload);
+      await this.runActionManager(schema, action, step, payload);
       return;
     }
 
@@ -161,24 +204,19 @@ export class NgxLowcodeRendererComponent {
         this.setDatasourceRuntimeError(step.datasourceId, this.resolveErrorMessage(error));
       }
 
-      await this.runExternalActionExecutor(schema, action, step, payload);
+      await this.runActionManager(schema, action, step, payload);
       return;
     }
 
-    await this.runExternalActionExecutor(schema, action, step, payload);
+    await this.runActionManager(schema, action, step, payload);
   }
 
-  private async runExternalActionExecutor(
+  private async runActionManager(
     schema: NgxLowcodePageSchema,
     action: NgxLowcodeActionDefinition,
     step: NgxLowcodeActionStep,
     payload?: unknown
   ): Promise<void> {
-    const executor = this.actionExecutor() ?? this.config?.actionExecutor;
-    if (!executor) {
-      return;
-    }
-
     const request: NgxLowcodeActionExecutionRequest = {
       action,
       step,
@@ -187,7 +225,7 @@ export class NgxLowcodeRendererComponent {
       state: this.stateSignal()
     };
 
-    await executor(request);
+    await this.actionManager.execute(request);
   }
 
   private setDatasourceRuntimeError(datasourceId: string, message: string): void {
