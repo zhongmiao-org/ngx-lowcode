@@ -1,7 +1,11 @@
 name: Release Packages (Changesets)
 
 on:
-  push:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
     branches:
       - main
   workflow_dispatch:
@@ -12,6 +16,7 @@ concurrency:
 
 jobs:
   release:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     name: Version or publish changed packages
     runs-on: ubuntu-latest
     permissions:
@@ -22,6 +27,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.ref || github.event.workflow_run.head_sha }}
           fetch-depth: 0
 
       - name: Setup Node

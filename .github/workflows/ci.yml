@@ -2,6 +2,8 @@ name: CI
 
 on:
   pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
@@ -44,8 +46,14 @@ jobs:
 
       - name: Test
         env:
-          CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
-        run: npm run test
+          CHROME_BIN_REAL: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: |
+          cat > /tmp/chrome-no-sandbox <<'EOF'
+          #!/usr/bin/env bash
+          exec "${CHROME_BIN_REAL}" --no-sandbox --disable-dev-shm-usage "$@"
+          EOF
+          chmod +x /tmp/chrome-no-sandbox
+          CHROME_BIN=/tmp/chrome-no-sandbox npm run test
 
       - name: Build libraries
         run: npm run build:libs
