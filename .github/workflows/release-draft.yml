@@ -25,7 +25,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24.3.0
+
+      - name: Pin npm version
+        run: npm i -g npm@11.4.2
 
       - name: Resolve release metadata from main
         id: meta

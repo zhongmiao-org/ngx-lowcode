@@ -175,12 +175,13 @@ Current internal form is multi-package. Public npm scope is fixed as `@zhongmiao
 ## Release Flow
 
 - CI: `.github/workflows/ci.yml` runs lint + test + build + changelog gate on PR.
-- Draft: `.github/workflows/release-draft.yml` runs on `main` and upserts draft release from `CHANGELOG.md`.
+- Changesets release: `.github/workflows/release-changesets.yml` runs on `main`, opens version PR when changesets exist, and publishes only changed packages after merge.
+- Legacy draft (transition only): `.github/workflows/release-draft.yml` + `.github/workflows/release-publish.yml` are retained as fallback and disabled by default.
 - Empty draft window: if `## [Unreleased]` is empty, draft workflow exits successfully with skip (no red build).
-- Publish: manually click **Publish release** on draft, then `.github/workflows/release-publish.yml` publishes all 11 packages.
+- Changelog policy for code changes: update either a `.changeset/*.md` file or the corresponding package changelog.
 
 Release prerequisites:
 
 - repository/organization secret: `NPM_TOKEN`
-- all package versions aligned (checked by `npm run version:check`)
-- build artifacts generated (done in workflow via `npm run build:libs`)
+- `npm ci` lockfile consistency (CI enforces no drift after install)
+- build artifacts generated (workflow runs `npm run build:libs`)
