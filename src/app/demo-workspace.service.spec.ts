@@ -38,7 +38,10 @@ describe('DemoWorkspaceService', () => {
     service.addTable();
     const tableId = service.selectedTableId();
     service.addColumn(tableId);
-    const columnId = service.metaModel().tables.find((table) => table.id === tableId)?.columns.at(-1)?.id;
+    const columnId = service
+      .metaModel()
+      .tables.find((table) => table.id === tableId)
+      ?.columns.at(-1)?.id;
     expect(columnId).toBeTruthy();
     if (!columnId) {
       return;
@@ -46,18 +49,27 @@ describe('DemoWorkspaceService', () => {
 
     service.setColumnType(tableId, columnId, 'number');
     service.setColumnRequired(tableId, columnId, true);
-    let column = service.metaModel().tables.find((table) => table.id === tableId)?.columns.find((item) => item.id === columnId);
+    let column = service
+      .metaModel()
+      .tables.find((table) => table.id === tableId)
+      ?.columns.find((item) => item.id === columnId);
     expect(column?.type).toBe('number');
     expect(column?.required).toBeTrue();
     expect(column?.primary).toBeFalse();
 
     service.setColumnPrimary(tableId, columnId, true);
-    column = service.metaModel().tables.find((table) => table.id === tableId)?.columns.find((item) => item.id === columnId);
+    column = service
+      .metaModel()
+      .tables.find((table) => table.id === tableId)
+      ?.columns.find((item) => item.id === columnId);
     expect(column?.primary).toBeTrue();
     expect(column?.required).toBeTrue();
 
     service.setColumnRequired(tableId, columnId, false);
-    column = service.metaModel().tables.find((table) => table.id === tableId)?.columns.find((item) => item.id === columnId);
+    column = service
+      .metaModel()
+      .tables.find((table) => table.id === tableId)
+      ?.columns.find((item) => item.id === columnId);
     expect(column?.required).toBeTrue();
   });
 
@@ -101,8 +113,12 @@ describe('DemoWorkspaceService', () => {
 
     expect(service.schema().state['roles']).toEqual(['MANAGER', 'USER']);
     expect(service.schema().state['selectedOrgId']).toBe('dept-a-1');
-    const queryDatasource = service.schema().datasources.find((datasource) => datasource.id.endsWith('-query-datasource'));
-    const mutationDatasource = service.schema().datasources.find((datasource) => datasource.id.endsWith('-update-datasource'));
+    const queryDatasource = service
+      .schema()
+      .datasources.find((datasource) => datasource.id.endsWith('-query-datasource'));
+    const mutationDatasource = service
+      .schema()
+      .datasources.find((datasource) => datasource.id.endsWith('-update-datasource'));
     expect(queryDatasource?.request?.url).toBe('/query-v2');
     expect(mutationDatasource?.request?.url).toBe('/mutation-v2');
     expect((mutationDatasource?.request?.params?.['permissionScope'] as string) ?? '').toBe('DEPT_AND_CHILDREN');

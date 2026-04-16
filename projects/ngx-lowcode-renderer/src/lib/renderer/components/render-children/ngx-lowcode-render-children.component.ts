@@ -1,6 +1,10 @@
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
-import { NgxLowcodeDropTarget, NgxLowcodeNodeSchema, NgxLowcodeRuntimeContext } from '@zhongmiao/ngx-lowcode-core-types';
+import {
+  NgxLowcodeDropTarget,
+  NgxLowcodeNodeSchema,
+  NgxLowcodeRuntimeContext
+} from '@zhongmiao/ngx-lowcode-core-types';
 import { NgxLowcodeNodeRendererComponent } from '../node-renderer/ngx-lowcode-node-renderer.component';
 
 @Component({

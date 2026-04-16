@@ -211,10 +211,7 @@ export class DemoPermissionApiPageComponent {
     this.draft.update((draft) => ({ ...draft, permissionScope: this.toScope(String(value)) }));
   }
 
-  protected updateStateKey(
-    key: keyof DemoPermissionApiConfig['stateKeys'],
-    value: string
-  ): void {
+  protected updateStateKey(key: keyof DemoPermissionApiConfig['stateKeys'], value: string): void {
     this.draft.update((draft) => ({
       ...draft,
       stateKeys: {
@@ -232,7 +229,13 @@ export class DemoPermissionApiPageComponent {
   }
 
   private toScope(value: string): DemoPermissionScope {
-    if (value === 'SELF' || value === 'DEPT' || value === 'DEPT_AND_CHILDREN' || value === 'CUSTOM_ORG_SET' || value === 'TENANT_ALL') {
+    if (
+      value === 'SELF' ||
+      value === 'DEPT' ||
+      value === 'DEPT_AND_CHILDREN' ||
+      value === 'CUSTOM_ORG_SET' ||
+      value === 'TENANT_ALL'
+    ) {
       return value;
     }
     return 'DEPT';

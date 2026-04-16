@@ -18,7 +18,9 @@ const changed = sh(`git diff --name-only ${base} ${head}`)
   .map((s) => s.trim())
   .filter(Boolean);
 
-const changesetFiles = changed.filter((f) => f.startsWith('.changeset/') && f.endsWith('.md') && !f.endsWith('README.md'));
+const changesetFiles = changed.filter(
+  (f) => f.startsWith('.changeset/') && f.endsWith('.md') && !f.endsWith('README.md')
+);
 if (!changesetFiles.length) {
   process.exit(0);
 }
@@ -31,7 +33,10 @@ for (const file of changesetFiles) {
     process.exit(1);
   }
 
-  const lines = front[1].split('\n').map((l) => l.trim()).filter(Boolean);
+  const lines = front[1]
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
   const pkgs = lines
     .map((line) => {
       const m = line.match(/^"?(@zhongmiao\/ngx-lowcode[^"]*)"?\s*:\s*(patch|minor|major)$/);

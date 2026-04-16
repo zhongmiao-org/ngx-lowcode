@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, input, linkedSignal, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  OnInit,
+  computed,
+  inject,
+  input,
+  linkedSignal,
+  output
+} from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import {
   NGX_LOWCODE_ACTION_MANAGER,
@@ -34,16 +44,15 @@ export class NgxLowcodeRendererComponent implements OnInit, OnDestroy {
   private readonly configuredActionManager = inject(NGX_LOWCODE_ACTION_MANAGER, { optional: true });
   private readonly configuredDataSourceManager = inject(NGX_LOWCODE_DATASOURCE_MANAGER, { optional: true });
   private readonly configuredWebSocketManager = inject(NGX_LOWCODE_WEBSOCKET_MANAGER, { optional: true });
-  private readonly actionManager: NgxLowcodeActionManager = this.configuredActionManager ?? this.config?.actionManager ?? {
-    execute: () => undefined
-  };
-  private readonly dataSourceManager: NgxLowcodeDataSourceManager =
-    this.configuredDataSourceManager ??
+  private readonly actionManager: NgxLowcodeActionManager = this.configuredActionManager ??
+    this.config?.actionManager ?? {
+      execute: () => undefined
+    };
+  private readonly dataSourceManager: NgxLowcodeDataSourceManager = this.configuredDataSourceManager ??
     this.config?.dataSourceManager ?? {
       execute: async ({ datasource }) => datasource.mockData
     };
-  private readonly webSocketManager: NgxLowcodeWebSocketManager =
-    this.configuredWebSocketManager ??
+  private readonly webSocketManager: NgxLowcodeWebSocketManager = this.configuredWebSocketManager ??
     this.config?.webSocketManager ?? {
       connect: () => undefined,
       subscribe: () => undefined,

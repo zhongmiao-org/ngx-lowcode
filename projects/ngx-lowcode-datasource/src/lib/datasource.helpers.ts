@@ -1,6 +1,19 @@
-import type { NgxLowcodeActionDefinition, NgxLowcodeDatasourceDefinition, NgxLowcodeNodeSchema, NgxLowcodePageSchema } from '@zhongmiao/ngx-lowcode-core-types';
-import type { NgxLowcodeMetaColumnDraft, NgxLowcodeMetaModelDraft, NgxLowcodeMetaTableDraft } from '@zhongmiao/ngx-lowcode-meta-model';
-import type { NgxLowcodeBindingDraft, NgxLowcodeDatasourceDraft, NgxLowcodeDatasourceFieldDraft } from './datasource.types';
+import type {
+  NgxLowcodeActionDefinition,
+  NgxLowcodeDatasourceDefinition,
+  NgxLowcodeNodeSchema,
+  NgxLowcodePageSchema
+} from '@zhongmiao/ngx-lowcode-core-types';
+import type {
+  NgxLowcodeMetaColumnDraft,
+  NgxLowcodeMetaModelDraft,
+  NgxLowcodeMetaTableDraft
+} from '@zhongmiao/ngx-lowcode-meta-model';
+import type {
+  NgxLowcodeBindingDraft,
+  NgxLowcodeDatasourceDraft,
+  NgxLowcodeDatasourceFieldDraft
+} from './datasource.types';
 
 export function createDatasourceDraftFromTable(
   table: NgxLowcodeMetaTableDraft,
@@ -80,7 +93,9 @@ export function createRestQueryDatasourceDefinition(draft: NgxLowcodeDatasourceD
   };
 }
 
-export function createRestMutationDatasourceDefinitions(draft: NgxLowcodeDatasourceDraft): NgxLowcodeDatasourceDefinition[] {
+export function createRestMutationDatasourceDefinitions(
+  draft: NgxLowcodeDatasourceDraft
+): NgxLowcodeDatasourceDefinition[] {
   const fieldStateMap = draft.fields.reduce<Record<string, string>>((acc, field) => {
     acc[field.name] = `form_${field.name}`;
     return acc;
@@ -154,7 +169,10 @@ export function createCrudPageSchema(
   };
 }
 
-export function bindDatasourceToNode(schema: NgxLowcodePageSchema, binding: NgxLowcodeBindingDraft): NgxLowcodePageSchema {
+export function bindDatasourceToNode(
+  schema: NgxLowcodePageSchema,
+  binding: NgxLowcodeBindingDraft
+): NgxLowcodePageSchema {
   return {
     ...schema,
     layoutTree: schema.layoutTree.map((node) => bindNode(node, binding))

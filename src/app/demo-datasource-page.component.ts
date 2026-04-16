@@ -21,8 +21,12 @@ import { DemoWorkspaceService } from './demo-workspace.service';
             <p class="workspace-page__description">{{ copy().homeDatasourceDescription }}</p>
           </div>
           <div class="workspace-page__actions">
-            <button thyButton="outline-primary" size="sm" (click)="workspace.createDatasources()">{{ copy().createDatasource }}</button>
-            <button thyButton="outline-primary" size="sm" (click)="workspace.bindResultTable()">{{ copy().bindDatasource }}</button>
+            <button thyButton="outline-primary" size="sm" (click)="workspace.createDatasources()">
+              {{ copy().createDatasource }}
+            </button>
+            <button thyButton="outline-primary" size="sm" (click)="workspace.bindResultTable()">
+              {{ copy().bindDatasource }}
+            </button>
           </div>
         </div>
 
@@ -32,7 +36,9 @@ import { DemoWorkspaceService } from './demo-workspace.service';
             <div class="workspace-page__tags">
               <thy-tag thyColor="primary" thyTheme="weak-fill" thySize="sm">{{ selectedDatasource.id }}</thy-tag>
               <thy-tag thyColor="info" thyTheme="weak-fill" thySize="sm">{{ selectedDatasource.tableId }}</thy-tag>
-              <thy-tag thyColor="warning" thyTheme="weak-fill" thySize="sm">key {{ selectedDatasource.keyField }}</thy-tag>
+              <thy-tag thyColor="warning" thyTheme="weak-fill" thySize="sm"
+                >key {{ selectedDatasource.keyField }}</thy-tag
+              >
             </div>
             <span>{{ selectedDatasource.fields.map((field) => field.name).join(', ') }}</span>
           </div>
@@ -55,8 +61,18 @@ import { DemoWorkspaceService } from './demo-workspace.service';
         </div>
         <div class="workspace-page__card">
           <div class="workspace-page__stats">
-            <thy-statistic thyShape="card" thyColor="primary" [thyValue]="workspace.datasourceDrafts().length" [thyTitle]="copy().datasourceCount"></thy-statistic>
-            <thy-statistic thyShape="card" thyColor="success" [thyValue]="workspace.selectedDatasource() ? workspace.selectedDatasource()!.fields.length : 0" thyTitle="Fields"></thy-statistic>
+            <thy-statistic
+              thyShape="card"
+              thyColor="primary"
+              [thyValue]="workspace.datasourceDrafts().length"
+              [thyTitle]="copy().datasourceCount"
+            ></thy-statistic>
+            <thy-statistic
+              thyShape="card"
+              thyColor="success"
+              [thyValue]="workspace.selectedDatasource() ? workspace.selectedDatasource()!.fields.length : 0"
+              thyTitle="Fields"
+            ></thy-statistic>
           </div>
         </div>
       </thy-card>
@@ -71,14 +87,53 @@ import { DemoWorkspaceService } from './demo-workspace.service';
         grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
         gap: 12px;
       }
-      .workspace-page__panel { background: rgba(255,255,255,.92); border: 1px solid #dbe4ff; border-radius: 16px; box-shadow: 0 10px 30px rgba(15,23,42,.06); padding: 12px; }
-      .workspace-page__header, .workspace-page__actions { display: flex; justify-content: space-between; gap: 8px; align-items: center; flex-wrap: wrap; }
-      .workspace-page__eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: 11px; font-weight: 700; color: #0f766e; }
-      .workspace-page__description { color: #475467; }
-      .workspace-page__card { border: 1px solid #dbe4ff; border-radius: 12px; padding: 10px; display: grid; gap: 6px; }
-      .workspace-page__tags { display: flex; gap: 6px; flex-wrap: wrap; }
-      .workspace-page__stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-      @media (max-width: 1000px) { .workspace-page { grid-template-columns: 1fr; } }
+      .workspace-page__panel {
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid #dbe4ff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+        padding: 12px;
+      }
+      .workspace-page__header,
+      .workspace-page__actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .workspace-page__eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 11px;
+        font-weight: 700;
+        color: #0f766e;
+      }
+      .workspace-page__description {
+        color: #475467;
+      }
+      .workspace-page__card {
+        border: 1px solid #dbe4ff;
+        border-radius: 12px;
+        padding: 10px;
+        display: grid;
+        gap: 6px;
+      }
+      .workspace-page__tags {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .workspace-page__stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      @media (max-width: 1000px) {
+        .workspace-page {
+          grid-template-columns: 1fr;
+        }
+      }
     `
   ]
 })

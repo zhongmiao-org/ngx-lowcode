@@ -3,7 +3,8 @@ import type { NgxLowcodeDemoProjectI18n, NgxLowcodeDemoProjectLocale } from '../
 export const demoProjectI18nMap: Record<NgxLowcodeDemoProjectLocale, NgxLowcodeDemoProjectI18n> = {
   'zh-CN': {
     heroTitle: '商业演示级低代码工作台',
-    heroDescription: '把 demo 当成产品来做：先建数据模型，再建数据源，绑定到页面，然后生成可设计、可预览、可联调的业务工作区。',
+    heroDescription:
+      '把 demo 当成产品来做：先建数据模型，再建数据源，绑定到页面，然后生成可设计、可预览、可联调的业务工作区。',
     workspaceTitle: 'Demo Commerce Studio',
     workspaceDescription: '按官网产品流组织的 design-time 演示壳，首批纳入数据模型、数据源和页面生成。',
     backHome: '返回首页',
@@ -96,9 +97,11 @@ export const demoProjectI18nMap: Record<NgxLowcodeDemoProjectLocale, NgxLowcodeD
     pageNavDesigner: 'Designer',
     pageNavPreview: 'Preview & Route',
     pageNavRouteConfig: 'Route Config',
-    homeModelDescription: 'Enter the dedicated model route to manage tables, columns, child tables, foreign keys and indexes.',
+    homeModelDescription:
+      'Enter the dedicated model route to manage tables, columns, child tables, foreign keys and indexes.',
     homeDatasourceDescription: 'Enter the datasource route to generate datasources from the model and manage bindings.',
-    homePageDescription: 'Enter the page route to switch between designer and preview sub-routes and configure preview paths.',
+    homePageDescription:
+      'Enter the page route to switch between designer and preview sub-routes and configure preview paths.',
     commandBarTitle: 'Command Bar',
     modelStage: 'Data Model',
     datasourceStage: 'Datasource',
@@ -154,7 +157,8 @@ export const demoProjectI18nMap: Record<NgxLowcodeDemoProjectLocale, NgxLowcodeD
     refreshSnapshots: 'Refresh',
     snapshotEmpty: 'No snapshots yet. Create one first.',
     routeConfigTitle: 'Preview Route Config',
-    routeConfigDescription: 'After generating a page, keep an explicit route path for preview and future app entry wiring.',
+    routeConfigDescription:
+      'After generating a page, keep an explicit route path for preview and future app entry wiring.',
     routeConfigPathLabel: 'Route Path',
     routeConfigMenuLabel: 'Menu Mount',
     sidebarTitle: 'Studio Navigation',

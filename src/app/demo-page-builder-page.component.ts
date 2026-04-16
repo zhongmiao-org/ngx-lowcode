@@ -23,7 +23,9 @@ import { DemoWorkspaceService } from './demo-workspace.service';
         <thy-nav thyType="pills">
           <a thyNavItem routerLink="/studio/page/designer" routerLinkActive="active">{{ copy().pageNavDesigner }}</a>
           <a thyNavItem routerLink="/studio/page/preview" routerLinkActive="active">{{ copy().pageNavPreview }}</a>
-          <a thyNavItem routerLink="/studio/page/route-config" routerLinkActive="active">{{ copy().pageNavRouteConfig }}</a>
+          <a thyNavItem routerLink="/studio/page/route-config" routerLinkActive="active">{{
+            copy().pageNavRouteConfig
+          }}</a>
         </thy-nav>
       </thy-card>
 
