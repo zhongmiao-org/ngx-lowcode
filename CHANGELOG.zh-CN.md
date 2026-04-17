@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- chore(repo): 平台演示应用已从 `ngx-lowcode/src` 迁移到独立仓库 `meta-weave`。
+- chore(repo): 删除本仓 `demo` 应用目标与配置，`ngx-lowcode` 回归 `projects/*` 基础库定位。
+- docs(repo): README/README_zh 联调入口改为 `meta-weave`，不再使用 `ngx-lowcode/src`。
 - feat(runtime): demo manager 注入切换为 `@zhongmiao/meta-lc-runtime-angular` 包引用实现（直接替换）。
 - feat(runtime): 通过 runtime adapter 的 `onExecution` 回调迁移执行状态面板，保留 request-id/status/rowCount/message 可观测性。
 

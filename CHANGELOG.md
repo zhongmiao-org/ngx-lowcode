@@ -2,6 +2,9 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+- chore(repo): migrate the platform demo app from `ngx-lowcode/src` to standalone `meta-weave` repository.
+- chore(repo): remove `demo` app target/config from this workspace and keep `ngx-lowcode` library-only (`projects/*`).
+- docs(repo): update README/README_zh integration guidance to point demo/platform entry to `meta-weave`.
 - feat(runtime): switch demo manager injection to `@zhongmiao/meta-lc-runtime-angular` with direct package wiring.
 - feat(runtime): keep demo execution observability panel via runtime adapter `onExecution` callback migration (request-id/status/rows/message).
 
