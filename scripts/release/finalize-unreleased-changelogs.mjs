@@ -66,12 +66,21 @@ const runFinalize = (version, bodyFile, changelogFile) => {
   }
 };
 
-const updatePackageVersion = (pkgName, version) => {
+const updatePackageVersion = (pkgName, version, releasedVersionByPackage) => {
   const projectName = pkgName.replace('@zhongmiao/', '');
   const packagePath = `projects/${projectName}/package.json`;
   if (!fs.existsSync(packagePath)) return;
   const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
   packageJson.version = version;
+
+  if (packageJson.peerDependencies && typeof packageJson.peerDependencies === 'object') {
+    for (const peerName of Object.keys(packageJson.peerDependencies)) {
+      if (releasedVersionByPackage.has(peerName)) {
+        packageJson.peerDependencies[peerName] = `${releasedVersionByPackage.get(peerName)}`;
+      }
+    }
+  }
+
   fs.writeFileSync(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`, 'utf8');
 };
 
@@ -162,6 +171,13 @@ if (shouldFinalizeRoot) {
   }
 }
 
+const releasedVersionByPackage = new Map(
+  packages.map((releasedPkg) => [
+    releasedPkg.name,
+    publishedMap.get(releasedPkg.name)?.version || releasedPkg.version || aggregatePublishedVersion
+  ])
+);
+
 for (const pkg of packages) {
   const publishedItem = publishedMap.get(pkg.name);
   const targetVersion = publishedItem?.version || pkg.version;
@@ -176,7 +192,7 @@ for (const pkg of packages) {
     runFinalize(targetVersion, bodyPathZh, pkg.changelogPathZh);
   }
 
-  updatePackageVersion(pkg.name, targetVersion);
+  updatePackageVersion(pkg.name, targetVersion, releasedVersionByPackage);
 }
 
 syncAggregateDependencies(

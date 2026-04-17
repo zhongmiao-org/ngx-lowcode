@@ -5,6 +5,8 @@
 - chore(release): 将主包 `@zhongmiao/ngx-lowcode` 版本提升到 `0.1.3`。
 - fix(release): 子包发布清单改为仅保留“沙箱会改版本”的候选（相对基线 tag 有变更且 `sourceVersion != targetVersion`），避免误发全量子包。
 - fix(release): `release:draft-notes:json` 增加清单统计字段（`candidateCount`、`selectedCount`、`skippedAlreadyAtTargetCount`）。
+- feat(release): 新增递归依赖联动清单（`directPackages` + `cascadePackages`），被依赖子包会自动纳入同批次发布。
+- feat(release): 根据发布清单自动回写严格版本的 peerDependencies 与主包 dependencies，并为联动包自动补齐中英文 changelog 模板。
 
 ## 0.1.2 (2026-04-17)
 
