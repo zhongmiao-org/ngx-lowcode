@@ -16,9 +16,10 @@ if (!fs.existsSync(metadataPath)) {
 
 const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
 const aggregate = metadata.aggregate;
-let packages = metadata.packages;
+let packages = Array.isArray(metadata.packages) ? metadata.packages : [];
+const rootNotes = metadata.rootNotes || { en: '', zh: '' };
 
-if (!aggregate?.version || !Array.isArray(packages) || packages.length === 0) {
+if (!aggregate?.name || !aggregate?.version) {
   console.error('Invalid metadata structure.');
   process.exit(1);
 }
@@ -38,8 +39,17 @@ if (publishedMap.size > 0) {
   packages = packages.filter((pkg) => publishedMap.has(pkg.name));
 }
 
-if (packages.length === 0) {
-  console.log('No published packages to finalize.');
+const aggregatePublishedVersion = publishedMap.get(aggregate.name)?.version || aggregate.version;
+const rootNotesEn = typeof rootNotes.en === 'string' ? rootNotes.en.trim() : '';
+const rootNotesZh = typeof rootNotes.zh === 'string' ? rootNotes.zh.trim() : '';
+
+const shouldFinalizeRoot =
+  publishedMap.size === 0
+    ? true
+    : publishedMap.has(aggregate.name) || packages.length > 0 || Boolean(rootNotesEn || rootNotesZh);
+
+if (!shouldFinalizeRoot && packages.length === 0) {
+  console.log('No published aggregate/package changelog content to finalize.');
   process.exit(0);
 }
 
@@ -82,32 +92,74 @@ const syncAggregateDependencies = (aggregateVersion, releasedPackages) => {
   fs.writeFileSync(aggregatePath, `${JSON.stringify(aggregatePkg, null, 2)}\n`, 'utf8');
 };
 
-const rootLines = ['## Released Packages', ''];
 for (const pkg of packages) {
   if (!pkg.unreleasedEn || !pkg.unreleasedZh) {
     console.error(`Package ${pkg.name} must provide both English and Chinese Unreleased content before finalize.`);
     process.exit(1);
   }
-  const targetVersion = publishedMap.get(pkg.name)?.version || pkg.version;
-  rootLines.push(`### ${pkg.name}@${targetVersion}`);
-  rootLines.push(pkg.unreleasedEn);
-  rootLines.push('');
-}
-const rootBodyPath = '.tmp/release-root-body.md';
-fs.writeFileSync(rootBodyPath, `${rootLines.join('\n').trim()}\n`, 'utf8');
-runFinalize(aggregate.version, rootBodyPath, 'CHANGELOG.md');
 
-if (fs.existsSync('CHANGELOG.zh-CN.md')) {
-  const zhLines = ['## 发布包清单', ''];
+  if (!pkg.changelogPathEn) {
+    console.error(`Package ${pkg.name} is missing changelogPathEn metadata.`);
+    process.exit(1);
+  }
+}
+
+if (shouldFinalizeRoot) {
+  const rootLines = [];
+  if (rootNotesEn) {
+    rootLines.push(rootNotesEn);
+    rootLines.push('');
+  }
+
+  if (packages.length > 0) {
+    rootLines.push('## Released Packages');
+    rootLines.push('');
+  }
+
   for (const pkg of packages) {
     const targetVersion = publishedMap.get(pkg.name)?.version || pkg.version;
-    zhLines.push(`### ${pkg.name}@${targetVersion}`);
-    zhLines.push(pkg.unreleasedZh);
-    zhLines.push('');
+    rootLines.push(`### ${pkg.name}@${targetVersion}`);
+    rootLines.push(pkg.unreleasedEn);
+    rootLines.push('');
   }
-  const zhBodyPath = '.tmp/release-root-body-zh.md';
-  fs.writeFileSync(zhBodyPath, `${zhLines.join('\n').trim()}\n`, 'utf8');
-  runFinalize(aggregate.version, zhBodyPath, 'CHANGELOG.zh-CN.md');
+
+  const rootBody = rootLines.join('\n').trim();
+  if (rootBody) {
+    const rootBodyPath = '.tmp/release-root-body.md';
+    fs.writeFileSync(rootBodyPath, `${rootBody}\n`, 'utf8');
+    runFinalize(aggregatePublishedVersion, rootBodyPath, 'CHANGELOG.md');
+  } else {
+    console.log('Root English changelog has no finalize content; skipping CHANGELOG.md finalize.');
+  }
+
+  if (fs.existsSync('CHANGELOG.zh-CN.md')) {
+    const zhLines = [];
+    if (rootNotesZh) {
+      zhLines.push(rootNotesZh);
+      zhLines.push('');
+    }
+
+    if (packages.length > 0) {
+      zhLines.push('## 发布包清单');
+      zhLines.push('');
+    }
+
+    for (const pkg of packages) {
+      const targetVersion = publishedMap.get(pkg.name)?.version || pkg.version;
+      zhLines.push(`### ${pkg.name}@${targetVersion}`);
+      zhLines.push(pkg.unreleasedZh);
+      zhLines.push('');
+    }
+
+    const zhBody = zhLines.join('\n').trim();
+    if (zhBody) {
+      const zhBodyPath = '.tmp/release-root-body-zh.md';
+      fs.writeFileSync(zhBodyPath, `${zhBody}\n`, 'utf8');
+      runFinalize(aggregatePublishedVersion, zhBodyPath, 'CHANGELOG.zh-CN.md');
+    } else {
+      console.log('Root Chinese changelog has no finalize content; skipping CHANGELOG.zh-CN.md finalize.');
+    }
+  }
 }
 
 for (const pkg of packages) {
@@ -128,7 +180,7 @@ for (const pkg of packages) {
 }
 
 syncAggregateDependencies(
-  aggregate.version,
+  aggregatePublishedVersion,
   packages.map((pkg) => ({
     name: pkg.name,
     version: publishedMap.get(pkg.name)?.version || pkg.version

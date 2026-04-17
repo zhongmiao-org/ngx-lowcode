@@ -2,6 +2,9 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+- feat(designer): unify business textarea form controls to ngx-tethys inputs in the designer props panel (code editor textareas remain unchanged).
+- fix(release): allow finalize to complete for aggregate-only publish success and only archive/write back packages from `publish-result.published[]`.
+- fix(release): finalize now appends root unreleased notes and package release sections in one pass to avoid root-only release loss.
 - fix(changelog): add per-package `CHANGELOG.zh-CN.md` and enforce bilingual changelog updates for package code changes.
 - fix(release): split package release metadata/finalize flow into English and Chinese channels to avoid cross-language pollution.
 - chore(format): normalize changelog/release script formatting to keep CI prettier checks stable.

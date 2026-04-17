@@ -24,6 +24,7 @@
           <div class="ngx-lowcode-prop-row">
             <span>{{ t().pageDescription }}</span>
             <textarea
+              thyInput
               [ngModel]="editorSchema().pageMeta.description ?? ''"
               (ngModelChange)="pageMetaChange.emit({ key: 'description', value: $event })"
               rows="3"
@@ -69,6 +70,7 @@
                       @switch (setter.type) {
                         @case ('textarea') {
                           <textarea
+                            thyInput
                             [ngModel]="setterModelValue(node, setter)"
                             (ngModelChange)="emitSetterChange(node.id, setter, $event)"
                             rows="4"
@@ -130,6 +132,7 @@
                         @switch (setter.type) {
                           @case ('textarea') {
                             <textarea
+                              thyInput
                               [ngModel]="setterModelValue(node, setter)"
                               (ngModelChange)="emitSetterChange(node.id, setter, $event)"
                               rows="4"
@@ -182,6 +185,7 @@
                         @switch (setter.type) {
                           @case ('textarea') {
                             <textarea
+                              thyInput
                               [ngModel]="setterModelValue(node, setter)"
                               (ngModelChange)="emitSetterChange(node.id, setter, $event)"
                               rows="4"
