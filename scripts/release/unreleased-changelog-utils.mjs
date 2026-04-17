@@ -78,34 +78,42 @@ export function loadPackageReleaseMetadata() {
     const packageJsonPath = path.join(dir, 'package.json');
     const changelogPathEn = path.join(dir, 'CHANGELOG.md');
     const changelogPathZh = path.join(dir, 'CHANGELOG.zh-CN.md');
-    if (!fs.existsSync(packageJsonPath) || !fs.existsSync(changelogPathEn)) continue;
+    if (!fs.existsSync(packageJsonPath)) continue;
 
     const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-    const changelogEn = fs.readFileSync(changelogPathEn, 'utf8');
-    const unreleasedEn = extractUnreleased(changelogEn);
+    const unreleasedEn = fs.existsSync(changelogPathEn) ? readUnreleasedFromFile(changelogPathEn) : '';
     const unreleasedZh = fs.existsSync(changelogPathZh) ? readUnreleasedFromFile(changelogPathZh) : '';
-    if (!unreleasedEn && !unreleasedZh) continue;
 
-    const baseEn = latestReleaseTag ? extractUnreleased(readFileFromGitRef(latestReleaseTag, changelogPathEn)) : '';
-    const baseZh =
-      latestReleaseTag && fs.existsSync(changelogPathZh)
-        ? extractUnreleased(readFileFromGitRef(latestReleaseTag, changelogPathZh))
-        : '';
-    const hasUnreleasedChangedSinceBase =
-      !latestReleaseTag ||
-      normalizeBlock(unreleasedEn) !== normalizeBlock(baseEn) ||
-      normalizeBlock(unreleasedZh) !== normalizeBlock(baseZh);
+    let hasUnreleasedChangedSinceBase = false;
+    if (unreleasedEn || unreleasedZh) {
+      const baseEn =
+        latestReleaseTag && fs.existsSync(changelogPathEn)
+          ? extractUnreleased(readFileFromGitRef(latestReleaseTag, changelogPathEn))
+          : '';
+      const baseZh =
+        latestReleaseTag && fs.existsSync(changelogPathZh)
+          ? extractUnreleased(readFileFromGitRef(latestReleaseTag, changelogPathZh))
+          : '';
+      hasUnreleasedChangedSinceBase =
+        !latestReleaseTag ||
+        normalizeBlock(unreleasedEn) !== normalizeBlock(baseEn) ||
+        normalizeBlock(unreleasedZh) !== normalizeBlock(baseZh);
+    }
+
+    const peerDependencies = pkg.peerDependencies || {};
 
     packages.push({
       name: pkg.name,
       version: pkg.version,
       latestReleaseTag,
       projectDir: path.relative(process.cwd(), dir),
-      changelogPathEn: path.relative(process.cwd(), changelogPathEn),
+      packageJsonPath: path.relative(process.cwd(), packageJsonPath),
+      changelogPathEn: fs.existsSync(changelogPathEn) ? path.relative(process.cwd(), changelogPathEn) : '',
       changelogPathZh: fs.existsSync(changelogPathZh) ? path.relative(process.cwd(), changelogPathZh) : '',
       unreleasedEn,
       unreleasedZh,
-      hasUnreleasedChangedSinceBase
+      hasUnreleasedChangedSinceBase,
+      peerDependencies
     });
   }
 
