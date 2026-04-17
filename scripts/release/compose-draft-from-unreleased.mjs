@@ -4,7 +4,7 @@ import { loadRootReleaseNotes } from './unreleased-changelog-utils.mjs';
 
 const asJson = process.argv.includes('--json');
 const aggregate = loadAggregatePackage();
-const packages = loadPackageReleaseMetadata().filter((pkg) => pkg.name !== aggregate.name);
+const packages = loadPackageReleaseMetadata().filter((pkg) => pkg.name !== aggregate.name && pkg.unreleasedEn);
 const rootNotes = loadRootReleaseNotes();
 
 if (packages.length === 0) {
@@ -35,36 +35,22 @@ lines.push(`- aggregate package: ${aggregate.name}@${aggregate.version}`);
 lines.push(`- affected packages: ${packages.length}`);
 lines.push('');
 
-if (rootNotes.zh || rootNotes.en) {
+if (rootNotes.en) {
   lines.push('## Root Changelog (Unreleased)');
   lines.push('');
-  if (rootNotes.zh) {
-    lines.push('### CHANGELOG.zh-CN.md');
-    lines.push(rootNotes.zh);
-    lines.push('');
-  }
-  if (rootNotes.en) {
-    lines.push('### CHANGELOG.md');
-    lines.push(rootNotes.en);
-    lines.push('');
-  }
+  lines.push('### CHANGELOG.md');
+  lines.push(rootNotes.en);
+  lines.push('');
 }
 
 lines.push('## Package Changes');
 lines.push('');
 
 for (const pkg of packages) {
-  if (!pkg.unreleasedEn || !pkg.unreleasedZh) {
-    throw new Error(
-      `Package ${pkg.name} must provide both English and Chinese Unreleased content (CHANGELOG.md + CHANGELOG.zh-CN.md).`
-    );
+  if (!pkg.unreleasedEn) {
+    throw new Error(`Package ${pkg.name} must provide English Unreleased content (CHANGELOG.md).`);
   }
   lines.push(`### ${pkg.name} -> ${pkg.version}`);
-  lines.push('');
-  lines.push('#### Chinese');
-  lines.push(pkg.unreleasedZh);
-  lines.push('');
-  lines.push('#### English');
   lines.push(pkg.unreleasedEn);
   lines.push('');
 }
