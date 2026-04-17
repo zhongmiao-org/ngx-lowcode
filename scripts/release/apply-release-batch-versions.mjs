@@ -35,7 +35,7 @@ aggregatePackage.version = aggregate.version;
 aggregatePackage.dependencies = aggregatePackage.dependencies || {};
 
 for (const pkg of changedPackages) {
-  const packageVersion = pkg.version || pkg.sourceVersion;
+  const packageVersion = pkg.targetVersion || pkg.version || pkg.sourceVersion;
   if (!packageVersion) {
     console.error(`Missing package version in metadata for ${pkg.name}.`);
     process.exit(1);

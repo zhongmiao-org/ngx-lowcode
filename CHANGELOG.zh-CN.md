@@ -1,7 +1,10 @@
 [English](CHANGELOG.md) | 中文文档
 
-
 ## [Unreleased]
+
+- chore(release): 将主包 `@zhongmiao/ngx-lowcode` 版本提升到 `0.1.3`。
+- fix(release): 子包发布清单改为仅保留“沙箱会改版本”的候选（相对基线 tag 有变更且 `sourceVersion != targetVersion`），避免误发全量子包。
+- fix(release): `release:draft-notes:json` 增加清单统计字段（`candidateCount`、`selectedCount`、`skippedAlreadyAtTargetCount`）。
 
 ## 0.1.2 (2026-04-17)
 
@@ -22,8 +25,11 @@
 - chore(release): 将聚合包 `@zhongmiao/ngx-lowcode` 版本提升到 `0.1.1`。
 - fix(release): finalize 根级发布包清单改为使用 publish-result 中的实际发布版本号。
 - fix(release): 当子包无 Unreleased 变更时，若根 `CHANGELOG.md` 有 Unreleased 仍允许生成草稿，避免错误跳过草稿更新。
+
 ## 发布包清单
+
 ### @zhongmiao/ngx-lowcode-designer@0.1.2
+
 - 统一设计器属性面板业务表单 `textarea` 的 ngx-tethys 输入样式，代码编辑区 `textarea` 保持不变。
 
 ## 0.1.0 (2026-04-16)

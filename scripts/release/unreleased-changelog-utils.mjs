@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 
 export function extractUnreleased(content) {
   const normalized = content.replace(/\r\n/g, '\n');
@@ -33,7 +34,40 @@ export function readUnreleasedFromFile(filePath) {
   return extractUnreleased(content);
 }
 
+function readFileFromGitRef(ref, repoRelativePath) {
+  const result = spawnSync('git', ['show', `${ref}:${repoRelativePath}`], {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore']
+  });
+  if (result.status !== 0) return '';
+  return result.stdout || '';
+}
+
+function normalizeBlock(value) {
+  return (value || '')
+    .replace(/\r\n/g, '\n')
+    .split('\n')
+    .map((line) => line.replace(/\s+$/g, ''))
+    .join('\n')
+    .trim();
+}
+
+function resolveLatestReleaseTag() {
+  const result = spawnSync('git', ['tag', '--sort=-version:refname'], {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore']
+  });
+  if (result.status !== 0) return '';
+  const tags = (result.stdout || '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter((tag) => /^v\d+\.\d+\.\d+/.test(tag));
+  return tags[0] || '';
+}
+
 export function loadPackageReleaseMetadata() {
+  const latestReleaseTag = resolveLatestReleaseTag();
   const projectsDir = path.resolve('projects');
   const entries = fs.readdirSync(projectsDir, { withFileTypes: true });
   const packages = [];
@@ -52,14 +86,26 @@ export function loadPackageReleaseMetadata() {
     const unreleasedZh = fs.existsSync(changelogPathZh) ? readUnreleasedFromFile(changelogPathZh) : '';
     if (!unreleasedEn && !unreleasedZh) continue;
 
+    const baseEn = latestReleaseTag ? extractUnreleased(readFileFromGitRef(latestReleaseTag, changelogPathEn)) : '';
+    const baseZh =
+      latestReleaseTag && fs.existsSync(changelogPathZh)
+        ? extractUnreleased(readFileFromGitRef(latestReleaseTag, changelogPathZh))
+        : '';
+    const hasUnreleasedChangedSinceBase =
+      !latestReleaseTag ||
+      normalizeBlock(unreleasedEn) !== normalizeBlock(baseEn) ||
+      normalizeBlock(unreleasedZh) !== normalizeBlock(baseZh);
+
     packages.push({
       name: pkg.name,
       version: pkg.version,
+      latestReleaseTag,
       projectDir: path.relative(process.cwd(), dir),
       changelogPathEn: path.relative(process.cwd(), changelogPathEn),
       changelogPathZh: fs.existsSync(changelogPathZh) ? path.relative(process.cwd(), changelogPathZh) : '',
       unreleasedEn,
-      unreleasedZh
+      unreleasedZh,
+      hasUnreleasedChangedSinceBase
     });
   }
 
