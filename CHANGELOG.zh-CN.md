@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- feat(designer): 统一设计器属性面板业务表单的 `textarea` 为 ngx-tethys 输入控件（代码编辑区 `textarea` 继续保留）。
+- fix(release): `finalize` 支持“仅主包发布成功”场景，且仅按 `publish-result.published[]` 归档与回写版本。
+- fix(release): `finalize` 归档时同步写入根 changelog 的 Unreleased 内容与已发布子包清单，避免主包单发时根日志丢失。
 - fix(changelog): 为所有子包新增 `CHANGELOG.zh-CN.md`，并对“子包代码改动”启用中英双 changelog 强制门禁。
 - fix(release): 发布元数据与 finalize 改为中英文双通道，避免英文变更被写入中文 changelog。
 - chore(format): 规范 changelog 与发布脚本格式，保持 CI 的 prettier 检查稳定通过。
