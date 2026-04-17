@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
-import path from 'node:path';
 
 const metadataPath = process.argv[2];
 const outputPath = process.argv[3] || '';
@@ -24,7 +23,7 @@ if (!aggregate?.name || !aggregate?.version) {
   process.exit(1);
 }
 
-const aggregatePackagePath = path.resolve('projects/ngx-lowcode/package.json');
+const aggregatePackagePath = 'projects/ngx-lowcode/package.json';
 if (!fs.existsSync(aggregatePackagePath)) {
   console.error(`Aggregate package file not found: ${aggregatePackagePath}`);
   process.exit(1);
@@ -36,19 +35,14 @@ aggregatePackage.version = aggregate.version;
 aggregatePackage.dependencies = aggregatePackage.dependencies || {};
 
 for (const pkg of changedPackages) {
-  const projectName = pkg.name.replace('@zhongmiao/', '');
-  const pkgJsonPath = path.resolve(`projects/${projectName}/package.json`);
-  if (!fs.existsSync(pkgJsonPath)) {
-    console.error(`Package file not found: ${pkgJsonPath}`);
+  const packageVersion = pkg.sourceVersion || pkg.version;
+  if (!packageVersion) {
+    console.error(`Missing package version in metadata for ${pkg.name}.`);
     process.exit(1);
   }
 
-  const packageJson = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
-  packageJson.version = aggregate.version;
-  fs.writeFileSync(pkgJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`, 'utf8');
-
   if (Object.hasOwn(aggregatePackage.dependencies, pkg.name)) {
-    aggregatePackage.dependencies[pkg.name] = `${aggregate.version}`;
+    aggregatePackage.dependencies[pkg.name] = `${packageVersion}`;
   }
 }
 
@@ -61,7 +55,7 @@ const appliedPlan = {
   },
   packages: changedPackages.map((pkg) => ({
     name: pkg.name,
-    version: aggregate.version
+    version: pkg.sourceVersion || pkg.version
   })),
   generatedAt: new Date().toISOString()
 };

@@ -2,10 +2,11 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+- fix(release): restore package draft/publish plan versions to each subpackage's own release version (supports non-uniform version jumps).
+- fix(release): sandbox apply step now only updates aggregate dependency pins by release plan versions and no longer rewrites subpackage versions before publish.
 - chore(aggregate): remove redundant aggregate package `projects/ngx-lowcode` changelog files and source `index.js`; release publish now generates aggregate dist entry file and copies root changelog.
 - fix(release): enforce strict aggregate dependency versions (no caret) for batch apply/finalize write-back to prevent aggregate package from pulling stale subpackage versions.
 - fix(ci): treat `projects/ngx-lowcode` code changes as root changelog-governed changes in changelog gate.
-- fix(release): draft package changes now display batch target version from aggregate package (instead of source package version).
 - feat(designer): unify business textarea form controls to ngx-tethys inputs in the designer props panel (code editor textareas remain unchanged).
 - fix(release): allow finalize to complete for aggregate-only publish success and only archive/write back packages from `publish-result.published[]`.
 - fix(release): finalize now appends root unreleased notes and package release sections in one pass to avoid root-only release loss.

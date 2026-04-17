@@ -2,10 +2,11 @@
 
 ## [Unreleased]
 
+- fix(release): 子包草稿与发布计划版本恢复为“各子包自身版本”，支持不同子包独立跳号发布。
+- fix(release): 沙箱 apply 步骤改为仅按发布清单更新主包依赖版本，不再在发布前重写子包版本号。
 - chore(aggregate): 删除 `projects/ngx-lowcode` 下冗余的主包 changelog 与源码 `index.js`；发布时改为动态生成主包 dist 入口并复制根 changelog。
 - fix(release): 主包依赖版本改为严格版本（去掉 `^`），并在 batch apply/finalize 回写时保持严格版本，避免主包拉到旧子包版本。
 - fix(ci): `changelog gate` 对 `projects/ngx-lowcode` 的代码改动改为校验根级中英文 changelog，不再依赖子目录 changelog。
-- fix(release): 发布草稿中的子包版本改为显示主包批次目标版本（不再显示子包源码当前版本）。
 - feat(designer): 统一设计器属性面板业务表单的 `textarea` 为 ngx-tethys 输入控件（代码编辑区 `textarea` 继续保留）。
 - fix(release): `finalize` 支持“仅主包发布成功”场景，且仅按 `publish-result.published[]` 归档与回写版本。
 - fix(release): `finalize` 归档时同步写入根 changelog 的 Unreleased 内容与已发布子包清单，避免主包单发时根日志丢失。
