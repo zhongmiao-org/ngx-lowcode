@@ -4,7 +4,13 @@ import { loadRootReleaseNotes } from './unreleased-changelog-utils.mjs';
 
 const asJson = process.argv.includes('--json');
 const aggregate = loadAggregatePackage();
-const packages = loadPackageReleaseMetadata().filter((pkg) => pkg.name !== aggregate.name && pkg.unreleasedEn);
+const packages = loadPackageReleaseMetadata()
+  .filter((pkg) => pkg.name !== aggregate.name && pkg.unreleasedEn)
+  .map((pkg) => ({
+    ...pkg,
+    sourceVersion: pkg.version,
+    version: aggregate.version
+  }));
 const rootNotes = loadRootReleaseNotes();
 
 if (packages.length === 0 && !rootNotes.en) {
