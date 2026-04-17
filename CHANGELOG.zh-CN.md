@@ -1,6 +1,9 @@
 [English](CHANGELOG.md) | 中文文档
 
+
 ## [Unreleased]
+
+## 0.1.2 (2026-04-17)
 
 - chore(aggregate): 将主包依赖基线重置为全部子包 `0.1.0` 初始版本。
 - fix(release): 发布草稿中的子包版本改为展示目标发布版本（即将发布版本），不再显示源码当前版本。
@@ -19,6 +22,9 @@
 - chore(release): 将聚合包 `@zhongmiao/ngx-lowcode` 版本提升到 `0.1.1`。
 - fix(release): finalize 根级发布包清单改为使用 publish-result 中的实际发布版本号。
 - fix(release): 当子包无 Unreleased 变更时，若根 `CHANGELOG.md` 有 Unreleased 仍允许生成草稿，避免错误跳过草稿更新。
+## 发布包清单
+### @zhongmiao/ngx-lowcode-designer@0.1.2
+- 统一设计器属性面板业务表单 `textarea` 的 ngx-tethys 输入样式，代码编辑区 `textarea` 保持不变。
 
 ## 0.1.0 (2026-04-16)
 

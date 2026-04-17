@@ -14,7 +14,7 @@
     "@zhongmiao/ngx-lowcode-core": "0.1.0",
     "@zhongmiao/ngx-lowcode-renderer": "0.1.0",
     "@zhongmiao/ngx-lowcode-materials": "0.1.0",
-    "@zhongmiao/ngx-lowcode-designer": "0.1.0",
+    "@zhongmiao/ngx-lowcode-designer": "0.1.2",
     "@zhongmiao/ngx-lowcode-testing": "0.1.0",
     "@zhongmiao/ngx-lowcode-puzzle-adapter": "0.1.0"
   },
