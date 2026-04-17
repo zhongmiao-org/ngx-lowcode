@@ -3,6 +3,9 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+- feat(runtime): switch demo manager injection to `@zhongmiao/meta-lc-runtime-angular` with direct package wiring.
+- feat(runtime): keep demo execution observability panel via runtime adapter `onExecution` callback migration (request-id/status/rows/message).
+
 ## 0.1.3 (2026-04-17)
 
 - chore(release): bump aggregate package `@zhongmiao/ngx-lowcode` version to `0.1.3`.

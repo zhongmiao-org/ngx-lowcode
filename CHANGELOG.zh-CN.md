@@ -3,6 +3,9 @@
 
 ## [Unreleased]
 
+- feat(runtime): demo manager 注入切换为 `@zhongmiao/meta-lc-runtime-angular` 包引用实现（直接替换）。
+- feat(runtime): 通过 runtime adapter 的 `onExecution` 回调迁移执行状态面板，保留 request-id/status/rowCount/message 可观测性。
+
 ## 0.1.3 (2026-04-17)
 
 - chore(release): 将主包 `@zhongmiao/ngx-lowcode` 版本提升到 `0.1.3`。

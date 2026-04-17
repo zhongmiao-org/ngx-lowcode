@@ -43,6 +43,7 @@
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.38.6",
     "@tabler/icons-webfont": "^3.41.1",
+    "@zhongmiao/meta-lc-runtime-angular": "0.1.0",
     "@tethys/cdk": "21.0.0",
     "@tethys/icons": "^1.4.23",
     "ngx-tethys": "21.0.0",
