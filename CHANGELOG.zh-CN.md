@@ -1,10 +1,10 @@
 [English](CHANGELOG.md) | 中文文档
 
-
 ## [Unreleased]
 
 - fix(changelog): 为所有子包新增 `CHANGELOG.zh-CN.md`，并对“子包代码改动”启用中英双 changelog 强制门禁。
 - fix(release): 发布元数据与 finalize 改为中英文双通道，避免英文变更被写入中文 changelog。
+- chore(format): 规范 changelog 与发布脚本格式，保持 CI 的 prettier 检查稳定通过。
 
 ## 0.1.0 (2026-04-16)
 
@@ -18,25 +18,47 @@
 - fix(ci): 升级 actions 到 Node24 兼容版本，并强化 release 流程（监听 `release` 事件 + 本地 dist 路径发包）。
 
 ## 发布包清单
+
 ### @zhongmiao/ngx-lowcode-core@0.1.0
+
 - Initial public scoped release under `@zhongmiao/*`.
+
 ### @zhongmiao/ngx-lowcode-core-types@0.1.0
+
 - Initial public scoped release under `@zhongmiao/*`.
+
 ### @zhongmiao/ngx-lowcode-core-utils@0.1.0
+
 - Initial public scoped release under `@zhongmiao/*`.
+
 ### @zhongmiao/ngx-lowcode-datasource@0.1.0
+
 - Initial public scoped release under `@zhongmiao/*`.
+
 ### @zhongmiao/ngx-lowcode-designer@0.1.0
+
 - Initial public scoped release under `@zhongmiao/*`.
+
 ### @zhongmiao/ngx-lowcode-i18n@0.1.0
+
 - Initial public scoped release under `@zhongmiao/*`.
+
 ### @zhongmiao/ngx-lowcode-materials@0.1.0
+
 - Initial public scoped release under `@zhongmiao/*`.
+
 ### @zhongmiao/ngx-lowcode-meta-model@0.1.0
+
 - Initial public scoped release under `@zhongmiao/*`.
+
 ### @zhongmiao/ngx-lowcode-puzzle-adapter@0.1.0
+
 - Initial public scoped release under `@zhongmiao/*`.
+
 ### @zhongmiao/ngx-lowcode-renderer@0.1.0
+
 - Initial public scoped release under `@zhongmiao/*`.
+
 ### @zhongmiao/ngx-lowcode-testing@0.1.0
+
 - Initial public scoped release under `@zhongmiao/*`.
