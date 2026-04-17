@@ -9,6 +9,7 @@
 - feat(release): 增加发版沙箱版本同步、按清单发布与发布结果制品；finalize 仅归档实际发布成功的包并回写 package 版本 PR。
 - chore(release): 将聚合包 `@zhongmiao/ngx-lowcode` 版本提升到 `0.1.1`。
 - fix(release): finalize 根级发布包清单改为使用 publish-result 中的实际发布版本号。
+- fix(release): 当子包无 Unreleased 变更时，若根 `CHANGELOG.md` 有 Unreleased 仍允许生成草稿，避免错误跳过草稿更新。
 
 ## 0.1.0 (2026-04-16)
 

@@ -9,6 +9,7 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 - feat(release): add release sandbox version sync + selected publish result artifact, and finalize only actually published packages with package version write-back PR.
 - chore(release): bump aggregate package `@zhongmiao/ngx-lowcode` version to `0.1.1`.
 - fix(release): finalize root release package list now uses actual published versions from publish-result.
+- fix(release): allow draft generation from root `CHANGELOG.md` unreleased notes even when no subpackage unreleased changes exist.
 
 ## 0.1.0 (2026-04-16)
 

@@ -7,7 +7,7 @@ const aggregate = loadAggregatePackage();
 const packages = loadPackageReleaseMetadata().filter((pkg) => pkg.name !== aggregate.name && pkg.unreleasedEn);
 const rootNotes = loadRootReleaseNotes();
 
-if (packages.length === 0) {
+if (packages.length === 0 && !rootNotes.en) {
   process.exit(2);
 }
 
@@ -43,16 +43,18 @@ if (rootNotes.en) {
   lines.push('');
 }
 
-lines.push('## Package Changes');
-lines.push('');
-
-for (const pkg of packages) {
-  if (!pkg.unreleasedEn) {
-    throw new Error(`Package ${pkg.name} must provide English Unreleased content (CHANGELOG.md).`);
-  }
-  lines.push(`### ${pkg.name} -> ${pkg.version}`);
-  lines.push(pkg.unreleasedEn);
+if (packages.length > 0) {
+  lines.push('## Package Changes');
   lines.push('');
+
+  for (const pkg of packages) {
+    if (!pkg.unreleasedEn) {
+      throw new Error(`Package ${pkg.name} must provide English Unreleased content (CHANGELOG.md).`);
+    }
+    lines.push(`### ${pkg.name} -> ${pkg.version}`);
+    lines.push(pkg.unreleasedEn);
+    lines.push('');
+  }
 }
 
 process.stdout.write(lines.join('\n').trim() + '\n');
