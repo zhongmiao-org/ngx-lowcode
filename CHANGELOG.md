@@ -8,6 +8,7 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 - fix(release): generate release draft notes in English only while keeping bilingual finalize/changelog maintenance.
 - feat(release): add release sandbox version sync + selected publish result artifact, and finalize only actually published packages with package version write-back PR.
 - chore(release): bump aggregate package `@zhongmiao/ngx-lowcode` version to `0.1.1`.
+- fix(release): finalize root release package list now uses actual published versions from publish-result.
 
 ## 0.1.0 (2026-04-16)
 

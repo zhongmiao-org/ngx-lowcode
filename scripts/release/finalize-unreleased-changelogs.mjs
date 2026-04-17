@@ -88,7 +88,8 @@ for (const pkg of packages) {
     console.error(`Package ${pkg.name} must provide both English and Chinese Unreleased content before finalize.`);
     process.exit(1);
   }
-  rootLines.push(`### ${pkg.name}@${pkg.version}`);
+  const targetVersion = publishedMap.get(pkg.name)?.version || pkg.version;
+  rootLines.push(`### ${pkg.name}@${targetVersion}`);
   rootLines.push(pkg.unreleasedEn);
   rootLines.push('');
 }
@@ -99,7 +100,8 @@ runFinalize(aggregate.version, rootBodyPath, 'CHANGELOG.md');
 if (fs.existsSync('CHANGELOG.zh-CN.md')) {
   const zhLines = ['## 发布包清单', ''];
   for (const pkg of packages) {
-    zhLines.push(`### ${pkg.name}@${pkg.version}`);
+    const targetVersion = publishedMap.get(pkg.name)?.version || pkg.version;
+    zhLines.push(`### ${pkg.name}@${targetVersion}`);
     zhLines.push(pkg.unreleasedZh);
     zhLines.push('');
   }
