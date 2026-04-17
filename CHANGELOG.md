@@ -1,12 +1,28 @@
 English | [中文文档](CHANGELOG.zh-CN.md)
 
+
 ## [Unreleased]
+
+## 0.1.3 (2026-04-17)
 
 - chore(release): bump aggregate package `@zhongmiao/ngx-lowcode` version to `0.1.3`.
 - fix(release): select package release list by sandbox rewrite candidates only (`changed since base tag` + `sourceVersion != targetVersion`) to prevent accidental full-package publish.
 - fix(release): enrich `release:draft-notes:json` with selection metrics (`candidateCount`, `selectedCount`, `skippedAlreadyAtTargetCount`).
 - feat(release): add recursive dependency cascade selection (`directPackages` + `cascadePackages`) so dependent packages are auto-included in the same release batch.
 - feat(release): auto-sync strict peerDependencies and aggregate dependencies from batch metadata, and auto-inject cascade changelog templates for dependent packages.
+## Released Packages
+### @zhongmiao/ngx-lowcode-core@0.1.3
+- test version upgrade to 0.1.3
+### @zhongmiao/ngx-lowcode-designer@0.1.3
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.1.3 in release cascade.
+### @zhongmiao/ngx-lowcode-materials@0.1.3
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.1.3 in release cascade.
+### @zhongmiao/ngx-lowcode-puzzle-adapter@0.1.3
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.1.3 in release cascade.
+### @zhongmiao/ngx-lowcode-renderer@0.1.3
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.1.3 in release cascade.
+### @zhongmiao/ngx-lowcode-testing@0.1.3
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.1.3 in release cascade.
 
 ## 0.1.2 (2026-04-17)
 
