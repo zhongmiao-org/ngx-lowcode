@@ -56,10 +56,10 @@ const prepareAggregateDist = () => {
   run('rm', ['-rf', targetDir]);
   fs.mkdirSync(targetDir, { recursive: true });
   fs.copyFileSync(sourcePkg, `${targetDir}/package.json`);
-  fs.copyFileSync('projects/ngx-lowcode/index.js', `${targetDir}/index.js`);
+  fs.writeFileSync(`${targetDir}/index.js`, "'use strict';\nmodule.exports = {};\n", 'utf8');
   fs.copyFileSync('projects/ngx-lowcode/index.d.ts', `${targetDir}/index.d.ts`);
-  if (fs.existsSync('projects/ngx-lowcode/CHANGELOG.md')) {
-    fs.copyFileSync('projects/ngx-lowcode/CHANGELOG.md', `${targetDir}/CHANGELOG.md`);
+  if (fs.existsSync('CHANGELOG.md')) {
+    fs.copyFileSync('CHANGELOG.md', `${targetDir}/CHANGELOG.md`);
   }
 };
 

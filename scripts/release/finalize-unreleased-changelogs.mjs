@@ -85,7 +85,7 @@ const syncAggregateDependencies = (aggregateVersion, releasedPackages) => {
   for (const pkg of releasedPackages) {
     if (pkg.name === aggregate.name) continue;
     if (Object.hasOwn(aggregatePkg.dependencies, pkg.name)) {
-      aggregatePkg.dependencies[pkg.name] = `^${pkg.version}`;
+      aggregatePkg.dependencies[pkg.name] = `${pkg.version}`;
     }
   }
 
