@@ -5,6 +5,7 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 - fix(changelog): add per-package `CHANGELOG.zh-CN.md` and enforce bilingual changelog updates for package code changes.
 - fix(release): split package release metadata/finalize flow into English and Chinese channels to avoid cross-language pollution.
 - chore(format): normalize changelog/release script formatting to keep CI prettier checks stable.
+- fix(release): generate release draft notes in English only while keeping bilingual finalize/changelog maintenance.
 
 ## 0.1.0 (2026-04-16)
 
