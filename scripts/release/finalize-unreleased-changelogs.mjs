@@ -3,8 +3,9 @@ import fs from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
 const metadataPath = process.argv[2];
+const publishResultPath = process.argv[3] || '';
 if (!metadataPath) {
-  console.error('Usage: finalize-unreleased-changelogs.mjs <metadata-json-path>');
+  console.error('Usage: finalize-unreleased-changelogs.mjs <metadata-json-path> [publish-result-json-path]');
   process.exit(2);
 }
 
@@ -15,11 +16,31 @@ if (!fs.existsSync(metadataPath)) {
 
 const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
 const aggregate = metadata.aggregate;
-const packages = metadata.packages;
+let packages = metadata.packages;
 
 if (!aggregate?.version || !Array.isArray(packages) || packages.length === 0) {
   console.error('Invalid metadata structure.');
   process.exit(1);
+}
+
+let published = [];
+if (publishResultPath) {
+  if (!fs.existsSync(publishResultPath)) {
+    console.error(`Publish result file not found: ${publishResultPath}`);
+    process.exit(1);
+  }
+  const publishResult = JSON.parse(fs.readFileSync(publishResultPath, 'utf8'));
+  published = Array.isArray(publishResult.published) ? publishResult.published : [];
+}
+
+const publishedMap = new Map(published.filter((item) => item?.name && item?.version).map((item) => [item.name, item]));
+if (publishedMap.size > 0) {
+  packages = packages.filter((pkg) => publishedMap.has(pkg.name));
+}
+
+if (packages.length === 0) {
+  console.log('No published packages to finalize.');
+  process.exit(0);
 }
 
 if (!fs.existsSync('.tmp')) {
@@ -33,6 +54,32 @@ const runFinalize = (version, bodyFile, changelogFile) => {
   if (result.status !== 0) {
     process.exit(result.status ?? 1);
   }
+};
+
+const updatePackageVersion = (pkgName, version) => {
+  const projectName = pkgName.replace('@zhongmiao/', '');
+  const packagePath = `projects/${projectName}/package.json`;
+  if (!fs.existsSync(packagePath)) return;
+  const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+  packageJson.version = version;
+  fs.writeFileSync(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`, 'utf8');
+};
+
+const syncAggregateDependencies = (aggregateVersion, releasedPackages) => {
+  const aggregatePath = 'projects/ngx-lowcode/package.json';
+  if (!fs.existsSync(aggregatePath)) return;
+  const aggregatePkg = JSON.parse(fs.readFileSync(aggregatePath, 'utf8'));
+  aggregatePkg.version = aggregateVersion;
+  aggregatePkg.dependencies = aggregatePkg.dependencies || {};
+
+  for (const pkg of releasedPackages) {
+    if (pkg.name === aggregate.name) continue;
+    if (Object.hasOwn(aggregatePkg.dependencies, pkg.name)) {
+      aggregatePkg.dependencies[pkg.name] = `^${pkg.version}`;
+    }
+  }
+
+  fs.writeFileSync(aggregatePath, `${JSON.stringify(aggregatePkg, null, 2)}\n`, 'utf8');
 };
 
 const rootLines = ['## Released Packages', ''];
@@ -62,14 +109,26 @@ if (fs.existsSync('CHANGELOG.zh-CN.md')) {
 }
 
 for (const pkg of packages) {
+  const publishedItem = publishedMap.get(pkg.name);
+  const targetVersion = publishedItem?.version || pkg.version;
   const slug = pkg.name.replace(/[@/]/g, '_');
   const bodyPathEn = `.tmp/release-${slug}.md`;
   fs.writeFileSync(bodyPathEn, `${pkg.unreleasedEn}\n`, 'utf8');
-  runFinalize(pkg.version, bodyPathEn, pkg.changelogPathEn);
+  runFinalize(targetVersion, bodyPathEn, pkg.changelogPathEn);
 
   if (pkg.changelogPathZh) {
     const bodyPathZh = `.tmp/release-${slug}-zh.md`;
     fs.writeFileSync(bodyPathZh, `${pkg.unreleasedZh}\n`, 'utf8');
-    runFinalize(pkg.version, bodyPathZh, pkg.changelogPathZh);
+    runFinalize(targetVersion, bodyPathZh, pkg.changelogPathZh);
   }
+
+  updatePackageVersion(pkg.name, targetVersion);
 }
+
+syncAggregateDependencies(
+  aggregate.version,
+  packages.map((pkg) => ({
+    name: pkg.name,
+    version: publishedMap.get(pkg.name)?.version || pkg.version
+  }))
+);

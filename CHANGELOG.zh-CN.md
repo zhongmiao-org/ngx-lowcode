@@ -6,6 +6,8 @@
 - fix(release): 发布元数据与 finalize 改为中英文双通道，避免英文变更被写入中文 changelog。
 - chore(format): 规范 changelog 与发布脚本格式，保持 CI 的 prettier 检查稳定通过。
 - fix(release): 发布草稿改为仅英文展示，同时保持双语 finalize 与 changelog 维护不变。
+- feat(release): 增加发版沙箱版本同步、按清单发布与发布结果制品；finalize 仅归档实际发布成功的包并回写 package 版本 PR。
+- chore(release): 将聚合包 `@zhongmiao/ngx-lowcode` 版本提升到 `0.1.1`。
 
 ## 0.1.0 (2026-04-16)
 

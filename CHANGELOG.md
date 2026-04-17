@@ -6,6 +6,8 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 - fix(release): split package release metadata/finalize flow into English and Chinese channels to avoid cross-language pollution.
 - chore(format): normalize changelog/release script formatting to keep CI prettier checks stable.
 - fix(release): generate release draft notes in English only while keeping bilingual finalize/changelog maintenance.
+- feat(release): add release sandbox version sync + selected publish result artifact, and finalize only actually published packages with package version write-back PR.
+- chore(release): bump aggregate package `@zhongmiao/ngx-lowcode` version to `0.1.1`.
 
 ## 0.1.0 (2026-04-16)
 
