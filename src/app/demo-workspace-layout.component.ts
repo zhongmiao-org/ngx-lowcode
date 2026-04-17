@@ -16,7 +16,7 @@ import { ThySpaceModule } from 'ngx-tethys/space';
 import { ThyStatisticModule } from 'ngx-tethys/statistic';
 import { ThyTagModule } from 'ngx-tethys/tag';
 import { filter, map, startWith } from 'rxjs';
-import { DemoBffDatasourceExecutorService } from './demo-bff-datasource-executor.service';
+import { DemoRuntimeExecutionStatusService } from './demo-runtime-execution-status.service';
 import { DemoWorkspaceService } from './demo-workspace.service';
 
 @Component({
@@ -459,10 +459,10 @@ import { DemoWorkspaceService } from './demo-workspace.service';
 })
 export class DemoWorkspaceLayoutComponent {
   protected readonly workspace = inject(DemoWorkspaceService);
-  private readonly executor = inject(DemoBffDatasourceExecutorService);
+  private readonly executionStatus = inject(DemoRuntimeExecutionStatusService);
   private readonly router = inject(Router);
   protected readonly copy = computed(() => getDemoProjectI18n(this.workspace.locale()));
-  protected readonly queryStatus = this.executor.lastExecution.asReadonly();
+  protected readonly queryStatus = this.executionStatus.lastExecution.asReadonly();
   protected readonly projectTitle = computed(() =>
     this.workspace.projectId() === 'commerce-core' ? 'Commerce Core' : 'CRM Ops'
   );

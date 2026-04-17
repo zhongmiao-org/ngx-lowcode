@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { NgxLowcodeRendererComponent } from '@zhongmiao/ngx-lowcode-renderer';
 import { getDemoProjectI18n } from '@zhongmiao/ngx-lowcode-i18n';
 import { ThyCardModule } from 'ngx-tethys/card';
-import { DemoBffDatasourceExecutorService } from './demo-bff-datasource-executor.service';
+import { DemoRuntimeExecutionStatusService } from './demo-runtime-execution-status.service';
 import { DemoWorkspaceService } from './demo-workspace.service';
 
 @Component({
@@ -98,7 +98,7 @@ import { DemoWorkspaceService } from './demo-workspace.service';
 })
 export class DemoPagePreviewPageComponent {
   protected readonly workspace = inject(DemoWorkspaceService);
-  private readonly executor = inject(DemoBffDatasourceExecutorService);
+  private readonly executionStatus = inject(DemoRuntimeExecutionStatusService);
   protected readonly copy = computed(() => getDemoProjectI18n(this.workspace.locale()));
-  protected readonly queryStatus = this.executor.lastExecution.asReadonly();
+  protected readonly queryStatus = this.executionStatus.lastExecution.asReadonly();
 }
