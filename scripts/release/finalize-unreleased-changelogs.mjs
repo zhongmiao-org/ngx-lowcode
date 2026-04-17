@@ -38,9 +38,7 @@ const runFinalize = (version, bodyFile, changelogFile) => {
 const rootLines = ['## Released Packages', ''];
 for (const pkg of packages) {
   if (!pkg.unreleasedEn || !pkg.unreleasedZh) {
-    console.error(
-      `Package ${pkg.name} must provide both English and Chinese Unreleased content before finalize.`
-    );
+    console.error(`Package ${pkg.name} must provide both English and Chinese Unreleased content before finalize.`);
     process.exit(1);
   }
   rootLines.push(`### ${pkg.name}@${pkg.version}`);
