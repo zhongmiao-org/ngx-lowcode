@@ -1,7 +1,10 @@
 English | [中文文档](CHANGELOG.zh-CN.md)
 
-
 ## [Unreleased]
+
+- chore(release): bump aggregate package `@zhongmiao/ngx-lowcode` version to `0.1.3`.
+- fix(release): select package release list by sandbox rewrite candidates only (`changed since base tag` + `sourceVersion != targetVersion`) to prevent accidental full-package publish.
+- fix(release): enrich `release:draft-notes:json` with selection metrics (`candidateCount`, `selectedCount`, `skippedAlreadyAtTargetCount`).
 
 ## 0.1.2 (2026-04-17)
 
@@ -22,8 +25,11 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 - chore(release): bump aggregate package `@zhongmiao/ngx-lowcode` version to `0.1.1`.
 - fix(release): finalize root release package list now uses actual published versions from publish-result.
 - fix(release): allow draft generation from root `CHANGELOG.md` unreleased notes even when no subpackage unreleased changes exist.
+
 ## Released Packages
+
 ### @zhongmiao/ngx-lowcode-designer@0.1.2
+
 - Unify business form `textarea` controls in the designer props panel with ngx-tethys input styling while keeping code editor textareas unchanged.
 
 ## 0.1.0 (2026-04-16)

@@ -4,19 +4,40 @@ import { loadRootReleaseNotes } from './unreleased-changelog-utils.mjs';
 
 const asJson = process.argv.includes('--json');
 const aggregate = loadAggregatePackage();
-const packages = loadPackageReleaseMetadata()
-  .filter((pkg) => pkg.name !== aggregate.name && pkg.unreleasedEn)
-  .map((pkg) => {
-    const targetVersion = pkg.targetVersion || aggregate.version;
-    return {
-      ...pkg,
-      sourceVersion: pkg.version,
-      version: targetVersion
-    };
+const candidates = loadPackageReleaseMetadata().filter((pkg) => pkg.name !== aggregate.name && pkg.unreleasedEn);
+const selectedPackages = [];
+let skippedAlreadyAtTargetCount = 0;
+let skippedUnchangedSinceBaseCount = 0;
+
+for (const pkg of candidates) {
+  const sourceVersion = pkg.version;
+  const targetVersion = aggregate.version;
+  const changedSinceBase = pkg.hasUnreleasedChangedSinceBase !== false;
+  const willRewriteInSandbox = changedSinceBase && sourceVersion !== targetVersion;
+
+  if (!changedSinceBase) {
+    skippedUnchangedSinceBaseCount += 1;
+    continue;
+  }
+
+  if (!willRewriteInSandbox) {
+    skippedAlreadyAtTargetCount += 1;
+    continue;
+  }
+
+  selectedPackages.push({
+    ...pkg,
+    sourceVersion,
+    targetVersion,
+    version: targetVersion,
+    willRewriteInSandbox,
+    selectionReason: 'version_change_required'
   });
+}
+
 const rootNotes = loadRootReleaseNotes();
 
-if (packages.length === 0 && !rootNotes.en) {
+if (selectedPackages.length === 0 && !rootNotes.en) {
   process.exit(2);
 }
 
@@ -25,7 +46,11 @@ if (asJson) {
     JSON.stringify(
       {
         aggregate,
-        packages,
+        packages: selectedPackages,
+        candidateCount: candidates.length,
+        selectedCount: selectedPackages.length,
+        skippedAlreadyAtTargetCount,
+        skippedUnchangedSinceBaseCount,
         rootNotes,
         generatedAt: new Date().toISOString()
       },
@@ -41,7 +66,10 @@ const lines = [];
 lines.push('## Release Summary');
 lines.push('');
 lines.push(`- aggregate package: ${aggregate.name}@${aggregate.version}`);
-lines.push(`- affected packages: ${packages.length}`);
+lines.push(`- candidate packages: ${candidates.length}`);
+lines.push(`- selected packages: ${selectedPackages.length}`);
+lines.push(`- skipped at target version: ${skippedAlreadyAtTargetCount}`);
+lines.push(`- skipped unchanged since base: ${skippedUnchangedSinceBaseCount}`);
 lines.push('');
 
 if (rootNotes.en) {
@@ -52,11 +80,11 @@ if (rootNotes.en) {
   lines.push('');
 }
 
-if (packages.length > 0) {
+if (selectedPackages.length > 0) {
   lines.push('## Package Changes');
   lines.push('');
 
-  for (const pkg of packages) {
+  for (const pkg of selectedPackages) {
     if (!pkg.unreleasedEn) {
       throw new Error(`Package ${pkg.name} must provide English Unreleased content (CHANGELOG.md).`);
     }
