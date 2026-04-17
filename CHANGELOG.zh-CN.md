@@ -4,6 +4,7 @@
 
 - fix(changelog): 为所有子包新增 `CHANGELOG.zh-CN.md`，并对“子包代码改动”启用中英双 changelog 强制门禁。
 - fix(release): 发布元数据与 finalize 改为中英文双通道，避免英文变更被写入中文 changelog。
+- chore(format): 规范 changelog 与发布脚本格式，保持 CI 的 prettier 检查稳定通过。
 
 ## 0.1.0 (2026-04-16)
 
