@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- chore(aggregate): 将主包依赖基线重置为全部子包 `0.1.0` 初始版本。
 - fix(release): 子包草稿与发布计划版本恢复为“各子包自身版本”，支持不同子包独立跳号发布。
 - fix(release): 沙箱 apply 步骤改为仅按发布清单更新主包依赖版本，不再在发布前重写子包版本号。
 - chore(aggregate): 删除 `projects/ngx-lowcode` 下冗余的主包 changelog 与源码 `index.js`；发布时改为动态生成主包 dist 入口并复制根 changelog。

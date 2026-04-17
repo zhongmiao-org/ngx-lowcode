@@ -2,6 +2,7 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+- chore(aggregate): reset aggregate package dependency baseline to `0.1.0` for all subpackages.
 - fix(release): restore package draft/publish plan versions to each subpackage's own release version (supports non-uniform version jumps).
 - fix(release): sandbox apply step now only updates aggregate dependency pins by release plan versions and no longer rewrites subpackage versions before publish.
 - chore(aggregate): remove redundant aggregate package `projects/ngx-lowcode` changelog files and source `index.js`; release publish now generates aggregate dist entry file and copies root changelog.
