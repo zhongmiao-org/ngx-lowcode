@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- fix(release): 发布草稿中的子包版本改为显示主包批次目标版本（不再显示子包源码当前版本）。
 - feat(designer): 统一设计器属性面板业务表单的 `textarea` 为 ngx-tethys 输入控件（代码编辑区 `textarea` 继续保留）。
 - fix(release): `finalize` 支持“仅主包发布成功”场景，且仅按 `publish-result.published[]` 归档与回写版本。
 - fix(release): `finalize` 归档时同步写入根 changelog 的 Unreleased 内容与已发布子包清单，避免主包单发时根日志丢失。

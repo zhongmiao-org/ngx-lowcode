@@ -2,6 +2,7 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+- fix(release): draft package changes now display batch target version from aggregate package (instead of source package version).
 - feat(designer): unify business textarea form controls to ngx-tethys inputs in the designer props panel (code editor textareas remain unchanged).
 - fix(release): allow finalize to complete for aggregate-only publish success and only archive/write back packages from `publish-result.published[]`.
 - fix(release): finalize now appends root unreleased notes and package release sections in one pass to avoid root-only release loss.
