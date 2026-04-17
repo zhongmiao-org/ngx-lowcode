@@ -50,17 +50,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build libraries
-        run: npm run build:libs
-
-      - name: Version consistency
-        run: npm run version:check
-
       - name: Compose release metadata from package changelogs
         run: |
           mkdir -p .tmp
           npm run -s release:draft-notes:json > .tmp/release-metadata.json
           npm run -s release:draft-notes > .tmp/release-draft.md
+
+      - name: Version consistency
+        run: npm run version:check
 
       - name: Capture release commit
         id: meta
@@ -101,6 +98,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Download release metadata artifact
+        uses: actions/download-artifact@v6
+        with:
+          name: release-metadata
+          path: .tmp
+
+      - name: Apply batch versions in sandbox
+        run: |
+          node scripts/release/apply-release-batch-versions.mjs \
+            .tmp/release-metadata.json \
+            .tmp/release-plan.json
+
       - name: Build libraries
         run: npm run build:libs
 
@@ -128,7 +137,7 @@ jobs:
           //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
           EOF
 
-      - name: Publish all packages by package.json versions
+      - name: Publish selected packages by release plan
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
@@ -136,7 +145,18 @@ jobs:
             echo "NPM_TOKEN is not configured."
             exit 1
           fi
-          npm run publish:all -- --tag "${{ steps.dist.outputs.dist_tag }}"
+          node scripts/release/publish-selected-packages.mjs \
+            .tmp/release-metadata.json \
+            .tmp/publish-result.json \
+            "${{ steps.dist.outputs.dist_tag }}"
+
+      - name: Upload publish result artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: publish-result
+          path: |
+            .tmp/release-plan.json
+            .tmp/publish-result.json
 
   finalize-changelog:
     name: Finalize changelogs and open PR
@@ -172,15 +192,21 @@ jobs:
           name: release-metadata
           path: .tmp
 
+      - name: Download publish result artifact
+        uses: actions/download-artifact@v6
+        with:
+          name: publish-result
+          path: .tmp
+
       - name: Finalize root/package changelogs
         run: |
-          npm run -s release:finalize-unreleased -- .tmp/release-metadata.json
+          npm run -s release:finalize-unreleased -- .tmp/release-metadata.json .tmp/publish-result.json
 
       - name: Create changelog PR and enable auto-merge
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if git diff --quiet -- CHANGELOG.md CHANGELOG.zh-CN.md projects/*/CHANGELOG.md projects/*/CHANGELOG.zh-CN.md; then
+          if git diff --quiet -- CHANGELOG.md CHANGELOG.zh-CN.md projects/*/CHANGELOG.md projects/*/CHANGELOG.zh-CN.md projects/*/package.json; then
             echo "No changelog changes detected."
             exit 0
           fi
@@ -191,7 +217,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "${BRANCH}"
-          git add CHANGELOG.md CHANGELOG.zh-CN.md projects/*/CHANGELOG.md projects/*/CHANGELOG.zh-CN.md
+          git add CHANGELOG.md CHANGELOG.zh-CN.md projects/*/CHANGELOG.md projects/*/CHANGELOG.zh-CN.md projects/*/package.json
           git commit -m "chore(changelog): finalize ${VERSION} release logs"
           git push --set-upstream origin "${BRANCH}"
 
@@ -201,4 +227,9 @@ jobs:
             --base main \
             --head "${BRANCH}")"
           echo "Created changelog PR: ${PR_URL}"
-          gh pr merge --auto --squash "${PR_URL}"
+          if gh pr merge --auto --squash "${PR_URL}"; then
+            echo "Enabled auto-merge for ${PR_URL}"
+          else
+            echo "Auto-merge is unavailable for this repository. Falling back to direct squash merge."
+            gh pr merge --squash --delete-branch "${PR_URL}"
+          fi

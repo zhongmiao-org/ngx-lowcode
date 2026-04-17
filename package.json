@@ -23,6 +23,8 @@
     "release:status": "changeset status --verbose",
     "release:draft-notes": "node scripts/release/compose-draft-from-unreleased.mjs",
     "release:draft-notes:json": "node scripts/release/compose-draft-from-unreleased.mjs --json",
+    "release:apply-batch-versions": "node scripts/release/apply-release-batch-versions.mjs",
+    "release:publish-selected": "node scripts/release/publish-selected-packages.mjs",
     "release:finalize-unreleased": "node scripts/release/finalize-unreleased-changelogs.mjs",
     "release:next-version": "node -p \"require('./projects/ngx-lowcode/package.json').version\""
   },
