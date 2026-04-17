@@ -1,6 +1,5 @@
 [English](CHANGELOG.md) | 中文文档
 
-
 ## [Unreleased]
 
 - feat(runtime): demo manager 注入切换为 `@zhongmiao/meta-lc-runtime-angular` 包引用实现（直接替换）。
@@ -13,18 +12,31 @@
 - fix(release): `release:draft-notes:json` 增加清单统计字段（`candidateCount`、`selectedCount`、`skippedAlreadyAtTargetCount`）。
 - feat(release): 新增递归依赖联动清单（`directPackages` + `cascadePackages`），被依赖子包会自动纳入同批次发布。
 - feat(release): 根据发布清单自动回写严格版本的 peerDependencies 与主包 dependencies，并为联动包自动补齐中英文 changelog 模板。
+
 ## 发布包清单
+
 ### @zhongmiao/ngx-lowcode-core@0.1.3
+
 - 测试升级到 0.1.3
+
 ### @zhongmiao/ngx-lowcode-designer@0.1.3
+
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.1.3。
+
 ### @zhongmiao/ngx-lowcode-materials@0.1.3
+
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.1.3。
+
 ### @zhongmiao/ngx-lowcode-puzzle-adapter@0.1.3
+
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.1.3。
+
 ### @zhongmiao/ngx-lowcode-renderer@0.1.3
+
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.1.3。
+
 ### @zhongmiao/ngx-lowcode-testing@0.1.3
+
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.1.3。
 
 ## 0.1.2 (2026-04-17)

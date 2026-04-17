@@ -1,6 +1,5 @@
 English | [中文文档](CHANGELOG.zh-CN.md)
 
-
 ## [Unreleased]
 
 - feat(runtime): switch demo manager injection to `@zhongmiao/meta-lc-runtime-angular` with direct package wiring.
@@ -13,18 +12,31 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 - fix(release): enrich `release:draft-notes:json` with selection metrics (`candidateCount`, `selectedCount`, `skippedAlreadyAtTargetCount`).
 - feat(release): add recursive dependency cascade selection (`directPackages` + `cascadePackages`) so dependent packages are auto-included in the same release batch.
 - feat(release): auto-sync strict peerDependencies and aggregate dependencies from batch metadata, and auto-inject cascade changelog templates for dependent packages.
+
 ## Released Packages
+
 ### @zhongmiao/ngx-lowcode-core@0.1.3
+
 - test version upgrade to 0.1.3
+
 ### @zhongmiao/ngx-lowcode-designer@0.1.3
+
 - chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.1.3 in release cascade.
+
 ### @zhongmiao/ngx-lowcode-materials@0.1.3
+
 - chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.1.3 in release cascade.
+
 ### @zhongmiao/ngx-lowcode-puzzle-adapter@0.1.3
+
 - chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.1.3 in release cascade.
+
 ### @zhongmiao/ngx-lowcode-renderer@0.1.3
+
 - chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.1.3 in release cascade.
+
 ### @zhongmiao/ngx-lowcode-testing@0.1.3
+
 - chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.1.3 in release cascade.
 
 ## 0.1.2 (2026-04-17)
