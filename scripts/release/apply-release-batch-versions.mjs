@@ -35,11 +35,22 @@ aggregatePackage.version = aggregate.version;
 aggregatePackage.dependencies = aggregatePackage.dependencies || {};
 
 for (const pkg of changedPackages) {
-  const packageVersion = pkg.sourceVersion || pkg.version;
+  const packageVersion = pkg.version || pkg.sourceVersion;
   if (!packageVersion) {
     console.error(`Missing package version in metadata for ${pkg.name}.`);
     process.exit(1);
   }
+
+  const projectName = pkg.name.replace('@zhongmiao/', '');
+  const pkgJsonPath = `projects/${projectName}/package.json`;
+  if (!fs.existsSync(pkgJsonPath)) {
+    console.error(`Package file not found: ${pkgJsonPath}`);
+    process.exit(1);
+  }
+
+  const packageJson = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
+  packageJson.version = packageVersion;
+  fs.writeFileSync(pkgJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`, 'utf8');
 
   if (Object.hasOwn(aggregatePackage.dependencies, pkg.name)) {
     aggregatePackage.dependencies[pkg.name] = `${packageVersion}`;
@@ -55,7 +66,7 @@ const appliedPlan = {
   },
   packages: changedPackages.map((pkg) => ({
     name: pkg.name,
-    version: pkg.sourceVersion || pkg.version
+    version: pkg.version || pkg.sourceVersion
   })),
   generatedAt: new Date().toISOString()
 };

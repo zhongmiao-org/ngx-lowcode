@@ -4,7 +4,16 @@ import { loadRootReleaseNotes } from './unreleased-changelog-utils.mjs';
 
 const asJson = process.argv.includes('--json');
 const aggregate = loadAggregatePackage();
-const packages = loadPackageReleaseMetadata().filter((pkg) => pkg.name !== aggregate.name && pkg.unreleasedEn);
+const packages = loadPackageReleaseMetadata()
+  .filter((pkg) => pkg.name !== aggregate.name && pkg.unreleasedEn)
+  .map((pkg) => {
+    const targetVersion = pkg.targetVersion || aggregate.version;
+    return {
+      ...pkg,
+      sourceVersion: pkg.version,
+      version: targetVersion
+    };
+  });
 const rootNotes = loadRootReleaseNotes();
 
 if (packages.length === 0 && !rootNotes.en) {
