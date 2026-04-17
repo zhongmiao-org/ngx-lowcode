@@ -18,8 +18,8 @@ This repository is intentionally organized as a `monorepo with multiple publisha
   Mock schema, mock executors, and test helpers for host integration.
 - `ngx-lowcode-puzzle-adapter`
   Optional bridge package for integrating `ngx-puzzle` into the low-code ecosystem.
-- `demo`
-  Host demo application used to validate library integration.
+- `meta-weave` (separate repository)
+  Platform application and demo host moved out of this library workspace.
 
 ## Naming Decision
 
@@ -106,40 +106,12 @@ These docs together are the current source of truth for:
 npm install
 npm run build
 npm test
-npm start
 ```
 
-## Demo Integration with `meta-lc-platform`
+## Platform App Migration
 
-The root `src` demo is wired to BFF `/query + /mutation` and supports tenant switching.
-
-- default BFF endpoint: `http://localhost:6000/query`
-- runtime override:
-  - `window.__LC_BFF_URL__ = "http://<host>:6000"` before app bootstrap
-  - or set datasource `request.url` to absolute URL
-
-Demo verification path:
-
-1. Start `meta-lc-platform/apps/bff-server` with PostgreSQL/Redis.
-2. Open demo and switch `Tenant A` / `Tenant B`.
-3. In `Query Filters`, trigger query via `Search` button or linked `status/channel/priority` changes.
-4. In `Order CRUD Editor`, run full CRUD flow:
-   - Create: fill `formOrderId/formOwner/formChannel/formPriority/formStatus` (optional `form_org_id`), then click `Create`
-   - Update: click a table row to populate editor, change fields, then click `Update`
-   - Delete: select a row or input `formOrderId`, then click `Delete`
-5. Verify widget linkage:
-   - row click populates `selectedOrderId` and editor state fields
-   - `status/channel/priority` changes auto-trigger query refresh
-6. Capture preview `request-id`, then confirm tenant isolation and CRUD result in table.
-7. Fallback to mock rows only when BFF is unavailable (`status=0/502/503/504`).
-8. Verify audit row by request id:
-
-```sql
-SELECT request_id, tenant_id, status, row_count, error_message, created_at
-FROM bff_query_audit_logs
-WHERE request_id = '<demo-request-id>'
-ORDER BY id DESC;
-```
+The old root `src` demo has been migrated to the standalone platform repository `meta-weave`.
+`ngx-lowcode` now focuses on publishable libraries under `projects/*`.
 
 ## Build Targets
 
@@ -150,7 +122,6 @@ ng build ngx-lowcode-materials
 ng build ngx-lowcode-designer
 ng build ngx-lowcode-testing
 ng build ngx-lowcode-puzzle-adapter
-ng build demo
 ```
 
 ## Publishing Direction

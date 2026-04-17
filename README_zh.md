@@ -18,8 +18,8 @@
   mock schema、mock executor 和测试辅助能力。
 - `ngx-lowcode-puzzle-adapter`
   用于把 `ngx-puzzle` 接入 low-code 体系的可选桥接包。
-- `demo`
-  用于验证宿主接入方式的演示应用。
+- `meta-weave`（独立仓库）
+  平台应用与演示宿主已迁移到独立仓库。
 
 ## 命名决策
 
@@ -60,40 +60,12 @@
 npm install
 npm run build
 npm test
-npm start
 ```
 
-## 与 `meta-lc-platform` 的演示联调
+## 平台应用迁移说明
 
-根目录 `src` 下的 demo 已接入 BFF `/query + /mutation`，并支持租户切换演示。
-
-- 默认 BFF 地址：`http://localhost:6000/query`
-- 运行时覆盖方式：
-  - 应用启动前设置 `window.__LC_BFF_URL__ = "http://<host>:6000"`
-  - 或在 datasource `request.url` 中写绝对地址
-
-演示建议路径：
-
-1. 启动 `meta-lc-platform/apps/bff-server` 与 PostgreSQL/Redis。
-2. 打开 demo，在 `Tenant A` 与 `Tenant B` 间切换。
-3. 在 `Query Filters` 中触发查询（`Search` 或 `status/channel/priority` 变更自动触发），验证 table 回填。
-4. 在 `Order CRUD Editor` 中执行完整 CRUD：
-   - Create：填写 `formOrderId/formOwner/formChannel/formPriority/formStatus`（可选 `form_org_id`）后点 `Create`
-   - Update：点击 table 行回填编辑器后修改字段并点 `Update`
-   - Delete：选择行或输入 `formOrderId` 后点 `Delete`
-5. 验证控件联动：
-   - table 行点击触发 `selectedOrderId + 表单字段` 回填
-   - `status/channel/priority` 变更触发联动查询
-6. 在预览区记录 `request-id`，并验证租户隔离与 CRUD 结果。
-7. 仅在 BFF 不可用（如 `status=0/502/503/504`）时回落 mock 数据；其他错误保持错误语义。
-8. 使用以下 SQL 对照审计落盘：
-
-```sql
-SELECT request_id, tenant_id, status, row_count, error_message, created_at
-FROM bff_query_audit_logs
-WHERE request_id = '<demo-request-id>'
-ORDER BY id DESC;
-```
+原 `ngx-lowcode/src` 演示应用已迁移到独立仓库 `meta-weave`。
+`ngx-lowcode` 当前仅负责 `projects/*` 下的基础库与发布。
 
 ## 构建目标
 
@@ -104,7 +76,6 @@ ng build ngx-lowcode-materials
 ng build ngx-lowcode-designer
 ng build ngx-lowcode-testing
 ng build ngx-lowcode-puzzle-adapter
-ng build demo
 ```
 
 ## 发布方向
