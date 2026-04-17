@@ -2,7 +2,10 @@
 
 [English](CHANGELOG.md) | 中文文档
 
+
 ## [Unreleased]
+
+## 0.1.2 (2026-04-17)
 
 - 统一设计器属性面板业务表单 `textarea` 的 ngx-tethys 输入样式，代码编辑区 `textarea` 保持不变。
 

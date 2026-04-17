@@ -1,6 +1,6 @@
 {
   "name": "@zhongmiao/ngx-lowcode-designer",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "peerDependencies": {
     "@angular/common": "^21.0.0",
     "@angular/core": "^21.0.0",
