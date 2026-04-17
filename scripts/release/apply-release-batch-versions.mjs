@@ -48,7 +48,7 @@ for (const pkg of changedPackages) {
   fs.writeFileSync(pkgJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`, 'utf8');
 
   if (Object.hasOwn(aggregatePackage.dependencies, pkg.name)) {
-    aggregatePackage.dependencies[pkg.name] = `^${aggregate.version}`;
+    aggregatePackage.dependencies[pkg.name] = `${aggregate.version}`;
   }
 }
 

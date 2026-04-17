@@ -91,6 +91,12 @@ collect_changed_package_dirs() {
 
 validate_package_changelog_pair() {
   local pkg_dir="$1"
+  if [[ "${pkg_dir}" == "projects/ngx-lowcode" ]]; then
+    validate_changelog_file "CHANGELOG.md"
+    validate_changelog_file "CHANGELOG.zh-CN.md"
+    return
+  fi
+
   local en_file="${pkg_dir}/CHANGELOG.md"
   local zh_file="${pkg_dir}/CHANGELOG.zh-CN.md"
 

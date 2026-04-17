@@ -39,10 +39,13 @@ prepare_aggregate_dist() {
   rm -rf "${target_dir}"
   mkdir -p "${target_dir}"
   cp "${source_pkg}" "${target_dir}/package.json"
-  cp "projects/ngx-lowcode/index.js" "${target_dir}/index.js"
+  cat > "${target_dir}/index.js" <<'EOF'
+'use strict';
+module.exports = {};
+EOF
   cp "projects/ngx-lowcode/index.d.ts" "${target_dir}/index.d.ts"
-  if [[ -f "projects/ngx-lowcode/CHANGELOG.md" ]]; then
-    cp "projects/ngx-lowcode/CHANGELOG.md" "${target_dir}/CHANGELOG.md"
+  if [[ -f "CHANGELOG.md" ]]; then
+    cp "CHANGELOG.md" "${target_dir}/CHANGELOG.md"
   fi
 }
 
