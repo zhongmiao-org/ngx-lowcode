@@ -4,6 +4,7 @@
 
 - fix(ci): watchdog 取消定时轮询，仅在 CI(main) 失败或手动触发时运行。
 - fix(ci): watchdog 创建待排查 issue 时支持 `ci` label 缺失场景，不再因此失败。
+- feat(ci): watchdog 新增失败 job/step 摘要，并在已有待排查 issue 下追加最新失败记录评论。
 - chore(repo): 平台演示应用已从 `ngx-lowcode/src` 迁移到独立仓库 `meta-weave`。
 - chore(repo): 删除本仓 `demo` 应用目标与配置，`ngx-lowcode` 回归 `projects/*` 基础库定位。
 - docs(repo): README/README_zh 联调入口改为 `meta-weave`，不再使用 `ngx-lowcode/src`。
