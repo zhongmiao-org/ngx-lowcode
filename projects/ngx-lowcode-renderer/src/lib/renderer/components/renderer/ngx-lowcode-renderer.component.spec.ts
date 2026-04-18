@@ -8,6 +8,7 @@ import {
 import type {
   NgxLowcodeActionManager,
   NgxLowcodeDataSourceManager,
+  NgxLowcodeDatasourceExecutionResult,
   NgxLowcodeWebSocketManager
 } from '@zhongmiao/ngx-lowcode-core-types';
 import { mockPageSchema } from '@zhongmiao/ngx-lowcode-testing';
@@ -129,6 +130,14 @@ describe('NgxLowcodeRendererComponent', () => {
         status: 'active'
       }
     ]);
+    expect(runtime.state()['__runtimeExecution']).toEqual(
+      jasmine.objectContaining({
+        datasourceId: 'orders-datasource',
+        status: 'success',
+        rowCount: 1,
+        source: 'websocket'
+      })
+    );
   });
 
   it('writes empty datasource result into runtime state without throwing', async () => {
@@ -146,6 +155,46 @@ describe('NgxLowcodeRendererComponent', () => {
 
     expect(dataSourceManager.execute).toHaveBeenCalled();
     expect(runtime.state()['tableData']).toEqual([]);
+    expect(runtime.state()['__runtimeExecution']).toEqual(
+      jasmine.objectContaining({
+        datasourceId: 'orders-datasource',
+        status: 'success',
+        rowCount: 0
+      })
+    );
+  });
+
+  it('consumes structured datasource execution results and exposes execution metadata', async () => {
+    const dataSourceManager = createDataSourceManagerSpy(
+      async (): Promise<NgxLowcodeDatasourceExecutionResult<Array<{ id: string }>>> => ({
+        data: [{ id: 'SO-6001' }],
+        meta: {
+          requestId: 'req-6001',
+          status: 'success',
+          rowCount: 1,
+          message: 'loaded',
+          source: 'rest'
+        }
+      })
+    );
+    TestBed.overrideProvider(NGX_LOWCODE_DATASOURCE_MANAGER, { useValue: dataSourceManager });
+
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    fixture.componentRef.setInput('schema', structuredClone(mockPageSchema));
+    await fixture.whenStable();
+
+    const runtime = fixture.componentInstance.runtime();
+    await expectAsync(runtime.executeActionById('search-action')).toBeResolved();
+
+    expect(runtime.state()['tableData']).toEqual([{ id: 'SO-6001' }]);
+    expect(runtime.state()['__runtimeExecution']).toEqual({
+      datasourceId: 'orders-datasource',
+      requestId: 'req-6001',
+      status: 'success',
+      rowCount: 1,
+      message: 'loaded',
+      source: 'rest'
+    });
   });
 
   it('overwrites datasource state on consecutive queries instead of accumulating stale rows', async () => {
@@ -195,6 +244,14 @@ describe('NgxLowcodeRendererComponent', () => {
     expect(runtime.state()['__runtimeDatasourceErrors']).toEqual({
       'orders-datasource': 'datasource unavailable'
     });
+    expect(runtime.state()['__runtimeExecution']).toEqual(
+      jasmine.objectContaining({
+        datasourceId: 'orders-datasource',
+        status: 'failure',
+        message: 'datasource unavailable',
+        source: 'websocket'
+      })
+    );
 
     runtime.setState({ keyword: '' });
     await expectAsync(runtime.executeActionById('search-action')).toBeResolved();
@@ -234,13 +291,52 @@ describe('NgxLowcodeRendererComponent', () => {
     const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
     fixture.componentRef.setInput('schema', schema);
     await fixture.whenStable();
+    await Promise.resolve();
 
     expect(webSocketManager.connect).toHaveBeenCalled();
     expect(webSocketManager.subscribe).toHaveBeenCalledWith('orders-updates', jasmine.any(Function));
 
     fixture.destroy();
+    await Promise.resolve();
     expect(webSocketManager.unsubscribe).toHaveBeenCalledWith('orders-updates', jasmine.any(Function));
     expect(webSocketManager.disconnect).toHaveBeenCalled();
+  });
+
+  it('absorbs websocket lifecycle errors without breaking renderer lifecycle', async () => {
+    const webSocketManager = createWebSocketManagerSpy({
+      connect: Promise.reject(new Error('connect failed')),
+      subscribe: Promise.reject(new Error('subscribe failed')),
+      unsubscribe: Promise.reject(new Error('unsubscribe failed')),
+      disconnect: Promise.reject(new Error('disconnect failed'))
+    });
+    const warnSpy = spyOn(console, 'warn');
+    const schema = structuredClone(mockPageSchema);
+    schema.datasources = [
+      ...schema.datasources,
+      {
+        id: 'realtime-orders',
+        type: 'middleware-command',
+        command: {
+          transport: 'websocket',
+          target: 'orders-updates'
+        }
+      }
+    ];
+    TestBed.overrideProvider(NGX_LOWCODE_WEBSOCKET_MANAGER, { useValue: webSocketManager });
+
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    fixture.componentRef.setInput('schema', schema);
+    await expectAsync(fixture.whenStable()).toBeResolved();
+    await Promise.resolve();
+
+    fixture.destroy();
+    await Promise.resolve();
+
+    expect(webSocketManager.connect).toHaveBeenCalledTimes(1);
+    expect(webSocketManager.subscribe).toHaveBeenCalledTimes(2);
+    expect(webSocketManager.unsubscribe).toHaveBeenCalledTimes(2);
+    expect(webSocketManager.disconnect).toHaveBeenCalledTimes(1);
+    expect(warnSpy).toHaveBeenCalled();
   });
 });
 
@@ -260,16 +356,29 @@ function createActionManagerSpy(): NgxLowcodeActionManager & { execute: jasmine.
   };
 }
 
-function createWebSocketManagerSpy(): NgxLowcodeWebSocketManager & {
+function createWebSocketManagerSpy(overrides?: {
+  connect?: void | Promise<void>;
+  subscribe?: void | Promise<void>;
+  unsubscribe?: void | Promise<void>;
+  disconnect?: void | Promise<void>;
+}): NgxLowcodeWebSocketManager & {
   connect: jasmine.Spy;
   subscribe: jasmine.Spy;
   unsubscribe: jasmine.Spy;
   disconnect: jasmine.Spy;
 } {
   return {
-    connect: jasmine.createSpy('webSocketManager.connect').and.resolveTo(undefined),
-    subscribe: jasmine.createSpy('webSocketManager.subscribe').and.resolveTo(undefined),
-    unsubscribe: jasmine.createSpy('webSocketManager.unsubscribe').and.resolveTo(undefined),
-    disconnect: jasmine.createSpy('webSocketManager.disconnect').and.resolveTo(undefined)
+    connect: jasmine
+      .createSpy('webSocketManager.connect')
+      .and.callFake(() => overrides?.connect ?? Promise.resolve(undefined)),
+    subscribe: jasmine
+      .createSpy('webSocketManager.subscribe')
+      .and.callFake(() => overrides?.subscribe ?? Promise.resolve(undefined)),
+    unsubscribe: jasmine
+      .createSpy('webSocketManager.unsubscribe')
+      .and.callFake(() => overrides?.unsubscribe ?? Promise.resolve(undefined)),
+    disconnect: jasmine
+      .createSpy('webSocketManager.disconnect')
+      .and.callFake(() => overrides?.disconnect ?? Promise.resolve(undefined))
   };
 }

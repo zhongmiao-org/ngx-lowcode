@@ -14,6 +14,8 @@ export type {
   NgxLowcodeConfig,
   NgxLowcodeDataSourceManager,
   NgxLowcodeDatasourceDefinition,
+  NgxLowcodeDatasourceExecutionMeta,
+  NgxLowcodeDatasourceExecutionResult,
   NgxLowcodeDatasourceExecutor,
   NgxLowcodeDatasourceRequest,
   NgxLowcodeDesignerCommand,

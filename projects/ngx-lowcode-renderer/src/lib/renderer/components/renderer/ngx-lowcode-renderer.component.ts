@@ -21,6 +21,9 @@ import {
   NgxLowcodeActionStep,
   NgxLowcodeConfig,
   NgxLowcodeDataSourceManager,
+  NgxLowcodeDatasourceDefinition,
+  NgxLowcodeDatasourceExecutionMeta,
+  NgxLowcodeDatasourceExecutionResult,
   NgxLowcodeDropTarget,
   NgxLowcodePageSchema,
   NgxLowcodeRuntimeContext,
@@ -39,6 +42,7 @@ import { NgxLowcodeDropListRegistryService } from '../../services/drop-list-regi
 })
 export class NgxLowcodeRendererComponent implements OnInit, OnDestroy {
   private static readonly runtimeDatasourceErrorsKey = '__runtimeDatasourceErrors';
+  private static readonly runtimeExecutionKey = '__runtimeExecution';
 
   private readonly config = inject(NGX_LOWCODE_CONFIG, { optional: true }) as NgxLowcodeConfig | null;
   private readonly configuredActionManager = inject(NGX_LOWCODE_ACTION_MANAGER, { optional: true });
@@ -59,6 +63,7 @@ export class NgxLowcodeRendererComponent implements OnInit, OnDestroy {
       unsubscribe: () => undefined,
       disconnect: () => undefined
     };
+  private runtimeRequestSequence = 0;
 
   readonly schema = input.required<NgxLowcodePageSchema>();
   readonly context = input<Record<string, unknown>>({});
@@ -143,17 +148,14 @@ export class NgxLowcodeRendererComponent implements OnInit, OnDestroy {
           return undefined;
         }
 
-        return this.dataSourceManager.execute({
-          datasource,
-          payload,
-          state: this.stateSignal()
-        });
+        const result = await this.executeDatasourceRequest(datasource, payload);
+        return result.data;
       }
     };
   });
 
   ngOnInit(): void {
-    void this.webSocketManager.connect();
+    this.runWebSocketEffect('connect', () => this.webSocketManager.connect());
     for (const datasource of this.schema().datasources) {
       if (datasource.command?.transport !== 'websocket') {
         continue;
@@ -164,15 +166,17 @@ export class NgxLowcodeRendererComponent implements OnInit, OnDestroy {
       }
       const handler = (_event: unknown) => undefined;
       this.webSocketSubscriptions.push({ channel, handler });
-      void this.webSocketManager.subscribe(channel, handler);
+      this.runWebSocketEffect(`subscribe:${channel}`, () => this.webSocketManager.subscribe(channel, handler));
     }
   }
 
   ngOnDestroy(): void {
     for (const subscription of this.webSocketSubscriptions) {
-      void this.webSocketManager.unsubscribe(subscription.channel, subscription.handler);
+      this.runWebSocketEffect(`unsubscribe:${subscription.channel}`, () =>
+        this.webSocketManager.unsubscribe(subscription.channel, subscription.handler)
+      );
     }
-    void this.webSocketManager.disconnect();
+    this.runWebSocketEffect('disconnect', () => this.webSocketManager.disconnect());
   }
 
   private async executeStep(
@@ -196,21 +200,41 @@ export class NgxLowcodeRendererComponent implements OnInit, OnDestroy {
     }
 
     if (step.type === 'callDatasource' && step.datasourceId) {
+      const datasource = schema.datasources.find((item) => item.id === step.datasourceId);
+      if (!datasource) {
+        await this.runActionManager(schema, action, step, payload);
+        return;
+      }
+
       try {
-        const result = await this.runtime().executeDatasourceById(step.datasourceId, payload);
-        const datasource = schema.datasources.find((item) => item.id === step.datasourceId);
+        const result = await this.executeDatasourceRequest(datasource, payload);
         const stateKey = step.stateKey ?? datasource?.responseMapping?.stateKey;
+
+        this.setRuntimeExecution(step.datasourceId, result.meta);
+
+        if (result.meta.status === 'failure') {
+          this.setDatasourceRuntimeError(step.datasourceId, result.meta.message ?? 'Datasource execution failed');
+          await this.runActionManager(schema, action, step, payload);
+          return;
+        }
 
         if (stateKey) {
           this.stateSignal.update((current) => ({
             ...current,
-            [stateKey]: result
+            [stateKey]: result.data
           }));
         }
 
         this.clearDatasourceRuntimeError(step.datasourceId);
       } catch (error) {
-        this.setDatasourceRuntimeError(step.datasourceId, this.resolveErrorMessage(error));
+        const message = this.resolveErrorMessage(error);
+        this.setDatasourceRuntimeError(step.datasourceId, message);
+        this.setRuntimeExecution(step.datasourceId, {
+          requestId: this.createDatasourceRequestId(step.datasourceId),
+          status: 'failure',
+          message,
+          source: this.resolveDatasourceExecutionSource(datasource)
+        });
       }
 
       await this.runActionManager(schema, action, step, payload);
@@ -263,6 +287,97 @@ export class NgxLowcodeRendererComponent implements OnInit, OnDestroy {
         [NgxLowcodeRendererComponent.runtimeDatasourceErrorsKey]: nextErrors
       };
     });
+  }
+
+  private setRuntimeExecution(datasourceId: string, meta: NgxLowcodeDatasourceExecutionMeta): void {
+    this.stateSignal.update((current) => ({
+      ...current,
+      [NgxLowcodeRendererComponent.runtimeExecutionKey]: {
+        datasourceId,
+        requestId: meta.requestId,
+        status: meta.status,
+        rowCount: meta.rowCount,
+        message: meta.message,
+        source: meta.source
+      }
+    }));
+  }
+
+  private async executeDatasourceRequest(
+    datasource: NgxLowcodeDatasourceDefinition,
+    payload?: unknown
+  ): Promise<NgxLowcodeDatasourceExecutionResult> {
+    const result = await this.dataSourceManager.execute({
+      datasource,
+      payload,
+      state: this.stateSignal()
+    });
+    return this.normalizeDatasourceExecutionResult(datasource, result);
+  }
+
+  private normalizeDatasourceExecutionResult(
+    datasource: NgxLowcodeDatasourceDefinition,
+    result: unknown | NgxLowcodeDatasourceExecutionResult
+  ): NgxLowcodeDatasourceExecutionResult {
+    if (this.isDatasourceExecutionResult(result)) {
+      return {
+        data: result.data,
+        meta: {
+          requestId: result.meta.requestId ?? this.createDatasourceRequestId(datasource.id),
+          status: result.meta.status,
+          rowCount: result.meta.rowCount ?? this.resolveDatasourceRowCount(result.data),
+          message: result.meta.message,
+          source: result.meta.source ?? this.resolveDatasourceExecutionSource(datasource)
+        }
+      };
+    }
+
+    return {
+      data: result,
+      meta: {
+        requestId: this.createDatasourceRequestId(datasource.id),
+        status: 'success',
+        rowCount: this.resolveDatasourceRowCount(result),
+        source: this.resolveDatasourceExecutionSource(datasource)
+      }
+    };
+  }
+
+  private isDatasourceExecutionResult(value: unknown): value is NgxLowcodeDatasourceExecutionResult {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return false;
+    }
+
+    const candidate = value as Partial<NgxLowcodeDatasourceExecutionResult>;
+    const meta = candidate.meta;
+    return Boolean(
+      meta &&
+      typeof meta === 'object' &&
+      !Array.isArray(meta) &&
+      (meta.status === 'success' || meta.status === 'failure') &&
+      'data' in candidate
+    );
+  }
+
+  private resolveDatasourceRowCount(value: unknown): number | undefined {
+    return Array.isArray(value) ? value.length : undefined;
+  }
+
+  private resolveDatasourceExecutionSource(datasource: NgxLowcodeDatasourceDefinition): string {
+    return String(datasource.command?.transport ?? datasource.type ?? 'unknown');
+  }
+
+  private createDatasourceRequestId(datasourceId: string): string {
+    this.runtimeRequestSequence += 1;
+    return `${datasourceId}-${this.runtimeRequestSequence}`;
+  }
+
+  private runWebSocketEffect(label: string, operation: () => void | Promise<void>): void {
+    void Promise.resolve()
+      .then(operation)
+      .catch((error) => {
+        console.warn(`[ngx-lowcode] websocket lifecycle failed: ${label}`, error);
+      });
   }
 
   private getDatasourceRuntimeErrors(state: Record<string, unknown>): Record<string, string> {
