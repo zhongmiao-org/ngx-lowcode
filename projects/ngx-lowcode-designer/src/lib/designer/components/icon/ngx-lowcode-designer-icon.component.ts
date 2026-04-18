@@ -1,9 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import {
-  NgxLowcodeIconNode,
-  NgxLowcodeMaterialIconKey,
-  resolveLowcodeMaterialIconNodes
-} from '../../../core';
+import { NgxLowcodeIconNode, NgxLowcodeMaterialIconKey, resolveLowcodeMaterialIconNodes } from '../../../core';
 
 @Component({
   selector: 'ngx-lowcode-designer-icon',
