@@ -47,3 +47,9 @@ UI components should consume typed document/editor state rather than mutating un
 ng build ngx-lowcode-designer
 ng test ngx-lowcode-designer
 ```
+
+## Icon Rendering
+
+- The designer now renders built-in material and outline icons with internal SVGs.
+- Host applications do not need to import `tabler-icons.css` or any icon font stylesheet.
+- `NgxLowcodeComponentDefinition.icon` is treated as a designer icon key, not a CSS class name.
