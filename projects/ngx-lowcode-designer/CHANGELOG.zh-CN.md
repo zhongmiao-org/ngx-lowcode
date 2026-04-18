@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+- refactor: 将设计器内嵌的 Tabler icon font CSS 改为库内 SVG 图标渲染，发包产物不再内联 base64 字体资源。
+- fix: 移除设计器包内联 `tabler-icons` 字体样式在 Angular 21/Vite 下导致的 bootstrap 卡死与页面白屏问题。
+
 ## 0.1.3 (2026-04-17)
 
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.1.3。

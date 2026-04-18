@@ -47,3 +47,9 @@ UI 组件应消费类型化状态，而不是相互直接修改彼此模块。
 ng build ngx-lowcode-designer
 ng test ngx-lowcode-designer
 ```
+
+## 图标渲染
+
+- 设计器内置物料图标与大纲图标已改为库内 SVG 渲染。
+- 宿主项目不再需要额外引入 `tabler-icons.css` 或任何 icon font 样式。
+- `NgxLowcodeComponentDefinition.icon` 现在表示设计器内部 icon key，而不是 CSS class 名。
