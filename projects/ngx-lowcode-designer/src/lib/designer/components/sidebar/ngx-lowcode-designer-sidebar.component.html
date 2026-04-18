@@ -36,7 +36,7 @@
                       cdkDragHandle
                       [attr.aria-label]="t().dragMaterial + ' ' + material.title"
                     >
-                      <i [class]="materialIcon(material)" aria-hidden="true"></i>
+                      <ngx-lowcode-designer-icon [icon]="materialIcon(material)"></ngx-lowcode-designer-icon>
                     </button>
                     <button
                       type="button"
@@ -69,7 +69,10 @@
           >
             <ng-template #treeNodeTemplate let-origin="origin">
               <div class="ngx-lowcode-outline__node">
-                <i class="ngx-lowcode-outline__icon" [class]="nodeTypeIcon(origin.origin)" aria-hidden="true"></i>
+                <ngx-lowcode-designer-icon
+                  class="ngx-lowcode-outline__icon"
+                  [icon]="nodeTypeIcon(origin.origin)"
+                ></ngx-lowcode-designer-icon>
                 @if (editingOutlineNodeId() === origin.origin.id) {
                   <input
                     thyInput

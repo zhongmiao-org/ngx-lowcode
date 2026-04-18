@@ -12,11 +12,20 @@ import { ThyButtonModule } from 'ngx-tethys/button';
 import { ThyInputModule } from 'ngx-tethys/input';
 import { ThyTabsModule } from 'ngx-tethys/tabs';
 import { ThyTreeEmitEvent, ThyTreeModule, ThyTreeNodeData } from 'ngx-tethys/tree';
-import { resolveLowcodeMaterialIcon } from '../../../core';
+import { NgxLowcodeMaterialIconKey, resolveLowcodeMaterialIcon } from '../../../core';
+import { NgxLowcodeDesignerIconComponent } from '../icon/ngx-lowcode-designer-icon.component';
 
 @Component({
   selector: 'ngx-lowcode-designer-sidebar',
-  imports: [DragDropModule, FormsModule, ThyButtonModule, ThyInputModule, ThyTabsModule, ThyTreeModule],
+  imports: [
+    DragDropModule,
+    FormsModule,
+    ThyButtonModule,
+    ThyInputModule,
+    ThyTabsModule,
+    ThyTreeModule,
+    NgxLowcodeDesignerIconComponent,
+  ],
   templateUrl: './ngx-lowcode-designer-sidebar.component.html',
   styleUrl: './ngx-lowcode-designer-sidebar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -152,11 +161,11 @@ export class NgxLowcodeDesignerSidebarComponent implements OnChanges {
     return node.id;
   }
 
-  materialIcon(material: NgxLowcodeComponentDefinition): string {
-    return material.icon ?? resolveLowcodeMaterialIcon(material.type);
+  materialIcon(material: NgxLowcodeComponentDefinition): NgxLowcodeMaterialIconKey {
+    return resolveLowcodeMaterialIcon(material.icon ?? material.type);
   }
 
-  nodeTypeIcon(node: NgxLowcodeNodeSchema): string {
+  nodeTypeIcon(node: NgxLowcodeNodeSchema): NgxLowcodeMaterialIconKey {
     return resolveLowcodeMaterialIcon(node.componentType);
   }
 
