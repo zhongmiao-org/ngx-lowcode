@@ -29,12 +29,12 @@ export const LOWCODE_MATERIAL_ICONS: Record<string, NgxLowcodeMaterialIconKey> =
   avatar: 'avatar',
   progress: 'progress',
   statistic: 'statistic',
-  alert: 'alert',
+  alert: 'alert'
 };
 
 export function resolveLowcodeMaterialIcon(
   type: string,
-  fallback: NgxLowcodeMaterialIconKey = 'icon',
+  fallback: NgxLowcodeMaterialIconKey = 'icon'
 ): NgxLowcodeMaterialIconKey {
   return LOWCODE_MATERIAL_ICONS[type] ?? fallback;
 }

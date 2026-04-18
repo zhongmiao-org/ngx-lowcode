@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import {
   NgxLowcodeIconNode,
   NgxLowcodeMaterialIconKey,
-  resolveLowcodeMaterialIconNodes,
-} from '../../../core/constants/material-icon-nodes.constant';
+  resolveLowcodeMaterialIconNodes
+} from '../../../core';
 
 @Component({
   selector: 'ngx-lowcode-designer-icon',
@@ -11,14 +11,12 @@ import {
   styleUrl: './ngx-lowcode-designer-icon.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'ngx-lowcode-designer-icon-host',
-  },
+    class: 'ngx-lowcode-designer-icon-host'
+  }
 })
 export class NgxLowcodeDesignerIconComponent {
   readonly icon = input.required<NgxLowcodeMaterialIconKey>();
   readonly decorative = input(true);
   readonly label = input('');
-  readonly nodes = computed<readonly NgxLowcodeIconNode[]>(() =>
-    resolveLowcodeMaterialIconNodes(this.icon()),
-  );
+  readonly nodes = computed<readonly NgxLowcodeIconNode[]>(() => resolveLowcodeMaterialIconNodes(this.icon()));
 }
