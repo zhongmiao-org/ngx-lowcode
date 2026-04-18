@@ -24,7 +24,7 @@ import { NgxLowcodeDesignerIconComponent } from '../icon/ngx-lowcode-designer-ic
     ThyInputModule,
     ThyTabsModule,
     ThyTreeModule,
-    NgxLowcodeDesignerIconComponent,
+    NgxLowcodeDesignerIconComponent
   ],
   templateUrl: './ngx-lowcode-designer-sidebar.component.html',
   styleUrl: './ngx-lowcode-designer-sidebar.component.scss',
