@@ -9,14 +9,26 @@ import {
   NgxLowcodeComponentDefinition,
   NgxLowcodeConfig,
   NgxLowcodeDataSourceManager,
+  NgxLowcodeDatasourceExecutionResult,
   NgxLowcodeDatasourceExecutor,
   NgxLowcodeWebSocketManager
 } from '@zhongmiao/ngx-lowcode-core-types';
 import { NgxLowcodeMaterialRegistry } from '../material-registry';
 
 export function defaultDataSourceManager(): NgxLowcodeDataSourceManager {
-  const executor: NgxLowcodeDatasourceExecutor = async ({ datasource }: Parameters<NgxLowcodeDatasourceExecutor>[0]) =>
-    datasource.mockData ?? [];
+  const executor: NgxLowcodeDatasourceExecutor = async ({
+    datasource
+  }: Parameters<NgxLowcodeDatasourceExecutor>[0]): Promise<NgxLowcodeDatasourceExecutionResult> => {
+    const data = datasource.mockData ?? [];
+    return {
+      data,
+      meta: {
+        status: 'success',
+        rowCount: Array.isArray(data) ? data.length : undefined,
+        source: datasource.command?.transport ?? datasource.type
+      }
+    };
+  };
   return {
     execute: executor
   };

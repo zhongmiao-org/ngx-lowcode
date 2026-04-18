@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+- feat(runtime): renderer 新增 datasource 结果归一化与 `__runtimeExecution`，失败时保留旧表格数据，并吞掉 websocket 生命周期异常。
+
 ## 0.1.3 (2026-04-17)
 
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.1.3。

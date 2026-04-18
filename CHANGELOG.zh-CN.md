@@ -1,7 +1,8 @@
 [English](CHANGELOG.md) | 中文文档
 
-
 ## [Unreleased]
+
+- feat(runtime): 收紧 datasource/websocket manager 契约，新增结构化执行 envelope、renderer 侧结果归一化，以及稳定的运行时可观测状态。
 
 ## 0.1.4 (2026-04-18)
 
@@ -13,8 +14,11 @@
 - docs(repo): README/README_zh 联调入口改为 `meta-weave`，不再使用 `ngx-lowcode/src`。
 - feat(runtime): demo manager 注入切换为 `@zhongmiao/meta-lc-runtime-angular` 包引用实现（直接替换）。
 - feat(runtime): 通过 runtime adapter 的 `onExecution` 回调迁移执行状态面板，保留 request-id/status/rowCount/message 可观测性。
+
 ## 发布包清单
+
 ### @zhongmiao/ngx-lowcode-designer@0.1.4
+
 - refactor: 将设计器内嵌的 Tabler icon font CSS 改为库内 SVG 图标渲染，发包产物不再内联 base64 字体资源。
 - fix: 移除设计器包内联 `tabler-icons` 字体样式在 Angular 21/Vite 下导致的 bootstrap 卡死与页面白屏问题。
 

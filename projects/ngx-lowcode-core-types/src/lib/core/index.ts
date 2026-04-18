@@ -129,6 +129,19 @@ export interface NgxLowcodeDatasourceRequest {
   payload?: unknown;
 }
 
+export interface NgxLowcodeDatasourceExecutionMeta {
+  requestId?: string;
+  status: 'success' | 'failure';
+  rowCount?: number;
+  message?: string;
+  source?: string;
+}
+
+export interface NgxLowcodeDatasourceExecutionResult<T = unknown> {
+  data: T;
+  meta: NgxLowcodeDatasourceExecutionMeta;
+}
+
 export interface NgxLowcodeActionExecutionRequest {
   action: NgxLowcodeActionDefinition;
   step: NgxLowcodeActionStep;
@@ -137,11 +150,13 @@ export interface NgxLowcodeActionExecutionRequest {
   payload?: unknown;
 }
 
-export type NgxLowcodeDatasourceExecutor = (request: NgxLowcodeDatasourceRequest) => Promise<unknown>;
+export type NgxLowcodeDatasourceExecutor = (
+  request: NgxLowcodeDatasourceRequest
+) => Promise<unknown | NgxLowcodeDatasourceExecutionResult>;
 export type NgxLowcodeActionExecutor = (request: NgxLowcodeActionExecutionRequest) => void | Promise<void>;
 
 export interface NgxLowcodeDataSourceManager {
-  execute: (request: NgxLowcodeDatasourceRequest) => Promise<unknown>;
+  execute: (request: NgxLowcodeDatasourceRequest) => Promise<unknown | NgxLowcodeDatasourceExecutionResult>;
 }
 
 export interface NgxLowcodeActionManager {
@@ -151,6 +166,8 @@ export interface NgxLowcodeActionManager {
 export type NgxLowcodeWebSocketEventHandler = (event: unknown) => void;
 
 export interface NgxLowcodeWebSocketManager {
+  // Lifecycle errors should be handled internally by the host and must not
+  // break renderer initialization or teardown.
   connect: () => void | Promise<void>;
   subscribe: (channel: string, handler: NgxLowcodeWebSocketEventHandler) => void | Promise<void>;
   unsubscribe: (channel: string, handler: NgxLowcodeWebSocketEventHandler) => void | Promise<void>;
