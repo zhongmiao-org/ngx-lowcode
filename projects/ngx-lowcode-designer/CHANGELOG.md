@@ -1,6 +1,9 @@
 # Changelog
 
+
 ## [Unreleased]
+
+## 0.1.4 (2026-04-18)
 
 - refactor: replace embedded Tabler icon font CSS with internal SVG icon rendering so published designer bundles no longer inline base64 font assets.
 - fix: remove the Angular 21/Vite bootstrap freeze caused by inlined `tabler-icons` font styles in the designer package.
