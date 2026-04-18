@@ -1,6 +1,9 @@
 English | [中文文档](CHANGELOG.zh-CN.md)
 
+
 ## [Unreleased]
+
+## 0.1.4 (2026-04-18)
 
 - fix(ci): stop watchdog scheduled polling and only trigger on failed CI(main) or manual dispatch.
 - fix(ci): make watchdog triage issue creation resilient when `ci` label is missing.
@@ -10,6 +13,10 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 - docs(repo): update README/README_zh integration guidance to point demo/platform entry to `meta-weave`.
 - feat(runtime): switch demo manager injection to `@zhongmiao/meta-lc-runtime-angular` with direct package wiring.
 - feat(runtime): keep demo execution observability panel via runtime adapter `onExecution` callback migration (request-id/status/rows/message).
+## Released Packages
+### @zhongmiao/ngx-lowcode-designer@0.1.4
+- refactor: replace embedded Tabler icon font CSS with internal SVG icon rendering so published designer bundles no longer inline base64 font assets.
+- fix: remove the Angular 21/Vite bootstrap freeze caused by inlined `tabler-icons` font styles in the designer package.
 
 ## 0.1.3 (2026-04-17)
 

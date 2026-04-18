@@ -1,6 +1,9 @@
 [English](CHANGELOG.md) | 中文文档
 
+
 ## [Unreleased]
+
+## 0.1.4 (2026-04-18)
 
 - fix(ci): watchdog 取消定时轮询，仅在 CI(main) 失败或手动触发时运行。
 - fix(ci): watchdog 创建待排查 issue 时支持 `ci` label 缺失场景，不再因此失败。
@@ -10,6 +13,10 @@
 - docs(repo): README/README_zh 联调入口改为 `meta-weave`，不再使用 `ngx-lowcode/src`。
 - feat(runtime): demo manager 注入切换为 `@zhongmiao/meta-lc-runtime-angular` 包引用实现（直接替换）。
 - feat(runtime): 通过 runtime adapter 的 `onExecution` 回调迁移执行状态面板，保留 request-id/status/rowCount/message 可观测性。
+## 发布包清单
+### @zhongmiao/ngx-lowcode-designer@0.1.4
+- refactor: 将设计器内嵌的 Tabler icon font CSS 改为库内 SVG 图标渲染，发包产物不再内联 base64 字体资源。
+- fix: 移除设计器包内联 `tabler-icons` 字体样式在 Angular 21/Vite 下导致的 bootstrap 卡死与页面白屏问题。
 
 ## 0.1.3 (2026-04-17)
 
