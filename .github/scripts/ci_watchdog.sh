@@ -69,11 +69,19 @@ ISSUE_TITLE="ci-watchdog: manual triage required for failed run ${RUN_ID}"
 EXISTING="$(gh issue list --state open --search "${ISSUE_TITLE} in:title" --json number -L 1 | node -e "const fs=require('fs');const d=JSON.parse(fs.readFileSync(0,'utf8'));if(d[0])process.stdout.write(String(d[0].number));")"
 
 if [[ -z "${EXISTING}" ]]; then
-  gh issue create \
-    --title "${ISSUE_TITLE}" \
-    --body "CI run failed and no deterministic auto-fix was found.\n\n- run: ${RUN_URL}\n- branch: ${HEAD_BRANCH}\n- sha: ${HEAD_SHA}\n\nPlease triage logs and patch manually." \
-    --label "ci"
+  ISSUE_BODY="CI run failed and no deterministic auto-fix was found.\n\n- run: ${RUN_URL}\n- branch: ${HEAD_BRANCH}\n- sha: ${HEAD_SHA}\n\nPlease triage logs and patch manually."
+  HAS_CI_LABEL="$(
+    gh label list --limit 200 --json name \
+      | node -e "const fs=require('fs');const labels=JSON.parse(fs.readFileSync(0,'utf8'));process.stdout.write(labels.some(l=>l.name==='ci')?'true':'false');"
+  )"
+  if [[ "${HAS_CI_LABEL}" == "true" ]]; then
+    gh issue create --title "${ISSUE_TITLE}" --body "${ISSUE_BODY}" --label "ci"
+  else
+    gh issue create --title "${ISSUE_TITLE}" --body "${ISSUE_BODY}"
+  fi
   echo "Created triage issue for run ${RUN_ID}."
 else
   echo "Triage issue already exists: #${EXISTING}"
 fi
+
+exit 0

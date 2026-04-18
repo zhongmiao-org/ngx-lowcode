@@ -2,6 +2,8 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+- fix(ci): stop watchdog scheduled polling and only trigger on failed CI(main) or manual dispatch.
+- fix(ci): make watchdog triage issue creation resilient when `ci` label is missing.
 - chore(repo): migrate the platform demo app from `ngx-lowcode/src` to standalone `meta-weave` repository.
 - chore(repo): remove `demo` app target/config from this workspace and keep `ngx-lowcode` library-only (`projects/*`).
 - docs(repo): update README/README_zh integration guidance to point demo/platform entry to `meta-weave`.
