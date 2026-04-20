@@ -297,6 +297,7 @@ describe('NgxLowcodeRendererComponent', () => {
 
     expect(webSocketManager.connect).toHaveBeenCalled();
     expect(webSocketManager.subscribe).toHaveBeenCalledWith('orders-updates', jasmine.any(Function));
+    expect(webSocketManager.subscribe.calls.mostRecent().args.length).toBe(2);
 
     fixture.destroy();
     await Promise.resolve();
@@ -355,6 +356,44 @@ describe('NgxLowcodeRendererComponent', () => {
       source: 'websocket'
     });
     expect(dataSourceManager.execute).toHaveBeenCalledTimes(1);
+  });
+
+  it('stores runtime manager replay cursors and passes them on later subscriptions', async () => {
+    const webSocketManager = createWebSocketManagerSpy();
+    const schema = structuredClone(mockPageSchema);
+    const topic = 'tenant.tenant-a.page.demo-page.instance.instance-1';
+    schema.datasources[0] = {
+      ...schema.datasources[0],
+      command: {
+        ...schema.datasources[0].command,
+        target: topic
+      }
+    };
+    TestBed.overrideProvider(NGX_LOWCODE_WEBSOCKET_MANAGER, { useValue: webSocketManager });
+
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    fixture.componentRef.setInput('schema', schema);
+    await fixture.whenStable();
+    await Promise.resolve();
+    expect(webSocketManager.subscribe.calls.mostRecent().args.length).toBe(2);
+
+    resolveLastWebSocketHandler(webSocketManager)(
+      createRuntimeManagerExecutedEvent({
+        replayId: '42-0',
+        patchState: { status: 'active' }
+      })
+    );
+    await flushWebSocketEvent();
+
+    fixture.componentInstance.ngOnDestroy();
+    await Promise.resolve();
+    webSocketManager.subscribe.calls.reset();
+    fixture.componentInstance.ngOnInit();
+    await Promise.resolve();
+
+    expect(webSocketManager.subscribe).toHaveBeenCalledWith(topic, jasmine.any(Function), {
+      afterReplayId: '42-0'
+    });
   });
 
   it('consumes runtime manager websocket events and runs listed actions', async () => {

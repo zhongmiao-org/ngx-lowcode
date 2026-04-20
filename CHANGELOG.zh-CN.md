@@ -4,6 +4,7 @@
 
 - feat(runtime): 收紧 datasource/websocket manager 契约，新增结构化执行 envelope、renderer 侧结果归一化，以及稳定的运行时可观测状态。
 - feat(runtime): renderer 消费 runtime manager WebSocket 更新事件，并触发 manager-first refresh/action 流程。
+- feat(runtime): 新增 runtime WebSocket replay cursor 订阅支持。
 
 ## 0.1.4 (2026-04-18)
 

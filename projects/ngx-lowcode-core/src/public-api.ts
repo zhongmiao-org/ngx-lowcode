@@ -40,7 +40,8 @@ export type {
   NgxLowcodeSetterType,
   NgxLowcodeSlotDefinition,
   NgxLowcodeWebSocketEventHandler,
-  NgxLowcodeWebSocketManager
+  NgxLowcodeWebSocketManager,
+  NgxLowcodeWebSocketSubscribeOptions
 } from './lib/core';
 export { NgxLowcodeEditorStore } from './lib/editor-store';
 export { NgxLowcodeMaterialRegistry } from './lib/material-registry';

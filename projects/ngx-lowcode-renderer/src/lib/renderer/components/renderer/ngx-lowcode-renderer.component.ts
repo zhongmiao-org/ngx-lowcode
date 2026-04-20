@@ -82,6 +82,7 @@ export class NgxLowcodeRendererComponent implements OnInit, OnDestroy {
     channel: string;
     handler: (event: unknown) => void;
   }> = [];
+  private readonly runtimeReplayIdsByTopic = new Map<string, string>();
 
   private readonly stateSignal = linkedSignal<Record<string, unknown>>(() => ({
     ...this.schema().state,
@@ -169,7 +170,7 @@ export class NgxLowcodeRendererComponent implements OnInit, OnDestroy {
         this.runWebSocketEffect(`event:${channel}`, () => this.handleWebSocketEvent(event));
       };
       this.webSocketSubscriptions.push({ channel, handler });
-      this.runWebSocketEffect(`subscribe:${channel}`, () => this.webSocketManager.subscribe(channel, handler));
+      this.runWebSocketEffect(`subscribe:${channel}`, () => this.subscribeWebSocketChannel(channel, handler));
     }
   }
 
@@ -234,6 +235,10 @@ export class NgxLowcodeRendererComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (event.replayId) {
+      this.runtimeReplayIdsByTopic.set(event.topic, event.replayId);
+    }
+
     this.stateSignal.update((current) => ({
       ...current,
       ...event.patchState
@@ -282,6 +287,7 @@ export class NgxLowcodeRendererComponent implements OnInit, OnDestroy {
       typeof page.tenantId === 'string' &&
       typeof page.pageId === 'string' &&
       typeof page.pageInstanceId === 'string' &&
+      (candidate.replayId === undefined || typeof candidate.replayId === 'string') &&
       Boolean(candidate.patchState) &&
       typeof candidate.patchState === 'object' &&
       !Array.isArray(candidate.patchState) &&
@@ -450,6 +456,15 @@ export class NgxLowcodeRendererComponent implements OnInit, OnDestroy {
       .catch((error) => {
         console.warn(`[ngx-lowcode] websocket lifecycle failed: ${label}`, error);
       });
+  }
+
+  private subscribeWebSocketChannel(channel: string, handler: (event: unknown) => void): void | Promise<void> {
+    const afterReplayId = this.runtimeReplayIdsByTopic.get(channel);
+    if (!afterReplayId) {
+      return this.webSocketManager.subscribe(channel, handler);
+    }
+
+    return this.webSocketManager.subscribe(channel, handler, { afterReplayId });
   }
 
   private getDatasourceRuntimeErrors(state: Record<string, unknown>): Record<string, string> {
