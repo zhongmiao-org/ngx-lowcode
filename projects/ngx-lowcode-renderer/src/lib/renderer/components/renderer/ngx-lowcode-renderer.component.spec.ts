@@ -3,12 +3,14 @@ import { TestBed } from '@angular/core/testing';
 import {
   NGX_LOWCODE_ACTION_MANAGER,
   NGX_LOWCODE_DATASOURCE_MANAGER,
+  NGX_LOWCODE_RUNTIME_MANAGER_EXECUTED_EVENT,
   NGX_LOWCODE_WEBSOCKET_MANAGER
 } from '@zhongmiao/ngx-lowcode-core';
 import type {
   NgxLowcodeActionManager,
   NgxLowcodeDataSourceManager,
   NgxLowcodeDatasourceExecutionResult,
+  NgxLowcodeRuntimeManagerExecutedEvent,
   NgxLowcodeWebSocketManager
 } from '@zhongmiao/ngx-lowcode-core-types';
 import { mockPageSchema } from '@zhongmiao/ngx-lowcode-testing';
@@ -302,6 +304,120 @@ describe('NgxLowcodeRendererComponent', () => {
     expect(webSocketManager.disconnect).toHaveBeenCalled();
   });
 
+  it('consumes runtime manager websocket events and applies patch plus datasource refresh', async () => {
+    const dataSourceManager = createDataSourceManagerSpy(
+      async (): Promise<NgxLowcodeDatasourceExecutionResult<Array<{ id: string }>>> => ({
+        data: [{ id: 'SO-7001' }],
+        meta: {
+          requestId: 'req-datasource-1',
+          status: 'success',
+          rowCount: 1,
+          source: 'websocket'
+        }
+      })
+    );
+    const webSocketManager = createWebSocketManagerSpy();
+    TestBed.overrideProvider(NGX_LOWCODE_DATASOURCE_MANAGER, { useValue: dataSourceManager });
+    TestBed.overrideProvider(NGX_LOWCODE_WEBSOCKET_MANAGER, { useValue: webSocketManager });
+
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    fixture.componentRef.setInput('schema', structuredClone(mockPageSchema));
+    await fixture.whenStable();
+    await Promise.resolve();
+
+    const handler = resolveLastWebSocketHandler(webSocketManager);
+    expect(NGX_LOWCODE_RUNTIME_MANAGER_EXECUTED_EVENT).toBe('runtimeManagerExecuted');
+    handler({
+      type: 'runtime.manager.executed',
+      topic: 'tenant.tenant-a.page.demo-page.instance.instance-1',
+      page: {
+        tenantId: 'tenant-a',
+        pageId: 'demo-page',
+        pageInstanceId: 'instance-1'
+      },
+      requestId: 'req-runtime-1',
+      patchState: { status: 'active', runtimeOnly: true },
+      refreshedDatasourceIds: ['orders-datasource'],
+      runActionIds: []
+    });
+    await flushWebSocketEvent();
+
+    const state = fixture.componentInstance.runtime().state();
+    expect(state['status']).toBe('active');
+    expect(state['runtimeOnly']).toBeTrue();
+    expect(state['tableData']).toEqual([{ id: 'SO-7001' }]);
+    expect(state['__runtimeExecution']).toEqual({
+      datasourceId: 'orders-datasource',
+      requestId: 'req-datasource-1',
+      status: 'success',
+      rowCount: 1,
+      message: undefined,
+      source: 'websocket'
+    });
+    expect(dataSourceManager.execute).toHaveBeenCalledTimes(1);
+  });
+
+  it('consumes runtime manager websocket events and runs listed actions', async () => {
+    const actionManager = createActionManagerSpy();
+    const webSocketManager = createWebSocketManagerSpy();
+    const schema = structuredClone(mockPageSchema);
+    schema.actions = [
+      ...schema.actions,
+      {
+        id: 'notify-action',
+        steps: [{ type: 'message', message: 'runtime updated' }]
+      }
+    ];
+    TestBed.overrideProvider(NGX_LOWCODE_ACTION_MANAGER, { useValue: actionManager });
+    TestBed.overrideProvider(NGX_LOWCODE_WEBSOCKET_MANAGER, { useValue: webSocketManager });
+
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    fixture.componentRef.setInput('schema', schema);
+    await fixture.whenStable();
+    await Promise.resolve();
+
+    resolveLastWebSocketHandler(webSocketManager)(
+      createRuntimeManagerExecutedEvent({
+        patchState: {},
+        refreshedDatasourceIds: [],
+        runActionIds: ['notify-action']
+      })
+    );
+    await flushWebSocketEvent();
+
+    expect(actionManager.execute).toHaveBeenCalledOnceWith(
+      jasmine.objectContaining({
+        action: jasmine.objectContaining({ id: 'notify-action' }),
+        step: jasmine.objectContaining({ type: 'message', message: 'runtime updated' })
+      })
+    );
+  });
+
+  it('ignores non runtime manager websocket events', async () => {
+    const dataSourceManager = createDataSourceManagerSpy(async () => []);
+    const actionManager = createActionManagerSpy();
+    const webSocketManager = createWebSocketManagerSpy();
+    TestBed.overrideProvider(NGX_LOWCODE_ACTION_MANAGER, { useValue: actionManager });
+    TestBed.overrideProvider(NGX_LOWCODE_DATASOURCE_MANAGER, { useValue: dataSourceManager });
+    TestBed.overrideProvider(NGX_LOWCODE_WEBSOCKET_MANAGER, { useValue: webSocketManager });
+
+    const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
+    fixture.componentRef.setInput('schema', structuredClone(mockPageSchema));
+    await fixture.whenStable();
+    await Promise.resolve();
+
+    const beforeState = fixture.componentInstance.runtime().state();
+    resolveLastWebSocketHandler(webSocketManager)({
+      type: 'pageSubscribed',
+      status: 'subscribed'
+    });
+    await flushWebSocketEvent();
+
+    expect(fixture.componentInstance.runtime().state()).toEqual(beforeState);
+    expect(dataSourceManager.execute).not.toHaveBeenCalled();
+    expect(actionManager.execute).not.toHaveBeenCalled();
+  });
+
   it('absorbs websocket lifecycle errors without breaking renderer lifecycle', async () => {
     const webSocketManager = createWebSocketManagerSpy({
       connect: Promise.reject(new Error('connect failed')),
@@ -339,6 +455,38 @@ describe('NgxLowcodeRendererComponent', () => {
     expect(warnSpy).toHaveBeenCalled();
   });
 });
+
+function createRuntimeManagerExecutedEvent(
+  patch: Partial<NgxLowcodeRuntimeManagerExecutedEvent>
+): NgxLowcodeRuntimeManagerExecutedEvent {
+  return {
+    type: 'runtime.manager.executed',
+    topic: 'tenant.tenant-a.page.demo-page.instance.instance-1',
+    page: {
+      tenantId: 'tenant-a',
+      pageId: 'demo-page',
+      pageInstanceId: 'instance-1'
+    },
+    patchState: {},
+    refreshedDatasourceIds: [],
+    runActionIds: [],
+    ...patch
+  };
+}
+
+function resolveLastWebSocketHandler(
+  webSocketManager: NgxLowcodeWebSocketManager & { subscribe: jasmine.Spy }
+): (event: unknown) => void {
+  const handler = webSocketManager.subscribe.calls.mostRecent().args[1];
+  expect(typeof handler).toBe('function');
+  return handler;
+}
+
+async function flushWebSocketEvent(): Promise<void> {
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+}
 
 function createDataSourceManagerSpy(
   executeImpl: NgxLowcodeDataSourceManager['execute']

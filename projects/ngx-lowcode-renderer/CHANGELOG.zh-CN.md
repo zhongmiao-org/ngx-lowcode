@@ -5,6 +5,7 @@
 ## [Unreleased]
 
 - feat(runtime): renderer 新增 datasource 结果归一化与 `__runtimeExecution`，失败时保留旧表格数据，并吞掉 websocket 生命周期异常。
+- feat(runtime): renderer 消费 runtime manager WebSocket 更新事件，并应用 patch、datasource 与 action 更新。
 
 ## 0.1.3 (2026-04-17)
 

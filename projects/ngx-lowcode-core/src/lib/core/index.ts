@@ -25,6 +25,8 @@ export type {
   NgxLowcodeNodeSchema,
   NgxLowcodePageSchema,
   NgxLowcodeRuntimeContext,
+  NgxLowcodeRuntimeManagerExecutedEvent,
+  NgxLowcodeRuntimePageTopicRef,
   NgxLowcodeSetterDefinition,
   NgxLowcodeSetterGroup,
   NgxLowcodeSetterOption,
@@ -37,5 +39,6 @@ export {
   NGX_LOWCODE_ACTION_MANAGER,
   NGX_LOWCODE_CONFIG,
   NGX_LOWCODE_DATASOURCE_MANAGER,
+  NGX_LOWCODE_RUNTIME_MANAGER_EXECUTED_EVENT,
   NGX_LOWCODE_WEBSOCKET_MANAGER
 } from '@zhongmiao/ngx-lowcode-core-types';
