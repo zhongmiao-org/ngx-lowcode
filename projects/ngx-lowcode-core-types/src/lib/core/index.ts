@@ -165,6 +165,24 @@ export interface NgxLowcodeActionManager {
 
 export type NgxLowcodeWebSocketEventHandler = (event: unknown) => void;
 
+export const NGX_LOWCODE_RUNTIME_MANAGER_EXECUTED_EVENT = 'runtimeManagerExecuted';
+
+export interface NgxLowcodeRuntimePageTopicRef {
+  tenantId: string;
+  pageId: string;
+  pageInstanceId: string;
+}
+
+export interface NgxLowcodeRuntimeManagerExecutedEvent {
+  type: 'runtime.manager.executed';
+  topic: string;
+  page: NgxLowcodeRuntimePageTopicRef;
+  requestId?: string;
+  patchState: Record<string, unknown>;
+  refreshedDatasourceIds: string[];
+  runActionIds: string[];
+}
+
 export interface NgxLowcodeWebSocketManager {
   // Lifecycle errors should be handled internally by the host and must not
   // break renderer initialization or teardown.
