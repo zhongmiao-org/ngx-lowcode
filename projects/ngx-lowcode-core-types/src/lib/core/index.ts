@@ -178,16 +178,25 @@ export interface NgxLowcodeRuntimeManagerExecutedEvent {
   topic: string;
   page: NgxLowcodeRuntimePageTopicRef;
   requestId?: string;
+  replayId?: string;
   patchState: Record<string, unknown>;
   refreshedDatasourceIds: string[];
   runActionIds: string[];
+}
+
+export interface NgxLowcodeWebSocketSubscribeOptions {
+  afterReplayId?: string;
 }
 
 export interface NgxLowcodeWebSocketManager {
   // Lifecycle errors should be handled internally by the host and must not
   // break renderer initialization or teardown.
   connect: () => void | Promise<void>;
-  subscribe: (channel: string, handler: NgxLowcodeWebSocketEventHandler) => void | Promise<void>;
+  subscribe: (
+    channel: string,
+    handler: NgxLowcodeWebSocketEventHandler,
+    options?: NgxLowcodeWebSocketSubscribeOptions
+  ) => void | Promise<void>;
   unsubscribe: (channel: string, handler: NgxLowcodeWebSocketEventHandler) => void | Promise<void>;
   disconnect: () => void | Promise<void>;
 }

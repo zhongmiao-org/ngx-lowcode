@@ -4,6 +4,7 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 - feat(runtime): harden datasource/websocket manager contracts with structured execution envelopes, renderer-side normalization, and stable runtime observability state.
 - feat(runtime): consume runtime manager WebSocket update events in the renderer and trigger manager-first refresh/action flows.
+- feat(runtime): add runtime WebSocket replay cursor subscription support.
 
 ## 0.1.4 (2026-04-18)
 

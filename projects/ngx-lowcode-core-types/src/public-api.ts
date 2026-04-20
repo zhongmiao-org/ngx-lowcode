@@ -40,5 +40,6 @@ export type {
   NgxLowcodeSetterType,
   NgxLowcodeSlotDefinition,
   NgxLowcodeWebSocketEventHandler,
-  NgxLowcodeWebSocketManager
+  NgxLowcodeWebSocketManager,
+  NgxLowcodeWebSocketSubscribeOptions
 } from './lib/core';

@@ -4,6 +4,7 @@
 
 - feat(runtime): normalize datasource execution results in renderer, expose `__runtimeExecution`, preserve stale table data on failures, and absorb websocket lifecycle errors.
 - feat(runtime): consume runtime manager WebSocket update events and apply patch/datasource/action updates through the renderer.
+- feat(runtime): store runtime WebSocket replay cursors and pass them to later subscriptions.
 
 ## 0.1.3 (2026-04-17)
 

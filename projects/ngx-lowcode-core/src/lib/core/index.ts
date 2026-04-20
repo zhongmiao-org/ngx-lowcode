@@ -33,7 +33,8 @@ export type {
   NgxLowcodeSetterType,
   NgxLowcodeSlotDefinition,
   NgxLowcodeWebSocketEventHandler,
-  NgxLowcodeWebSocketManager
+  NgxLowcodeWebSocketManager,
+  NgxLowcodeWebSocketSubscribeOptions
 } from '@zhongmiao/ngx-lowcode-core-types';
 export {
   NGX_LOWCODE_ACTION_MANAGER,
