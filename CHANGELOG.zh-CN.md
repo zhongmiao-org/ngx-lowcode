@@ -1,39 +1,61 @@
 [English](CHANGELOG.md) | 中文文档
 
-
 ## [Unreleased]
+
+- feat(local-dev): 新增 watch 命令，用于宿主应用本地联调时刷新 ngx-lowcode dist 产物。
 
 ## 0.2.0 (2026-04-21)
 
 - feat(runtime): 收紧 datasource/websocket manager 契约，新增结构化执行 envelope、renderer 侧结果归一化，以及稳定的运行时可观测状态。
 - feat(runtime): renderer 消费 runtime manager WebSocket 更新事件，并触发 manager-first refresh/action 流程。
 - feat(runtime): 新增 runtime WebSocket replay cursor 订阅支持。
+
 ## 发布包清单
+
 ### @zhongmiao/ngx-lowcode-core@0.2.0
+
 - feat(runtime): 默认 datasource manager 改为输出结构化成功 envelope，同时保持 websocket manager 为稳定的 no-op 契约实现。
 - feat(runtime): 从 core 包重新导出 runtime manager WebSocket 更新事件类型。
 - feat(runtime): 重新导出 runtime WebSocket replay cursor 订阅契约。
+
 ### @zhongmiao/ngx-lowcode-core-types@0.2.0
+
 - feat(runtime): 新增 datasource 执行结果 envelope 类型，并放宽 datasource manager 返回契约以承载结构化可观测元数据。
 - feat(runtime): 新增与 platform 契约兼容的 runtime manager WebSocket 更新事件类型。
 - feat(runtime): 新增 WebSocket replay cursor 事件与订阅选项契约。
+
 ### @zhongmiao/ngx-lowcode-core-utils@0.2.0
+
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core-types 的 peerDependencies 对齐到 0.2.0。
+
 ### @zhongmiao/ngx-lowcode-datasource@0.2.0
+
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core-types 的 peerDependencies 对齐到 0.2.0。
+
 ### @zhongmiao/ngx-lowcode-designer@0.2.0
+
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core、@zhongmiao/ngx-lowcode-core-types、@zhongmiao/ngx-lowcode-renderer 的 peerDependencies 对齐到 0.2.0。
+
 ### @zhongmiao/ngx-lowcode-materials@0.2.0
+
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core、@zhongmiao/ngx-lowcode-core-types、@zhongmiao/ngx-lowcode-renderer 的 peerDependencies 对齐到 0.2.0。
+
 ### @zhongmiao/ngx-lowcode-meta-model@0.2.0
+
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core-types 的 peerDependencies 对齐到 0.2.0。
+
 ### @zhongmiao/ngx-lowcode-puzzle-adapter@0.2.0
+
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core、@zhongmiao/ngx-lowcode-core-types 的 peerDependencies 对齐到 0.2.0。
+
 ### @zhongmiao/ngx-lowcode-renderer@0.2.0
+
 - feat(runtime): renderer 新增 datasource 结果归一化与 `__runtimeExecution`，失败时保留旧表格数据，并吞掉 websocket 生命周期异常。
 - feat(runtime): renderer 消费 runtime manager WebSocket 更新事件，并应用 patch、datasource 与 action 更新。
 - feat(runtime): renderer 记录 runtime WebSocket replay cursor，并在后续订阅中携带。
+
 ### @zhongmiao/ngx-lowcode-testing@0.2.0
+
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core、@zhongmiao/ngx-lowcode-core-types 的 peerDependencies 对齐到 0.2.0。
 
 ## 0.1.4 (2026-04-18)
