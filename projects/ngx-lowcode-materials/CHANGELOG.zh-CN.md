@@ -2,7 +2,12 @@
 
 [English](CHANGELOG.md) | 中文文档
 
+
 ## [Unreleased]
+
+## 0.2.0 (2026-04-21)
+
+- chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core、@zhongmiao/ngx-lowcode-core-types、@zhongmiao/ngx-lowcode-renderer 的 peerDependencies 对齐到 0.2.0。
 
 ## 0.1.3 (2026-04-17)
 

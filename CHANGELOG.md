@@ -1,10 +1,40 @@
 English | [中文文档](CHANGELOG.zh-CN.md)
 
+
 ## [Unreleased]
+
+## 0.2.0 (2026-04-21)
 
 - feat(runtime): harden datasource/websocket manager contracts with structured execution envelopes, renderer-side normalization, and stable runtime observability state.
 - feat(runtime): consume runtime manager WebSocket update events in the renderer and trigger manager-first refresh/action flows.
 - feat(runtime): add runtime WebSocket replay cursor subscription support.
+## Released Packages
+### @zhongmiao/ngx-lowcode-core@0.2.0
+- feat(runtime): make the default datasource manager emit structured success envelopes while keeping websocket manager as a stable no-op contract.
+- feat(runtime): re-export runtime manager WebSocket update event types from the core package.
+- feat(runtime): re-export runtime WebSocket replay cursor subscription contracts.
+### @zhongmiao/ngx-lowcode-core-types@0.2.0
+- feat(runtime): add datasource execution result envelope types and widen datasource manager return contract for structured observability metadata.
+- feat(runtime): add runtime manager WebSocket update event types compatible with the platform contract.
+- feat(runtime): add WebSocket replay cursor event and subscribe option contracts.
+### @zhongmiao/ngx-lowcode-core-utils@0.2.0
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core-types to 0.2.0 in release cascade.
+### @zhongmiao/ngx-lowcode-datasource@0.2.0
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core-types to 0.2.0 in release cascade.
+### @zhongmiao/ngx-lowcode-designer@0.2.0
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core, @zhongmiao/ngx-lowcode-core-types, @zhongmiao/ngx-lowcode-renderer to 0.2.0 in release cascade.
+### @zhongmiao/ngx-lowcode-materials@0.2.0
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core, @zhongmiao/ngx-lowcode-core-types, @zhongmiao/ngx-lowcode-renderer to 0.2.0 in release cascade.
+### @zhongmiao/ngx-lowcode-meta-model@0.2.0
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core-types to 0.2.0 in release cascade.
+### @zhongmiao/ngx-lowcode-puzzle-adapter@0.2.0
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core, @zhongmiao/ngx-lowcode-core-types to 0.2.0 in release cascade.
+### @zhongmiao/ngx-lowcode-renderer@0.2.0
+- feat(runtime): normalize datasource execution results in renderer, expose `__runtimeExecution`, preserve stale table data on failures, and absorb websocket lifecycle errors.
+- feat(runtime): consume runtime manager WebSocket update events and apply patch/datasource/action updates through the renderer.
+- feat(runtime): store runtime WebSocket replay cursors and pass them to later subscriptions.
+### @zhongmiao/ngx-lowcode-testing@0.2.0
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core, @zhongmiao/ngx-lowcode-core-types to 0.2.0 in release cascade.
 
 ## 0.1.4 (2026-04-18)
 

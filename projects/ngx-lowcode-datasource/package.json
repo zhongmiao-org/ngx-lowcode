@@ -1,9 +1,9 @@
 {
   "name": "@zhongmiao/ngx-lowcode-datasource",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "peerDependencies": {
-    "@zhongmiao/ngx-lowcode-core-types": "^0.1.0",
-    "@zhongmiao/ngx-lowcode-meta-model": "^0.1.0"
+    "@zhongmiao/ngx-lowcode-core-types": "0.2.0",
+    "@zhongmiao/ngx-lowcode-meta-model": "0.2.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
