@@ -2,7 +2,6 @@
 
 [English](CHANGELOG.md) | 中文文档
 
-
 ## [Unreleased]
 
 ## 0.2.0 (2026-04-21)
