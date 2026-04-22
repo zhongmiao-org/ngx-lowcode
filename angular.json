@@ -29,10 +29,11 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ngx-lowcode-i18n/tsconfig.spec.json",
-            "polyfills": []
+            "runner": "vitest",
+            "watch": false
           }
         }
       }
@@ -59,10 +60,11 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ngx-lowcode-core-types/tsconfig.spec.json",
-            "polyfills": []
+            "runner": "vitest",
+            "watch": false
           }
         }
       }
@@ -89,10 +91,11 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ngx-lowcode-core-utils/tsconfig.spec.json",
-            "polyfills": []
+            "runner": "vitest",
+            "watch": false
           }
         }
       }
@@ -119,10 +122,11 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ngx-lowcode-core/tsconfig.spec.json",
-            "polyfills": []
+            "runner": "vitest",
+            "watch": false
           }
         }
       }
@@ -149,10 +153,11 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ngx-lowcode-renderer/tsconfig.spec.json",
-            "polyfills": []
+            "runner": "vitest",
+            "watch": false
           }
         }
       }
@@ -179,10 +184,11 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ngx-lowcode-designer/tsconfig.spec.json",
-            "polyfills": []
+            "runner": "vitest",
+            "watch": false
           }
         }
       }
@@ -209,10 +215,11 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ngx-lowcode-materials/tsconfig.spec.json",
-            "polyfills": []
+            "runner": "vitest",
+            "watch": false
           }
         }
       }
@@ -239,10 +246,11 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ngx-lowcode-meta-model/tsconfig.spec.json",
-            "polyfills": []
+            "runner": "vitest",
+            "watch": false
           }
         }
       }
@@ -269,10 +277,11 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ngx-lowcode-datasource/tsconfig.spec.json",
-            "polyfills": []
+            "runner": "vitest",
+            "watch": false
           }
         }
       }
@@ -299,10 +308,11 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ngx-lowcode-testing/tsconfig.spec.json",
-            "polyfills": []
+            "runner": "vitest",
+            "watch": false
           }
         }
       }
@@ -329,10 +339,11 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "projects/ngx-lowcode-puzzle-adapter/tsconfig.spec.json",
-            "polyfills": []
+            "runner": "vitest",
+            "watch": false
           }
         }
       }

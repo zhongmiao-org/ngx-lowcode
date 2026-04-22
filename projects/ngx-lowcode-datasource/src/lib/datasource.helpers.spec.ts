@@ -39,7 +39,7 @@ describe('ngx-lowcode-datasource', () => {
     expect(querySchema.datasources[0]?.id).toBe('orders-query-datasource');
     expect(querySchema.actions.map((action) => action.id)).toEqual(['search-action', 'reset-filters-action']);
     expect(crudSchema.actions.map((action) => action.id)).toEqual(
-      jasmine.arrayContaining([
+      expect.arrayContaining([
         'search-action',
         'create-record-action',
         'update-record-action',
@@ -61,7 +61,7 @@ describe('ngx-lowcode-datasource', () => {
     const resultsTable = bound.layoutTree[0]?.children?.find((child) => child.id === 'results-table');
 
     expect(resultsTable?.props).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         datasourceId: 'orders-query-datasource',
         dataKey: 'tableData',
         rowClickActionId: 'select-row-action'

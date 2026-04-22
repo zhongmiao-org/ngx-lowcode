@@ -1,11 +1,31 @@
-import { provideZonelessChangeDetection } from '@angular/core';
+import { Component, input, output, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { NgxLowcodeComponentDefinition, NgxLowcodeNodeSchema } from '@zhongmiao/ngx-lowcode-core-types';
 import { getDesignerI18n, getMaterialsI18n } from '@zhongmiao/ngx-lowcode-i18n';
 import { mockPageSchema } from '@zhongmiao/ngx-lowcode-testing';
+import { ThyTabsModule } from 'ngx-tethys/tabs';
 import { NgxLowcodeDesignerSidebarComponent } from './ngx-lowcode-designer-sidebar.component';
 
 class DummyMaterialComponent {}
+
+@Component({
+  selector: 'thy-tabs',
+  template: '<ng-content />'
+})
+class ThyTabsStubComponent {
+  readonly thySize = input<string>();
+  readonly thyResponsive = input<boolean>();
+  readonly thyActiveTab = input<string>();
+  readonly thyActiveTabChange = output<string>();
+}
+
+@Component({
+  selector: 'thy-tab',
+  template: '<ng-content />'
+})
+class ThyTabStubComponent {
+  readonly thyTitle = input<string>();
+}
 
 function createMaterialDefinition(type: string, title: string, category: string): NgxLowcodeComponentDefinition {
   return {
@@ -42,7 +62,7 @@ function appendChild(nodes: NgxLowcodeNodeSchema[]): NgxLowcodeNodeSchema[] {
 
 describe('NgxLowcodeDesignerSidebarComponent', () => {
   beforeEach(async () => {
-    spyOn(console, 'error').and.callFake((...args: unknown[]) => {
+    vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
       if (args.some((arg) => String(arg).includes('Error retrieving icon'))) {
         return;
       }
@@ -51,7 +71,12 @@ describe('NgxLowcodeDesignerSidebarComponent', () => {
     await TestBed.configureTestingModule({
       imports: [NgxLowcodeDesignerSidebarComponent],
       providers: [provideZonelessChangeDetection()]
-    }).compileComponents();
+    })
+      .overrideComponent(NgxLowcodeDesignerSidebarComponent, {
+        remove: { imports: [ThyTabsModule] },
+        add: { imports: [ThyTabsStubComponent, ThyTabStubComponent] }
+      })
+      .compileComponents();
   });
 
   it('groups materials by category order and preserves collapsed outline nodes when schema updates', async () => {

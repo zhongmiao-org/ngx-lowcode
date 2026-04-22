@@ -13,7 +13,7 @@ describe('NgxLowcodeButtonMaterialComponent', () => {
 
   it('renders host styles and triggers the configured action on click', async () => {
     const fixture = TestBed.createComponent(NgxLowcodeButtonMaterialComponent);
-    const executeActionById = jasmine.createSpy('executeActionById').and.resolveTo(undefined);
+    const executeActionById = vi.fn().mockResolvedValue(undefined);
     const runtimeState = signal<Record<string, unknown>>({});
     const runtime: NgxLowcodeRuntimeContext = {
       mode: 'runtime',

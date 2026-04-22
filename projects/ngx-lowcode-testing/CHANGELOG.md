@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- test(vitest): migrate package tests from Karma/Jasmine to Angular unit-test with Vitest.
+
 ## 0.2.0 (2026-04-21)
 
 - chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core, @zhongmiao/ngx-lowcode-core-types to 0.2.0 in release cascade.

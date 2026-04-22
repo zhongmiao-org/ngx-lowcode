@@ -14,7 +14,7 @@ describe('NgxLowcodeFormMaterialComponent', () => {
   it('triggers the configured submit action when the form is submitted', async () => {
     const fixture = TestBed.createComponent(NgxLowcodeFormMaterialComponent);
     const runtimeState = signal<Record<string, unknown>>({});
-    const executeActionById = jasmine.createSpy('executeActionById').and.resolveTo(undefined);
+    const executeActionById = vi.fn().mockResolvedValue(undefined);
     const runtime: NgxLowcodeRuntimeContext = {
       mode: 'runtime',
       state: runtimeState.asReadonly(),

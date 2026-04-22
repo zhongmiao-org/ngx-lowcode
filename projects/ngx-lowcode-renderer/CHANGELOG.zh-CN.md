@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+- test(vitest): 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
 ## 0.2.0 (2026-04-21)
 
 - feat(runtime): renderer 新增 datasource 结果归一化与 `__runtimeExecution`，失败时保留旧表格数据，并吞掉 websocket 生命周期异常。

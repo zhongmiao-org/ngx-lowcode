@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- test(vitest): migrate package tests from Karma/Jasmine to Angular unit-test with Vitest.
+
 ## 0.2.0 (2026-04-21)
 
 - feat(runtime): add datasource execution result envelope types and widen datasource manager return contract for structured observability metadata.

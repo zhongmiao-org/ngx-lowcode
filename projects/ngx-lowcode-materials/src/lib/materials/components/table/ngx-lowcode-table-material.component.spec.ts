@@ -19,7 +19,7 @@ describe('NgxLowcodeTableMaterialComponent', () => {
         { id: 'SO-1002', owner: 'Bob', status: 'paused' }
       ]
     });
-    const executeActionById = jasmine.createSpy('executeActionById').and.resolveTo(undefined);
+    const executeActionById = vi.fn().mockResolvedValue(undefined);
     const runtime: NgxLowcodeRuntimeContext = {
       mode: 'runtime',
       state: runtimeState.asReadonly(),
