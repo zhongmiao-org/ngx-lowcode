@@ -1,31 +1,11 @@
-import { Component, input, output, provideZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { NgxLowcodeComponentDefinition, NgxLowcodeNodeSchema } from '@zhongmiao/ngx-lowcode-core-types';
 import { getDesignerI18n, getMaterialsI18n } from '@zhongmiao/ngx-lowcode-i18n';
 import { mockPageSchema } from '@zhongmiao/ngx-lowcode-testing';
-import { ThyTabsModule } from 'ngx-tethys/tabs';
 import { NgxLowcodeDesignerSidebarComponent } from './ngx-lowcode-designer-sidebar.component';
 
 class DummyMaterialComponent {}
-
-@Component({
-  selector: 'thy-tabs',
-  template: '<ng-content />'
-})
-class ThyTabsStubComponent {
-  readonly thySize = input<string>();
-  readonly thyResponsive = input<boolean>();
-  readonly thyActiveTab = input<string>();
-  readonly thyActiveTabChange = output<string>();
-}
-
-@Component({
-  selector: 'thy-tab',
-  template: '<ng-content />'
-})
-class ThyTabStubComponent {
-  readonly thyTitle = input<string>();
-}
 
 function createMaterialDefinition(type: string, title: string, category: string): NgxLowcodeComponentDefinition {
   return {
@@ -73,8 +53,7 @@ describe('NgxLowcodeDesignerSidebarComponent', () => {
       providers: [provideZonelessChangeDetection()]
     })
       .overrideComponent(NgxLowcodeDesignerSidebarComponent, {
-        remove: { imports: [ThyTabsModule] },
-        add: { imports: [ThyTabsStubComponent, ThyTabStubComponent] }
+        set: { template: '' }
       })
       .compileComponents();
   });
