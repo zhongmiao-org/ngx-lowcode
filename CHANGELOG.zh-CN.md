@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- test(runtime): 将 designer/material 测试对齐到 runtime mode 契约，不再围绕第三方 tab 内部实现。
 - test(vitest): 将库测试目标从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
 - feat(demo): 恢复源码直连的本地 demo 应用，包含 renderer、designer、materials 模块以及 online/offline 运行模式。
 - feat(local-dev): 新增 watch 命令，用于宿主应用本地联调时刷新 ngx-lowcode dist 产物。

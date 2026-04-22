@@ -4,6 +4,7 @@
 
 ## [Unreleased]
 
+- test(runtime): 断言 designer 向 renderer 传递 design mode，不再测试第三方 tab 内部实现。
 - test(vitest): 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
 
 ## 0.2.0 (2026-04-21)

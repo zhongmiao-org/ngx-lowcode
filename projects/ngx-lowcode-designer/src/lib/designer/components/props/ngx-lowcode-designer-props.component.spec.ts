@@ -1,30 +1,10 @@
-import { Component, input, output, provideZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { registerLowcodeMaterials } from '@zhongmiao/ngx-lowcode-core';
 import { getDesignerI18n } from '@zhongmiao/ngx-lowcode-i18n';
 import { getBuiltInMaterials } from '@zhongmiao/ngx-lowcode-materials';
 import { mockPageSchema } from '@zhongmiao/ngx-lowcode-testing';
-import { ThyTabsModule } from 'ngx-tethys/tabs';
 import { NgxLowcodeDesignerPropsComponent } from './ngx-lowcode-designer-props.component';
-
-@Component({
-  selector: 'thy-tabs',
-  template: '<ng-content />'
-})
-class ThyTabsStubComponent {
-  readonly thySize = input<string>();
-  readonly thyResponsive = input<boolean>();
-  readonly thyActiveTab = input<string>();
-  readonly thyActiveTabChange = output<string>();
-}
-
-@Component({
-  selector: 'thy-tab',
-  template: '<ng-content />'
-})
-class ThyTabStubComponent {
-  readonly thyTitle = input<string>();
-}
 
 describe('NgxLowcodeDesignerPropsComponent', () => {
   beforeEach(async () => {
@@ -39,8 +19,7 @@ describe('NgxLowcodeDesignerPropsComponent', () => {
       providers: [provideZonelessChangeDetection(), registerLowcodeMaterials(getBuiltInMaterials('en-US'))]
     })
       .overrideComponent(NgxLowcodeDesignerPropsComponent, {
-        remove: { imports: [ThyTabsModule] },
-        add: { imports: [ThyTabsStubComponent, ThyTabStubComponent] }
+        set: { template: '' }
       })
       .compileComponents();
   });

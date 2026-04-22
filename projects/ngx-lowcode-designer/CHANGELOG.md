@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- test(runtime): assert designer-to-renderer design mode handoff without exercising third-party tab internals.
 - test(vitest): migrate package tests from Karma/Jasmine to Angular unit-test with Vitest.
 
 ## 0.2.0 (2026-04-21)
