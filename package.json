@@ -7,8 +7,12 @@
   ],
   "scripts": {
     "ng": "ng",
-    "start": "echo \"Demo app moved to meta-weave repository. Use npm run build:libs in this repository.\"",
+    "start": "ng serve ngx-lowcode-demo --configuration offline",
+    "start:demo:offline": "ng serve ngx-lowcode-demo --configuration offline",
+    "start:demo:online": "ng serve ngx-lowcode-demo --configuration online",
     "build": "ng build ngx-lowcode-core-types && ng build ngx-lowcode-i18n && ng build ngx-lowcode-core-utils && ng build ngx-lowcode-meta-model && ng build ngx-lowcode-datasource && ng build ngx-lowcode-core && ng build ngx-lowcode-renderer && ng build ngx-lowcode-materials && ng build ngx-lowcode-designer && ng build ngx-lowcode-testing && ng build ngx-lowcode-puzzle-adapter",
+    "build:demo:offline": "ng build ngx-lowcode-demo --configuration offline",
+    "build:demo:online": "ng build ngx-lowcode-demo --configuration online",
     "build:libs": "ng build ngx-lowcode-core-types && ng build ngx-lowcode-i18n && ng build ngx-lowcode-core-utils && ng build ngx-lowcode-meta-model && ng build ngx-lowcode-datasource && ng build ngx-lowcode-core && ng build ngx-lowcode-renderer && ng build ngx-lowcode-materials && ng build ngx-lowcode-designer && ng build ngx-lowcode-testing && ng build ngx-lowcode-puzzle-adapter",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

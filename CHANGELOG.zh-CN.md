@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- feat(demo): 恢复源码直连的本地 demo 应用，包含 renderer、designer、materials 模块以及 online/offline 运行模式。
 - feat(local-dev): 新增 watch 命令，用于宿主应用本地联调时刷新 ngx-lowcode dist 产物。
 
 ## 0.2.0 (2026-04-21)

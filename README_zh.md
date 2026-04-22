@@ -18,8 +18,10 @@
   mock schema、mock executor 和测试辅助能力。
 - `ngx-lowcode-puzzle-adapter`
   用于把 `ngx-puzzle` 接入 low-code 体系的可选桥接包。
+- `src`
+  用于 renderer、designer、materials 本地开发的源码直连 demo 应用。
 - `meta-weave`（独立仓库）
-  平台应用与演示宿主已迁移到独立仓库。
+  用于完整平台应用与跨仓联调的宿主应用。
 
 ## 命名决策
 
@@ -62,10 +64,19 @@ npm run build
 npm test
 ```
 
-## 平台应用迁移说明
+## 本地 Demo 应用
 
-原 `ngx-lowcode/src` 演示应用已迁移到独立仓库 `meta-weave`。
-`ngx-lowcode` 当前仅负责 `projects/*` 下的基础库与发布。
+根目录 `src` 是最小本地 demo 宿主。它通过 `tsconfig.app.json` 将包导入映射到
+`projects/*/src`，因此库源码变更可以被 demo watcher 直接响应。
+
+```bash
+npm run start:demo:offline
+npm run start:demo:online
+npm run build:demo:offline
+npm run build:demo:online
+```
+
+完整平台应用与跨仓联调仍使用 `meta-weave`。
 
 ## 构建目标
 

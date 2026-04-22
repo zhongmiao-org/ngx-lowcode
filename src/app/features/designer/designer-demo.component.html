@@ -1,0 +1,29 @@
+<section class="designer-demo">
+  <header class="designer-demo__header">
+    <div>
+      <h2>Designer</h2>
+      <p>Edits the demo schema with the local designer package and the selected runtime mode.</p>
+    </div>
+    <div class="designer-demo__meta">
+      <span>mode: {{ runtimeMode }}</span>
+      @if (runtimeMode === 'online') {
+        <span>{{ bffBaseUrl }}</span>
+      }
+      <span>nodes: {{ schemaNodeCount() }}</span>
+      <span>{{ saveState() }}</span>
+      <button thyButton="outline-default" thySize="sm" (click)="resetSchema()">Reset</button>
+    </div>
+  </header>
+
+  <div class="designer-demo__stage">
+    <ngx-lowcode-designer
+      [schema]="schema()"
+      [designerConfig]="{ title: 'ngx-lowcode demo designer' }"
+      (schemaChange)="updateSchema($event)"
+      (previewRequest)="markPreview($event)"
+      (save)="markSave($event)"
+      (publishRequest)="markPublish($event)"
+    >
+    </ngx-lowcode-designer>
+  </div>
+</section>

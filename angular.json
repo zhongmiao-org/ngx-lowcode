@@ -336,6 +336,118 @@
           }
         }
       }
+    },
+    "ngx-lowcode-demo": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "outputPath": "dist/ngx-lowcode-demo",
+            "index": "src/index.html",
+            "browser": "src/main.ts",
+            "polyfills": [],
+            "tsConfig": "tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "./node_modules/@tethys/icons",
+                "output": "/assets/icons/"
+              }
+            ],
+            "styles": ["src/styles.scss"],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1MB",
+                  "maximumError": "2MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "8kB",
+                  "maximumError": "16kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
+            "offline": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
+            "online": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/app/demo-runtime-mode.ts",
+                  "with": "src/app/demo-runtime-mode.online.ts"
+                }
+              ]
+            }
+          },
+          "defaultConfiguration": "offline"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "prebundle": {
+              "exclude": [
+                "@zhongmiao/ngx-lowcode",
+                "@zhongmiao/ngx-lowcode-core",
+                "@zhongmiao/ngx-lowcode-core-types",
+                "@zhongmiao/ngx-lowcode-core-utils",
+                "@zhongmiao/ngx-lowcode-datasource",
+                "@zhongmiao/ngx-lowcode-designer",
+                "@zhongmiao/ngx-lowcode-i18n",
+                "@zhongmiao/ngx-lowcode-materials",
+                "@zhongmiao/ngx-lowcode-meta-model",
+                "@zhongmiao/ngx-lowcode-puzzle-adapter",
+                "@zhongmiao/ngx-lowcode-renderer",
+                "@zhongmiao/ngx-lowcode-testing"
+              ]
+            }
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "ngx-lowcode-demo:build:production"
+            },
+            "development": {
+              "buildTarget": "ngx-lowcode-demo:build:development"
+            },
+            "offline": {
+              "buildTarget": "ngx-lowcode-demo:build:offline"
+            },
+            "online": {
+              "buildTarget": "ngx-lowcode-demo:build:online"
+            }
+          },
+          "defaultConfiguration": "offline"
+        }
+      }
     }
   },
   "schematics": {

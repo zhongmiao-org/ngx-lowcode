@@ -1,0 +1,37 @@
+<section class="materials-demo">
+  <header class="materials-demo__header">
+    <div>
+      <h2>Materials</h2>
+      <p>Lists built-in material definitions and previews the selected node through renderer.</p>
+    </div>
+  </header>
+
+  <div class="materials-demo__layout">
+    <aside class="materials-demo__list" aria-label="Built-in materials">
+      @for (material of materials; track material.type) {
+        <button
+          type="button"
+          class="materials-demo__item"
+          [class.materials-demo__item--active]="material.type === selectedType()"
+          (click)="selectMaterial(material.type)"
+        >
+          <span>{{ material.title }}</span>
+          <small>{{ material.type }}</small>
+        </button>
+      }
+    </aside>
+
+    <section class="materials-demo__preview">
+      @if (selectedMaterial(); as material) {
+        <header>
+          <strong>{{ material.title }}</strong>
+          <span>{{ material.category }}</span>
+        </header>
+      }
+
+      @if (previewSchema(); as schema) {
+        <ngx-lowcode-renderer [schema]="schema" [mode]="'runtime'"></ngx-lowcode-renderer>
+      }
+    </section>
+  </div>
+</section>
