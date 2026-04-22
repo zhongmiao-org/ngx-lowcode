@@ -1,0 +1,24 @@
+<div class="demo-shell">
+  <header class="demo-shell__header">
+    <div>
+      <h1>ngx-lowcode demo</h1>
+      <p>Renderer, designer, and materials demos run from the local library sources.</p>
+    </div>
+    <div class="demo-shell__status">
+      <span class="demo-shell__mode">{{ runtimeMode }}</span>
+      @if (runtimeMode === 'online') {
+        <span class="demo-shell__bff">{{ bffBaseUrl }}</span>
+      }
+    </div>
+  </header>
+
+  <nav class="demo-shell__nav" aria-label="Demo modules">
+    <a routerLink="/renderer" routerLinkActive="demo-shell__link--active" class="demo-shell__link">Renderer</a>
+    <a routerLink="/designer" routerLinkActive="demo-shell__link--active" class="demo-shell__link">Designer</a>
+    <a routerLink="/materials" routerLinkActive="demo-shell__link--active" class="demo-shell__link">Materials</a>
+  </nav>
+
+  <main class="demo-shell__main">
+    <router-outlet></router-outlet>
+  </main>
+</div>

@@ -1,0 +1,25 @@
+.demo-page {
+  display: grid;
+  gap: 16px;
+}
+
+.demo-page__header {
+  h2 {
+    margin: 0;
+    font-size: 22px;
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: var(--demo-muted);
+  }
+}
+
+.demo-page__stage {
+  min-height: 520px;
+  overflow: auto;
+  border: 1px solid var(--demo-border);
+  border-radius: 8px;
+  background: var(--demo-surface);
+  padding: 20px;
+}

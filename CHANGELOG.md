@@ -2,6 +2,7 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+- feat(demo): restore a local source-linked demo app with renderer, designer, and materials modules plus online/offline runtime modes.
 - feat(local-dev): add watch commands for refreshing linked ngx-lowcode dist packages during host app development.
 
 ## 0.2.0 (2026-04-21)

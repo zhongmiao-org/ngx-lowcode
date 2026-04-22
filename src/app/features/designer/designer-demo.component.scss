@@ -1,0 +1,56 @@
+.designer-demo {
+  display: grid;
+  min-height: calc(100vh - 178px);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 16px;
+}
+
+.designer-demo__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+
+  h2 {
+    margin: 0;
+    font-size: 22px;
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: var(--demo-muted);
+  }
+}
+
+.designer-demo__meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 320px;
+
+  span {
+    max-width: 360px;
+    overflow-wrap: anywhere;
+    border: 1px solid var(--demo-border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    background: var(--demo-surface);
+    font-size: 12px;
+  }
+}
+
+.designer-demo__stage {
+  min-width: 0;
+  min-height: 680px;
+  overflow: hidden;
+  border: 1px solid var(--demo-border);
+  border-radius: 8px;
+  background: var(--demo-surface);
+}
+
+.designer-demo__stage ngx-lowcode-designer {
+  display: block;
+  height: 100%;
+}

@@ -18,8 +18,10 @@ This repository is intentionally organized as a `monorepo with multiple publisha
   Mock schema, mock executors, and test helpers for host integration.
 - `ngx-lowcode-puzzle-adapter`
   Optional bridge package for integrating `ngx-puzzle` into the low-code ecosystem.
+- `src`
+  Local source-linked demo app for renderer, designer, and materials package development.
 - `meta-weave` (separate repository)
-  Platform application and demo host moved out of this library workspace.
+  Platform application host for broader product integration.
 
 ## Naming Decision
 
@@ -108,10 +110,19 @@ npm run build
 npm test
 ```
 
-## Platform App Migration
+## Local Demo App
 
-The old root `src` demo has been migrated to the standalone platform repository `meta-weave`.
-`ngx-lowcode` now focuses on publishable libraries under `projects/*`.
+The root `src` app is a minimal local demo host for package development. It uses source path mappings in
+`tsconfig.app.json`, so changes under `projects/*/src` are picked up directly by the demo watcher.
+
+```bash
+npm run start:demo:offline
+npm run start:demo:online
+npm run build:demo:offline
+npm run build:demo:online
+```
+
+Use `meta-weave` for the full platform application and cross-repository integration surface.
 
 ## Build Targets
 
