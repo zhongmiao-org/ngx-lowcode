@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+- test(vitest): 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
 ## 0.2.0 (2026-04-21)
 
 - feat(runtime): 新增 datasource 执行结果 envelope 类型，并放宽 datasource manager 返回契约以承载结构化可观测元数据。

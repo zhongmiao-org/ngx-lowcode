@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- test(vitest): migrate package tests from Karma/Jasmine to Angular unit-test with Vitest.
+
 ## 0.2.0 (2026-04-21)
 
 - feat(runtime): make the default datasource manager emit structured success envelopes while keeping websocket manager as a stable no-op contract.

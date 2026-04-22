@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+- test(vitest): 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
 ## 0.2.0 (2026-04-21)
 
 - feat(runtime): 默认 datasource manager 改为输出结构化成功 envelope，同时保持 websocket manager 为稳定的 no-op 契约实现。

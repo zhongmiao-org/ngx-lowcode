@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+- test(vitest): 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
 ## 0.2.0 (2026-04-21)
 
 - chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core、@zhongmiao/ngx-lowcode-core-types 的 peerDependencies 对齐到 0.2.0。

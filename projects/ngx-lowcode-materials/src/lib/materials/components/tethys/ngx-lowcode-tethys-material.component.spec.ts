@@ -16,7 +16,7 @@ describe('NgxLowcodeTethysMaterialComponent', () => {
     const runtimeState = signal<Record<string, unknown>>({
       enabled: false
     });
-    const executeActionById = jasmine.createSpy('executeActionById').and.resolveTo(undefined);
+    const executeActionById = vi.fn().mockResolvedValue(undefined);
     const runtime: NgxLowcodeRuntimeContext = {
       mode: 'runtime',
       state: runtimeState.asReadonly(),
@@ -42,7 +42,7 @@ describe('NgxLowcodeTethysMaterialComponent', () => {
     await fixture.componentInstance.updateState(true);
     await fixture.whenStable();
 
-    expect(runtime.state()['enabled']).toBeTrue();
+    expect(runtime.state()['enabled']).toBe(true);
     expect(executeActionById).toHaveBeenCalledWith('enabled-change-action', {
       eventName: 'change',
       nodeId: 'checkbox-enabled',

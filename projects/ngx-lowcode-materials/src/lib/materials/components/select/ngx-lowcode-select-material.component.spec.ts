@@ -16,7 +16,7 @@ describe('NgxLowcodeSelectMaterialComponent', () => {
     const runtimeState = signal<Record<string, unknown>>({
       status: 'all'
     });
-    const executeActionById = jasmine.createSpy('executeActionById').and.resolveTo(undefined);
+    const executeActionById = vi.fn().mockResolvedValue(undefined);
     const runtime: NgxLowcodeRuntimeContext = {
       mode: 'runtime',
       state: runtimeState.asReadonly(),

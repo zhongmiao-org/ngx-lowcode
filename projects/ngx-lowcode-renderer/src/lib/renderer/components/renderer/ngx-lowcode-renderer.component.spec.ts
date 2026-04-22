@@ -14,6 +14,7 @@ import type {
   NgxLowcodeWebSocketManager
 } from '@zhongmiao/ngx-lowcode-core-types';
 import { mockPageSchema } from '@zhongmiao/ngx-lowcode-testing';
+import type { Mock } from 'vitest';
 import { NgxLowcodeRendererComponent } from './ngx-lowcode-renderer.component';
 
 describe('NgxLowcodeRendererComponent', () => {
@@ -48,7 +49,7 @@ describe('NgxLowcodeRendererComponent', () => {
 
     const runtime = fixture.componentInstance.runtime();
     expect(runtime.state()).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         keyword: 'from-context',
         owner: ''
       })
@@ -56,7 +57,7 @@ describe('NgxLowcodeRendererComponent', () => {
 
     runtime.setState({ owner: 'runtime-owner', runtimeOnly: true });
     expect(runtime.state()).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         keyword: 'from-context',
         owner: 'runtime-owner',
         runtimeOnly: true
@@ -69,7 +70,7 @@ describe('NgxLowcodeRendererComponent', () => {
     await fixture.whenStable();
 
     expect(runtime.state()).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         keyword: 'from-context',
         owner: 'schema-owner'
       })
@@ -133,7 +134,7 @@ describe('NgxLowcodeRendererComponent', () => {
       }
     ]);
     expect(runtime.state()['__runtimeExecution']).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         datasourceId: 'orders-datasource',
         status: 'success',
         rowCount: 1,
@@ -153,12 +154,12 @@ describe('NgxLowcodeRendererComponent', () => {
     await fixture.whenStable();
 
     const runtime = fixture.componentInstance.runtime();
-    await expectAsync(runtime.executeActionById('search-action')).toBeResolved();
+    await expect(runtime.executeActionById('search-action')).resolves.toBeUndefined();
 
     expect(dataSourceManager.execute).toHaveBeenCalled();
     expect(runtime.state()['tableData']).toEqual([]);
     expect(runtime.state()['__runtimeExecution']).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         datasourceId: 'orders-datasource',
         status: 'success',
         rowCount: 0
@@ -186,7 +187,7 @@ describe('NgxLowcodeRendererComponent', () => {
     await fixture.whenStable();
 
     const runtime = fixture.componentInstance.runtime();
-    await expectAsync(runtime.executeActionById('search-action')).toBeResolved();
+    await expect(runtime.executeActionById('search-action')).resolves.toBeUndefined();
 
     expect(runtime.state()['tableData']).toEqual([{ id: 'SO-6001' }]);
     expect(runtime.state()['__runtimeExecution']).toEqual({
@@ -241,13 +242,13 @@ describe('NgxLowcodeRendererComponent', () => {
     await fixture.whenStable();
 
     const runtime = fixture.componentInstance.runtime();
-    await expectAsync(runtime.executeActionById('search-action')).toBeResolved();
+    await expect(runtime.executeActionById('search-action')).resolves.toBeUndefined();
     expect(runtime.state()['tableData']).toEqual(schema.state['tableData']);
     expect(runtime.state()['__runtimeDatasourceErrors']).toEqual({
       'orders-datasource': 'datasource unavailable'
     });
     expect(runtime.state()['__runtimeExecution']).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         datasourceId: 'orders-datasource',
         status: 'failure',
         message: 'datasource unavailable',
@@ -256,7 +257,7 @@ describe('NgxLowcodeRendererComponent', () => {
     );
 
     runtime.setState({ keyword: '' });
-    await expectAsync(runtime.executeActionById('search-action')).toBeResolved();
+    await expect(runtime.executeActionById('search-action')).resolves.toBeUndefined();
     expect(runtime.state()['tableData']).toEqual([{ id: 'SO-5001', owner: 'Recovery', status: 'active' }]);
     expect(runtime.state()['__runtimeDatasourceErrors']).toEqual({});
   });
@@ -296,12 +297,12 @@ describe('NgxLowcodeRendererComponent', () => {
     await Promise.resolve();
 
     expect(webSocketManager.connect).toHaveBeenCalled();
-    expect(webSocketManager.subscribe).toHaveBeenCalledWith('orders-updates', jasmine.any(Function));
-    expect(webSocketManager.subscribe.calls.mostRecent().args.length).toBe(2);
+    expect(webSocketManager.subscribe).toHaveBeenCalledWith('orders-updates', expect.any(Function));
+    expect(lastCall(webSocketManager.subscribe).length).toBe(2);
 
     fixture.destroy();
     await Promise.resolve();
-    expect(webSocketManager.unsubscribe).toHaveBeenCalledWith('orders-updates', jasmine.any(Function));
+    expect(webSocketManager.unsubscribe).toHaveBeenCalledWith('orders-updates', expect.any(Function));
     expect(webSocketManager.disconnect).toHaveBeenCalled();
   });
 
@@ -345,7 +346,7 @@ describe('NgxLowcodeRendererComponent', () => {
 
     const state = fixture.componentInstance.runtime().state();
     expect(state['status']).toBe('active');
-    expect(state['runtimeOnly']).toBeTrue();
+    expect(state['runtimeOnly']).toBe(true);
     expect(state['tableData']).toEqual([{ id: 'SO-7001' }]);
     expect(state['__runtimeExecution']).toEqual({
       datasourceId: 'orders-datasource',
@@ -375,7 +376,7 @@ describe('NgxLowcodeRendererComponent', () => {
     fixture.componentRef.setInput('schema', schema);
     await fixture.whenStable();
     await Promise.resolve();
-    expect(webSocketManager.subscribe.calls.mostRecent().args.length).toBe(2);
+    expect(lastCall(webSocketManager.subscribe).length).toBe(2);
 
     resolveLastWebSocketHandler(webSocketManager)(
       createRuntimeManagerExecutedEvent({
@@ -387,11 +388,11 @@ describe('NgxLowcodeRendererComponent', () => {
 
     fixture.componentInstance.ngOnDestroy();
     await Promise.resolve();
-    webSocketManager.subscribe.calls.reset();
+    webSocketManager.subscribe.mockClear();
     fixture.componentInstance.ngOnInit();
     await Promise.resolve();
 
-    expect(webSocketManager.subscribe).toHaveBeenCalledWith(topic, jasmine.any(Function), {
+    expect(webSocketManager.subscribe).toHaveBeenCalledWith(topic, expect.any(Function), {
       afterReplayId: '42-0'
     });
   });
@@ -424,10 +425,11 @@ describe('NgxLowcodeRendererComponent', () => {
     );
     await flushWebSocketEvent();
 
-    expect(actionManager.execute).toHaveBeenCalledOnceWith(
-      jasmine.objectContaining({
-        action: jasmine.objectContaining({ id: 'notify-action' }),
-        step: jasmine.objectContaining({ type: 'message', message: 'runtime updated' })
+    expect(actionManager.execute).toHaveBeenCalledTimes(1);
+    expect(actionManager.execute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: expect.objectContaining({ id: 'notify-action' }),
+        step: expect.objectContaining({ type: 'message', message: 'runtime updated' })
       })
     );
   });
@@ -459,12 +461,12 @@ describe('NgxLowcodeRendererComponent', () => {
 
   it('absorbs websocket lifecycle errors without breaking renderer lifecycle', async () => {
     const webSocketManager = createWebSocketManagerSpy({
-      connect: Promise.reject(new Error('connect failed')),
-      subscribe: Promise.reject(new Error('subscribe failed')),
-      unsubscribe: Promise.reject(new Error('unsubscribe failed')),
-      disconnect: Promise.reject(new Error('disconnect failed'))
+      connect: () => Promise.reject(new Error('connect failed')),
+      subscribe: () => Promise.reject(new Error('subscribe failed')),
+      unsubscribe: () => Promise.reject(new Error('unsubscribe failed')),
+      disconnect: () => Promise.reject(new Error('disconnect failed'))
     });
-    const warnSpy = spyOn(console, 'warn');
+    const warnSpy = vi.spyOn(console, 'warn');
     const schema = structuredClone(mockPageSchema);
     schema.datasources = [
       ...schema.datasources,
@@ -481,7 +483,7 @@ describe('NgxLowcodeRendererComponent', () => {
 
     const fixture = TestBed.createComponent(NgxLowcodeRendererComponent);
     fixture.componentRef.setInput('schema', schema);
-    await expectAsync(fixture.whenStable()).toBeResolved();
+    await fixture.whenStable();
     await Promise.resolve();
 
     fixture.destroy();
@@ -514,11 +516,17 @@ function createRuntimeManagerExecutedEvent(
 }
 
 function resolveLastWebSocketHandler(
-  webSocketManager: NgxLowcodeWebSocketManager & { subscribe: jasmine.Spy }
+  webSocketManager: NgxLowcodeWebSocketManager & { subscribe: Mock }
 ): (event: unknown) => void {
-  const handler = webSocketManager.subscribe.calls.mostRecent().args[1];
+  const handler = lastCall(webSocketManager.subscribe)[1];
   expect(typeof handler).toBe('function');
-  return handler;
+  return handler as (event: unknown) => void;
+}
+
+function lastCall(spy: Mock): unknown[] {
+  const call = spy.mock.calls.at(-1);
+  expect(call).toBeDefined();
+  return call ?? [];
 }
 
 async function flushWebSocketEvent(): Promise<void> {
@@ -529,43 +537,35 @@ async function flushWebSocketEvent(): Promise<void> {
 
 function createDataSourceManagerSpy(
   executeImpl: NgxLowcodeDataSourceManager['execute']
-): NgxLowcodeDataSourceManager & { execute: jasmine.Spy } {
-  const execute = jasmine.createSpy('dataSourceManager.execute').and.callFake(executeImpl);
+): NgxLowcodeDataSourceManager & { execute: Mock } {
+  const execute = vi.fn(executeImpl);
   return {
     execute
   };
 }
 
-function createActionManagerSpy(): NgxLowcodeActionManager & { execute: jasmine.Spy } {
-  const execute = jasmine.createSpy('actionManager.execute').and.resolveTo(undefined);
+function createActionManagerSpy(): NgxLowcodeActionManager & { execute: Mock } {
+  const execute = vi.fn().mockResolvedValue(undefined);
   return {
     execute
   };
 }
 
 function createWebSocketManagerSpy(overrides?: {
-  connect?: void | Promise<void>;
-  subscribe?: void | Promise<void>;
-  unsubscribe?: void | Promise<void>;
-  disconnect?: void | Promise<void>;
+  connect?: () => void | Promise<void>;
+  subscribe?: () => void | Promise<void>;
+  unsubscribe?: () => void | Promise<void>;
+  disconnect?: () => void | Promise<void>;
 }): NgxLowcodeWebSocketManager & {
-  connect: jasmine.Spy;
-  subscribe: jasmine.Spy;
-  unsubscribe: jasmine.Spy;
-  disconnect: jasmine.Spy;
+  connect: Mock;
+  subscribe: Mock;
+  unsubscribe: Mock;
+  disconnect: Mock;
 } {
   return {
-    connect: jasmine
-      .createSpy('webSocketManager.connect')
-      .and.callFake(() => overrides?.connect ?? Promise.resolve(undefined)),
-    subscribe: jasmine
-      .createSpy('webSocketManager.subscribe')
-      .and.callFake(() => overrides?.subscribe ?? Promise.resolve(undefined)),
-    unsubscribe: jasmine
-      .createSpy('webSocketManager.unsubscribe')
-      .and.callFake(() => overrides?.unsubscribe ?? Promise.resolve(undefined)),
-    disconnect: jasmine
-      .createSpy('webSocketManager.disconnect')
-      .and.callFake(() => overrides?.disconnect ?? Promise.resolve(undefined))
+    connect: vi.fn(() => overrides?.connect?.() ?? Promise.resolve(undefined)),
+    subscribe: vi.fn(() => overrides?.subscribe?.() ?? Promise.resolve(undefined)),
+    unsubscribe: vi.fn(() => overrides?.unsubscribe?.() ?? Promise.resolve(undefined)),
+    disconnect: vi.fn(() => overrides?.disconnect?.() ?? Promise.resolve(undefined))
   };
 }

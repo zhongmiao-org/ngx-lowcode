@@ -42,11 +42,11 @@ describe('ngx-lowcode-meta-model', () => {
     const issues = validateMetaModelDraft(model);
 
     expect(issues).toEqual(
-      jasmine.arrayContaining([
-        jasmine.objectContaining({ path: 'tables.0.columns.2.name' }),
-        jasmine.objectContaining({ path: 'relations.0.fromColumnId' }),
-        jasmine.objectContaining({ path: 'relations.0.toTableId' }),
-        jasmine.objectContaining({ path: 'indexes.0.columnIds.0' })
+      expect.arrayContaining([
+        expect.objectContaining({ path: 'tables.0.columns.2.name' }),
+        expect.objectContaining({ path: 'relations.0.fromColumnId' }),
+        expect.objectContaining({ path: 'relations.0.toTableId' }),
+        expect.objectContaining({ path: 'indexes.0.columnIds.0' })
       ])
     );
   });
@@ -55,17 +55,17 @@ describe('ngx-lowcode-meta-model', () => {
     const schemaDraft = toMetaSchemaDraft(createCommerceModelPreset());
 
     expect(schemaDraft.tables[0]).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         name: 'orders'
       })
     );
     expect(schemaDraft.relations[0]).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         fromTable: 'orders'
       })
     );
     expect(schemaDraft.indexes[0]).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         table: 'orders'
       })
     );
