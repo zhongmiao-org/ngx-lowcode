@@ -19,6 +19,10 @@ export const routes: Routes = [
     loadChildren: () => import('./features/materials/materials-demo.routes').then((module) => module.routes)
   },
   {
+    path: 'table',
+    loadChildren: () => import('./features/table/table-demo.routes').then((module) => module.routes)
+  },
+  {
     path: '**',
     redirectTo: 'renderer'
   }

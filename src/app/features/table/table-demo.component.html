@@ -1,0 +1,19 @@
+<section class="table-demo">
+  <header class="table-demo__header">
+    <div>
+      <h2>Table</h2>
+      <p>Focused table schema with runtime state, datasource refresh, row action, and empty state checks.</p>
+    </div>
+    <div class="table-demo__actions">
+      <button [thyButton]="buttonKinds.primaryOutline" type="button" (click)="runSearch()">Run search</button>
+      <button [thyButton]="buttonKinds.default" type="button" (click)="clearTable()">Clear rows</button>
+      <button [thyButton]="buttonKinds.default" type="button" (click)="resetTable()">Reset rows</button>
+    </div>
+  </header>
+
+  <div class="table-demo__status">{{ status() }}</div>
+
+  <div class="table-demo__stage">
+    <ngx-lowcode-renderer [schema]="schema()" [mode]="'runtime'"></ngx-lowcode-renderer>
+  </div>
+</section>
