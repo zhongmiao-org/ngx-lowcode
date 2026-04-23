@@ -1,4 +1,5 @@
-import { EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
+import { ENVIRONMENT_INITIALIZER, EnvironmentProviders, inject, makeEnvironmentProviders } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
 import {
   defaultActionManager,
   defaultDataSourceManager,
@@ -16,10 +17,12 @@ import {
   createDefaultWebSocketManager,
   createSocketIoWebSocketManager
 } from '@zhongmiao/meta-lc-runtime-angular';
+import { ThyIconRegistry } from 'ngx-tethys/icon';
 import { demoRuntimeMode } from '../demo-runtime-mode';
 import { resolveDemoBffBaseUrl } from './bff-url';
 
 export const DEMO_RUNTIME_WEBSOCKET_NAMESPACE = '/runtime';
+const TETHYS_ICON_SPRITE_PATH = '/assets/icons/defs/svg/sprite.defs.svg';
 
 function createDemoDataSourceManager(): NgxLowcodeDataSourceManager {
   if (demoRuntimeMode === 'offline') {
@@ -53,6 +56,14 @@ export function provideNgxLowcodeDemo(): EnvironmentProviders {
   const webSocketManager = createDemoWebSocketManager();
 
   return makeEnvironmentProviders([
+    provideHttpClient(),
+    {
+      provide: ENVIRONMENT_INITIALIZER,
+      multi: true,
+      useValue: () => {
+        inject(ThyIconRegistry).addSvgIconSet(TETHYS_ICON_SPRITE_PATH);
+      }
+    },
     {
       provide: NGX_LOWCODE_ACTION_MANAGER,
       useValue: actionManager
