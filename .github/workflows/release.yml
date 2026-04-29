@@ -91,6 +91,19 @@ jobs:
             ".github/release-plans/v${VERSION}.json" \
             .tmp/release-pr-body.md
 
+      - name: Format release PR files
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          npx prettier --write \
+            CHANGELOG.md \
+            CHANGELOG.zh-CN.md \
+            ".github/release-plans/v${VERSION}.json" \
+            package-lock.json \
+            projects/*/CHANGELOG.md \
+            projects/*/CHANGELOG.zh-CN.md \
+            projects/*/package.json
+
       - name: Version consistency
         run: npm run version:check
 
