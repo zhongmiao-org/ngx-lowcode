@@ -2,6 +2,10 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+### 🤖 CI
+
+- Include package release notes and release plan metadata in generated GitHub Release bodies.
+
 ## 0.2.1 (2026-04-29)
 
 ### ✨ Added

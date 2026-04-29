@@ -54,6 +54,8 @@ const plan = {
   directCount: metadata.directCount || directPackages.length,
   cascadeCount: metadata.cascadeCount || cascadePackages.length,
   selectedCount: metadata.selectedCount || packages.length,
+  skippedAlreadyAtTargetCount: metadata.skippedAlreadyAtTargetCount || 0,
+  skippedUnchangedSinceBaseCount: metadata.skippedUnchangedSinceBaseCount || 0,
   rootNotes: metadata.rootNotes || { en: '', zh: '' },
   generatedAt: new Date().toISOString(),
   sourceSha: process.env.GITHUB_SHA || ''

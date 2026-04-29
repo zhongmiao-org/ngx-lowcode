@@ -259,7 +259,10 @@ jobs:
       - name: Extract release body
         if: ${{ steps.plan.outputs.skip != 'true' }}
         run: |
-          npm run -s release:body -- "${{ steps.plan.outputs.version }}" CHANGELOG.md > .tmp/release-body.md
+          npm run -s release:body -- \
+            "${{ steps.plan.outputs.version }}" \
+            CHANGELOG.md \
+            "${{ steps.plan.outputs.plan_path }}" > .tmp/release-body.md
 
       - name: Create release tag
         if: ${{ steps.plan.outputs.skip != 'true' }}
