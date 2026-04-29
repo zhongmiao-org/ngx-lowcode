@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### 🧪 Tests
+
+- Added Vitest unit tests for core package.
+
 ## 0.2.1 (2026-04-29)
 
 ### 🧪 Tests
