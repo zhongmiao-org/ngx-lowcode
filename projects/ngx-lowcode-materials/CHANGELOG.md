@@ -2,8 +2,10 @@
 
 ## [Unreleased]
 
-- test(runtime): cover page and section material mode switching directly through runtime context.
-- test(vitest): migrate package tests from Karma/Jasmine to Angular unit-test with Vitest.
+### 🧪 Tests
+
+- Covered page and section material mode switching directly through runtime context.
+- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
 
 ## 0.2.0 (2026-04-21)
 
