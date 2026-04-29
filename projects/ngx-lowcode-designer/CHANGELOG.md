@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.2.1 (2026-04-29)
+
 ### 🧪 Tests
 
 - Assert designer-to-renderer design mode handoff without exercising third-party tab internals.

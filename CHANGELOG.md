@@ -2,6 +2,8 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+## 0.2.1 (2026-04-29)
+
 ### ✨ Added
 
 - Restored a local source-linked demo app with renderer, designer, and materials modules plus online/offline runtime modes.
@@ -15,6 +17,76 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 ### 🤖 CI
 
 - Generate reviewable release PRs before publishing and publish merged plans after CI.
+
+## Released Packages
+
+### @zhongmiao/ngx-lowcode-core@0.2.1
+
+### 🧪 Tests
+
+- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
+
+### @zhongmiao/ngx-lowcode-core-types@0.2.1
+
+### 🧪 Tests
+
+- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
+
+### @zhongmiao/ngx-lowcode-core-utils@0.2.1
+
+### 🧪 Tests
+
+- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
+
+### @zhongmiao/ngx-lowcode-datasource@0.2.1
+
+### 🧪 Tests
+
+- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
+
+### @zhongmiao/ngx-lowcode-designer@0.2.1
+
+### 🧪 Tests
+
+- Assert designer-to-renderer design mode handoff without exercising third-party tab internals.
+- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
+
+### @zhongmiao/ngx-lowcode-i18n@0.2.1
+
+### 🧪 Tests
+
+- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
+
+### @zhongmiao/ngx-lowcode-materials@0.2.1
+
+### 🧪 Tests
+
+- Covered page and section material mode switching directly through runtime context.
+- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
+
+### @zhongmiao/ngx-lowcode-meta-model@0.2.1
+
+### 🧪 Tests
+
+- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
+
+### @zhongmiao/ngx-lowcode-puzzle-adapter@0.2.1
+
+### 🧪 Tests
+
+- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
+
+### @zhongmiao/ngx-lowcode-renderer@0.2.1
+
+### 🧪 Tests
+
+- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
+
+### @zhongmiao/ngx-lowcode-testing@0.2.1
+
+### 🧪 Tests
+
+- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
 
 ## 0.2.0 (2026-04-21)
 

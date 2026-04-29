@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## 0.2.1 (2026-04-29)
+
 ### 🧪 测试
 
 - 通过 runtime context 直接覆盖 page 与 section 物料的模式切换。
