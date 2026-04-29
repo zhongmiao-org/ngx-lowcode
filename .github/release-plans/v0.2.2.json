@@ -1,0 +1,25 @@
+{
+  "version": "0.2.2",
+  "tag": "v0.2.2",
+  "distTag": "latest",
+  "labels": ["auto-release", "release-pr"],
+  "aggregate": {
+    "name": "@zhongmiao/ngx-lowcode",
+    "version": "0.2.2"
+  },
+  "directPackages": [],
+  "cascadePackages": [],
+  "packages": [],
+  "candidateCount": 0,
+  "directCount": 0,
+  "cascadeCount": 0,
+  "selectedCount": 0,
+  "skippedAlreadyAtTargetCount": 0,
+  "skippedUnchangedSinceBaseCount": 0,
+  "rootNotes": {
+    "en": "### 🤖 CI\n\n- Include package release notes and release plan metadata in generated GitHub Release bodies.",
+    "zh": "### 🤖 CI\n\n- 在生成的 GitHub Release body 中包含子包发布说明与 release plan 元数据。"
+  },
+  "generatedAt": "2026-04-29T07:08:24.785Z",
+  "sourceSha": "aaca130b226552ff350b3681a2a03bfa7df25588"
+}

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.2.2 (2026-04-29)
+
 ### 🤖 CI
 
 - 在生成的 GitHub Release body 中包含子包发布说明与 release plan 元数据。
