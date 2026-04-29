@@ -3,6 +3,10 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
+      version:
+        description: Release version, for example 0.3.0
+        required: true
+        type: string
       dist_tag:
         description: npm dist-tag (latest / next)
         required: false
@@ -11,32 +15,50 @@ on:
         options:
           - latest
           - next
-  release:
+  workflow_run:
+    workflows:
+      - CI
     types:
-      - published
-      - prereleased
+      - completed
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 concurrency:
-  group: release-manual-${{ github.ref }}
+  group: release-${{ github.event_name }}-${{ github.event.workflow_run.head_sha || github.ref }}
   cancel-in-progress: false
 
 jobs:
-  prepare:
-    name: Prepare release metadata
+  prepare-release-pr:
+    name: Prepare release PR
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-    outputs:
-      release_sha: ${{ steps.meta.outputs.release_sha }}
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
+      - name: Validate release inputs
+        env:
+          RELEASE_PR_TOKEN: ${{ secrets.RELEASE_PR_TOKEN }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ -z "${RELEASE_PR_TOKEN}" ]]; then
+            echo "RELEASE_PR_TOKEN is not configured."
+            exit 1
+          fi
+
+          if ! [[ "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid release version: ${VERSION}"
+            exit 1
+          fi
+
       - name: Checkout main
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.event_name == 'release' && github.event.release.tag_name || 'main' }}
+          ref: main
           fetch-depth: 0
+          token: ${{ secrets.RELEASE_PR_TOKEN }}
 
       - name: Setup Node
         uses: actions/setup-node@v5
@@ -50,82 +72,162 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Compose release metadata from package changelogs
+      - name: Compose release metadata
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
           mkdir -p .tmp
-          npm run -s release:draft-notes:json > .tmp/release-metadata.json
-          npm run -s release:draft-notes > .tmp/release-draft.md
+          npm run -s release:draft-notes:json -- --version "${VERSION}" > .tmp/release-metadata.json
+          npm run -s release:draft-notes -- --version "${VERSION}" > .tmp/release-draft.md
+
+      - name: Finalize changelogs and versions
+        run: npm run -s release:finalize-unreleased -- .tmp/release-metadata.json
+
+      - name: Refresh package lockfile
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Write release plan
+        env:
+          VERSION: ${{ inputs.version }}
+          DIST_TAG: ${{ inputs.dist_tag }}
+        run: |
+          npm run -s release:write-plan -- \
+            .tmp/release-metadata.json \
+            "${VERSION}" \
+            "${DIST_TAG}" \
+            ".github/release-plans/v${VERSION}.json" \
+            .tmp/release-pr-body.md
 
       - name: Version consistency
         run: npm run version:check
 
-      - name: Capture release commit
-        id: meta
+      - name: Create or update release PR
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PR_TOKEN }}
+          VERSION: ${{ inputs.version }}
         run: |
-          echo "release_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          BRANCH="chore/release/v${VERSION}"
+          TITLE="chore(release): prepare v${VERSION}"
 
-      - name: Upload release metadata artifact
-        uses: actions/upload-artifact@v6
-        with:
-          name: release-metadata
-          path: |
-            .tmp/release-metadata.json
-            .tmp/release-draft.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C "${BRANCH}"
+          git add \
+            CHANGELOG.md \
+            CHANGELOG.zh-CN.md \
+            package-lock.json \
+            ".github/release-plans/v${VERSION}.json" \
+            projects/*/CHANGELOG.md \
+            projects/*/CHANGELOG.zh-CN.md \
+            projects/*/package.json
 
-  publish:
-    name: Publish npm packages
-    needs:
-      - prepare
+          if git diff --cached --quiet; then
+            echo "No release PR changes detected."
+            exit 0
+          fi
+
+          git commit -m "${TITLE}"
+          git push --set-upstream origin "${BRANCH}" --force-with-lease
+
+          gh label create auto-release \
+            --color 0E8A16 \
+            --description "Automated release preparation PR" || true
+          gh label create release-pr \
+            --color 5319E7 \
+            --description "Release preparation PR" || true
+
+          PR_URL="$(gh pr list --base main --head "${BRANCH}" --json url --jq '.[0].url')"
+          if [[ -z "${PR_URL}" ]]; then
+            PR_URL="$(gh pr create \
+              --title "${TITLE}" \
+              --body-file .tmp/release-pr-body.md \
+              --base main \
+              --head "${BRANCH}" \
+              --label auto-release \
+              --label release-pr)"
+            echo "Created release PR: ${PR_URL}"
+          else
+            gh pr edit "${PR_URL}" \
+              --title "${TITLE}" \
+              --body-file .tmp/release-pr-body.md \
+              --add-label auto-release \
+              --add-label release-pr
+            echo "Updated release PR: ${PR_URL}"
+          fi
+
+  publish-after-merge:
+    name: Publish merged release
+    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' }}
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - name: Checkout release commit
         uses: actions/checkout@v5
         with:
-          ref: ${{ needs.prepare.outputs.release_sha }}
+          ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
 
+      - name: Resolve merged release plan
+        id: plan
+        run: |
+          git fetch --tags --force
+          PLAN_FILES="$(git diff-tree --no-commit-id --name-only -r -m HEAD | grep -E '^\.github/release-plans/v[^/]+\.json$' | sort -u || true)"
+          PLAN_COUNT="$(printf '%s\n' "${PLAN_FILES}" | sed '/^$/d' | wc -l | tr -d ' ')"
+
+          if [[ "${PLAN_COUNT}" -eq 0 ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "No merged release plan detected."
+            exit 0
+          fi
+
+          if [[ "${PLAN_COUNT}" -gt 1 ]]; then
+            echo "Multiple release plans were merged in one commit:"
+            printf '%s\n' "${PLAN_FILES}"
+            exit 1
+          fi
+
+          PLAN_FILE="${PLAN_FILES}"
+          VERSION="$(node -e "const fs=require('fs'); const plan=JSON.parse(fs.readFileSync(process.argv[1], 'utf8')); console.log(plan.version || '');" "${PLAN_FILE}")"
+          DIST_TAG="$(node -e "const fs=require('fs'); const plan=JSON.parse(fs.readFileSync(process.argv[1], 'utf8')); console.log(plan.distTag || 'latest');" "${PLAN_FILE}")"
+
+          if [[ -z "${VERSION}" ]]; then
+            echo "Release plan ${PLAN_FILE} is missing version."
+            exit 1
+          fi
+
+          if git rev-parse "v${VERSION}" >/dev/null 2>&1; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Release tag v${VERSION} already exists; skipping publish."
+            exit 0
+          fi
+
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "plan_path=${PLAN_FILE}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "dist_tag=${DIST_TAG}" >> "$GITHUB_OUTPUT"
+
       - name: Setup Node
+        if: ${{ steps.plan.outputs.skip != 'true' }}
         uses: actions/setup-node@v5
         with:
           node-version: 24.3.0
           cache: npm
 
       - name: Pin npm version
+        if: ${{ steps.plan.outputs.skip != 'true' }}
         run: npm i -g npm@11.4.2
 
       - name: Install dependencies
+        if: ${{ steps.plan.outputs.skip != 'true' }}
         run: npm ci
 
-      - name: Download release metadata artifact
-        uses: actions/download-artifact@v6
-        with:
-          name: release-metadata
-          path: .tmp
-
-      - name: Apply batch versions in sandbox
-        run: |
-          node scripts/release/apply-release-batch-versions.mjs \
-            .tmp/release-metadata.json \
-            .tmp/release-plan.json
-
       - name: Build libraries
+        if: ${{ steps.plan.outputs.skip != 'true' }}
         run: npm run build:libs
 
-      - name: Resolve dist-tag
-        id: dist
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            TAG="${{ inputs.dist_tag }}"
-          elif [[ "${{ github.event.release.prerelease || false }}" == "true" ]]; then
-            TAG="next"
-          else
-            TAG="latest"
-          fi
-          echo "dist_tag=${TAG}" >> "$GITHUB_OUTPUT"
-
       - name: Configure npm auth
+        if: ${{ steps.plan.outputs.skip != 'true' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
@@ -137,99 +239,55 @@ jobs:
           //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
           EOF
 
-      - name: Publish selected packages by release plan
+      - name: Publish selected packages
+        if: ${{ steps.plan.outputs.skip != 'true' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          if [[ -z "${NODE_AUTH_TOKEN}" ]]; then
-            echo "NPM_TOKEN is not configured."
-            exit 1
-          fi
+          mkdir -p .tmp
           node scripts/release/publish-selected-packages.mjs \
-            .tmp/release-metadata.json \
+            "${{ steps.plan.outputs.plan_path }}" \
             .tmp/publish-result.json \
-            "${{ steps.dist.outputs.dist_tag }}"
+            "${{ steps.plan.outputs.dist_tag }}"
 
-      - name: Upload publish result artifact
-        uses: actions/upload-artifact@v6
-        with:
-          name: publish-result
-          path: |
-            .tmp/release-plan.json
-            .tmp/publish-result.json
-
-  finalize-changelog:
-    name: Finalize changelogs and open PR
-    needs:
-      - prepare
-      - publish
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      - name: Checkout main
-        uses: actions/checkout@v5
-        with:
-          ref: main
-          fetch-depth: 0
-
-      - name: Setup Node
-        uses: actions/setup-node@v5
-        with:
-          node-version: 24.3.0
-          cache: npm
-
-      - name: Pin npm version
-        run: npm i -g npm@11.4.2
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Download release metadata artifact
-        uses: actions/download-artifact@v6
-        with:
-          name: release-metadata
-          path: .tmp
-
-      - name: Download publish result artifact
-        uses: actions/download-artifact@v6
-        with:
-          name: publish-result
-          path: .tmp
-
-      - name: Finalize root/package changelogs
+      - name: Extract release body
+        if: ${{ steps.plan.outputs.skip != 'true' }}
         run: |
-          npm run -s release:finalize-unreleased -- .tmp/release-metadata.json .tmp/publish-result.json
+          npm run -s release:body -- "${{ steps.plan.outputs.version }}" CHANGELOG.md > .tmp/release-body.md
 
-      - name: Create changelog PR and enable auto-merge
+      - name: Create release tag
+        if: ${{ steps.plan.outputs.skip != 'true' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.plan.outputs.version }}
         run: |
-          if git diff --quiet -- CHANGELOG.md CHANGELOG.zh-CN.md projects/*/CHANGELOG.md projects/*/CHANGELOG.zh-CN.md projects/*/package.json; then
-            echo "No changelog changes detected."
-            exit 0
-          fi
-
-          VERSION="$(node -p "require('./projects/ngx-lowcode/package.json').version")"
-          BRANCH="chore/changelog-finalize-${VERSION}-${GITHUB_RUN_ID}"
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -c "${BRANCH}"
-          git add CHANGELOG.md CHANGELOG.zh-CN.md projects/*/CHANGELOG.md projects/*/CHANGELOG.zh-CN.md projects/*/package.json
-          git commit -m "chore(changelog): finalize ${VERSION} release logs"
-          git push --set-upstream origin "${BRANCH}"
+          git tag -a "v${VERSION}" -m "Release v${VERSION}"
+          git push origin "v${VERSION}"
 
-          PR_URL="$(gh pr create \
-            --title "chore(changelog): finalize ${VERSION} release logs" \
-            --body "Automated changelog finalize after manual release publish." \
-            --base main \
-            --head "${BRANCH}")"
-          echo "Created changelog PR: ${PR_URL}"
-          if gh pr merge --auto --squash "${PR_URL}"; then
-            echo "Enabled auto-merge for ${PR_URL}"
-          else
-            echo "Auto-merge is unavailable for this repository. Falling back to direct squash merge."
-            gh pr merge --squash --delete-branch "${PR_URL}"
-          fi
+      - name: Create GitHub Release
+        if: ${{ steps.plan.outputs.skip != 'true' }}
+        uses: actions/github-script@v7
+        env:
+          VERSION: ${{ steps.plan.outputs.version }}
+          DIST_TAG: ${{ steps.plan.outputs.dist_tag }}
+          RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
+        with:
+          script: |
+            const fs = require('fs');
+            const version = process.env.VERSION;
+            const tag = `v${version}`;
+            const distTag = process.env.DIST_TAG || 'latest';
+            const body = fs.readFileSync('.tmp/release-body.md', 'utf8');
+
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              target_commitish: process.env.RELEASE_SHA,
+              name: tag,
+              body,
+              draft: false,
+              prerelease: distTag !== 'latest',
+              make_latest: distTag === 'latest' ? 'true' : 'false',
+            });

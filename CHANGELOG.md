@@ -2,6 +2,7 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+- feat(release): generate reviewable release PRs before publishing and publish merged plans after CI.
 - fix(demo): register Tethys SVG icons, keep material image previews offline-safe, and add a focused table demo.
 - test(runtime): align designer/material tests with runtime mode contracts instead of third-party tab internals.
 - test(vitest): migrate library test targets from Karma/Jasmine to Angular unit-test with Vitest.

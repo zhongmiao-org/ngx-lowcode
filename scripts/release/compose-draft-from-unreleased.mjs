@@ -6,7 +6,22 @@ import {
 } from './unreleased-changelog-utils.mjs';
 
 const asJson = process.argv.includes('--json');
-const aggregate = loadAggregatePackage();
+const readArg = (name) => {
+  const index = process.argv.indexOf(name);
+  if (index === -1) return '';
+  return process.argv[index + 1] || '';
+};
+const targetVersionOverride = readArg('--version') || readArg('--target-version');
+if (targetVersionOverride && !/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/.test(targetVersionOverride)) {
+  console.error(`Invalid release version: ${targetVersionOverride}`);
+  process.exit(2);
+}
+
+const currentAggregate = loadAggregatePackage();
+const aggregate = {
+  ...currentAggregate,
+  version: targetVersionOverride || currentAggregate.version
+};
 const rootNotes = loadRootReleaseNotes();
 const workspacePackages = loadPackageReleaseMetadata();
 

@@ -72,7 +72,7 @@ jobs:
 
   changelog-gate:
     name: Changelog gate
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'auto-release') && !contains(github.event.pull_request.labels.*.name, 'release-pr') && !startsWith(github.event.pull_request.head.ref, 'chore/release/v') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
