@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+## 0.2.2 (2026-04-29)
+
+- chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.2.2。
+
 ## 0.2.1 (2026-04-29)
 
 ### 🧪 测试

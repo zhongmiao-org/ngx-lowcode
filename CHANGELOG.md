@@ -2,9 +2,39 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+## 0.2.2 (2026-04-29)
+
 ### 🤖 CI
 
 - Store sanitized release metadata in a fixed release plan file and generate release notes from archived changelog content.
+
+## Released Packages
+
+### @zhongmiao/ngx-lowcode-core@0.2.2
+
+### 🧪 Tests
+
+- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
+
+### @zhongmiao/ngx-lowcode-designer@0.2.2
+
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
+
+### @zhongmiao/ngx-lowcode-materials@0.2.2
+
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
+
+### @zhongmiao/ngx-lowcode-puzzle-adapter@0.2.2
+
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
+
+### @zhongmiao/ngx-lowcode-renderer@0.2.2
+
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
+
+### @zhongmiao/ngx-lowcode-testing@0.2.2
+
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
 
 ## 0.2.1 (2026-04-29)
 
