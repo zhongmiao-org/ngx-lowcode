@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## 0.2.3 (2026-04-29)
+
+### 🔧 Changed
+
+- Aligned @zhongmiao/ngx-lowcode-core peer dependency from 0.2.2 to 0.2.3 for the release cascade.
+
 ## 0.2.2 (2026-04-29)
 
 ### 🔧 Changed

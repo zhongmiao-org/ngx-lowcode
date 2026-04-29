@@ -2,9 +2,49 @@
 
 ## [Unreleased]
 
+## 0.2.3 (2026-04-29)
+
 ### 🤖 CI
 
 - GitHub Release body 不再包含纯级联包的维护文案，并保留直接变更包的原始 changelog 文案。
+
+## 发布包清单
+
+### @zhongmiao/ngx-lowcode-core@0.2.3
+
+### 🔧 变更
+
+- 新增 core 包发布验证说明，用于检查生成的 release body。
+
+### @zhongmiao/ngx-lowcode-designer@0.2.3
+
+### 🔧 变更
+
+- 因本次联动发布，将 @zhongmiao/ngx-lowcode-core peer dependency 从 0.2.2 更新到 0.2.3。
+
+### @zhongmiao/ngx-lowcode-materials@0.2.3
+
+### 🔧 变更
+
+- 因本次联动发布，将 @zhongmiao/ngx-lowcode-core peer dependency 从 0.2.2 更新到 0.2.3。
+
+### @zhongmiao/ngx-lowcode-puzzle-adapter@0.2.3
+
+### 🔧 变更
+
+- 因本次联动发布，将 @zhongmiao/ngx-lowcode-core peer dependency 从 0.2.2 更新到 0.2.3。
+
+### @zhongmiao/ngx-lowcode-renderer@0.2.3
+
+### 🔧 变更
+
+- 因本次联动发布，将 @zhongmiao/ngx-lowcode-core peer dependency 从 0.2.2 更新到 0.2.3。
+
+### @zhongmiao/ngx-lowcode-testing@0.2.3
+
+### 🔧 变更
+
+- 因本次联动发布，将 @zhongmiao/ngx-lowcode-core peer dependency 从 0.2.2 更新到 0.2.3。
 
 ## 0.2.2 (2026-04-29)
 

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.2.3 (2026-04-29)
+
 ### 🔧 Changed
 
 - Added a core package release validation note for checking generated release bodies.

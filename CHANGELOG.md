@@ -2,9 +2,49 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+## 0.2.3 (2026-04-29)
+
 ### 🤖 CI
 
 - Keep cascade-only package maintenance notes out of GitHub Release bodies and preserve direct package changelog wording.
+
+## Released Packages
+
+### @zhongmiao/ngx-lowcode-core@0.2.3
+
+### 🔧 Changed
+
+- Added a core package release validation note for checking generated release bodies.
+
+### @zhongmiao/ngx-lowcode-designer@0.2.3
+
+### 🔧 Changed
+
+- Updated @zhongmiao/ngx-lowcode-core peer dependency from 0.2.2 to 0.2.3 for the release cascade.
+
+### @zhongmiao/ngx-lowcode-materials@0.2.3
+
+### 🔧 Changed
+
+- Updated @zhongmiao/ngx-lowcode-core peer dependency from 0.2.2 to 0.2.3 for the release cascade.
+
+### @zhongmiao/ngx-lowcode-puzzle-adapter@0.2.3
+
+### 🔧 Changed
+
+- Updated @zhongmiao/ngx-lowcode-core peer dependency from 0.2.2 to 0.2.3 for the release cascade.
+
+### @zhongmiao/ngx-lowcode-renderer@0.2.3
+
+### 🔧 Changed
+
+- Updated @zhongmiao/ngx-lowcode-core peer dependency from 0.2.2 to 0.2.3 for the release cascade.
+
+### @zhongmiao/ngx-lowcode-testing@0.2.3
+
+### 🔧 Changed
+
+- Updated @zhongmiao/ngx-lowcode-core peer dependency from 0.2.2 to 0.2.3 for the release cascade.
 
 ## 0.2.2 (2026-04-29)
 
