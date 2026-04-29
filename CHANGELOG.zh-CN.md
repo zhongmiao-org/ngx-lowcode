@@ -2,9 +2,39 @@
 
 ## [Unreleased]
 
+## 0.2.2 (2026-04-29)
+
 ### 🤖 CI
 
 - 将发布元数据写入固定且精简的 release plan 文件，并从归档后的 changelog 生成 release notes。
+
+## 发布包清单
+
+### @zhongmiao/ngx-lowcode-core@0.2.2
+
+### 🧪 测试
+
+- 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
+### @zhongmiao/ngx-lowcode-designer@0.2.2
+
+- chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.2.2。
+
+### @zhongmiao/ngx-lowcode-materials@0.2.2
+
+- chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.2.2。
+
+### @zhongmiao/ngx-lowcode-puzzle-adapter@0.2.2
+
+- chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.2.2。
+
+### @zhongmiao/ngx-lowcode-renderer@0.2.2
+
+- chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.2.2。
+
+### @zhongmiao/ngx-lowcode-testing@0.2.2
+
+- chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.2.2。
 
 ## 0.2.1 (2026-04-29)
 
