@@ -1,4 +1,4 @@
-name: Release
+name: Pre-release
 
 on:
   workflow_dispatch:
@@ -25,7 +25,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 concurrency:
-  group: release-${{ github.event_name }}-${{ github.event.workflow_run.head_sha || github.ref }}
+  group: pre-release-${{ github.event_name }}-${{ github.event.workflow_run.head_sha || github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -40,14 +40,8 @@ jobs:
     steps:
       - name: Validate release inputs
         env:
-          RELEASE_PR_TOKEN: ${{ secrets.RELEASE_PR_TOKEN }}
           VERSION: ${{ inputs.version }}
         run: |
-          if [[ -z "${RELEASE_PR_TOKEN}" ]]; then
-            echo "RELEASE_PR_TOKEN is not configured."
-            exit 1
-          fi
-
           if ! [[ "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
             echo "Invalid release version: ${VERSION}"
             exit 1
@@ -58,7 +52,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-          token: ${{ secrets.RELEASE_PR_TOKEN }}
+          token: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
 
       - name: Setup Node
         uses: actions/setup-node@v5
@@ -102,11 +96,11 @@ jobs:
 
       - name: Create or update release PR
         env:
-          GH_TOKEN: ${{ secrets.RELEASE_PR_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
           VERSION: ${{ inputs.version }}
         run: |
-          BRANCH="chore/release/v${VERSION}"
-          TITLE="chore(release): prepare v${VERSION}"
+          BRANCH="ci/release/v${VERSION}"
+          TITLE="ci(release): prepare v${VERSION}"
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
