@@ -2,11 +2,15 @@
 
 ## [Unreleased]
 
+### 🔧 Changed
+
+- Added a core package release validation note for checking generated release bodies.
+
 ## 0.2.2 (2026-04-29)
 
 ### 🧪 Tests
 
-- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
+- Added Vitest unit tests for core package.
 
 ## 0.2.1 (2026-04-29)
 

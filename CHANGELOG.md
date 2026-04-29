@@ -2,6 +2,10 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+### 🤖 CI
+
+- Keep cascade-only package maintenance notes out of GitHub Release bodies and preserve direct package changelog wording.
+
 ## 0.2.2 (2026-04-29)
 
 ### 🤖 CI
@@ -14,27 +18,37 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ### 🧪 Tests
 
-- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
+- Added Vitest unit tests for core package.
 
 ### @zhongmiao/ngx-lowcode-designer@0.2.2
 
-- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
+### 🔧 Changed
+
+- Updated @zhongmiao/ngx-lowcode-core peer dependency from 0.2.1 to 0.2.2 for the release cascade.
 
 ### @zhongmiao/ngx-lowcode-materials@0.2.2
 
-- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
+### 🔧 Changed
+
+- Updated @zhongmiao/ngx-lowcode-core peer dependency from 0.2.1 to 0.2.2 for the release cascade.
 
 ### @zhongmiao/ngx-lowcode-puzzle-adapter@0.2.2
 
-- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
+### 🔧 Changed
+
+- Updated @zhongmiao/ngx-lowcode-core peer dependency from 0.2.1 to 0.2.2 for the release cascade.
 
 ### @zhongmiao/ngx-lowcode-renderer@0.2.2
 
-- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
+### 🔧 Changed
+
+- Updated @zhongmiao/ngx-lowcode-core peer dependency from 0.2.1 to 0.2.2 for the release cascade.
 
 ### @zhongmiao/ngx-lowcode-testing@0.2.2
 
-- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
+### 🔧 Changed
+
+- Updated @zhongmiao/ngx-lowcode-core peer dependency from 0.2.1 to 0.2.2 for the release cascade.
 
 ## 0.2.1 (2026-04-29)
 

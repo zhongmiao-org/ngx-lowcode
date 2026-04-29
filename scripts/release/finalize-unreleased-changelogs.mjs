@@ -101,6 +101,30 @@ const syncAggregateDependencies = (aggregateVersion, releasedPackages) => {
   fs.writeFileSync(aggregatePath, `${JSON.stringify(aggregatePkg, null, 2)}\n`, 'utf8');
 };
 
+const formatRootPeerDependencyChangeEn = (change) =>
+  change.from
+    ? `- Updated ${change.name} peer dependency from ${change.from} to ${change.to} for the release cascade.`
+    : `- Updated ${change.name} peer dependency to ${change.to} for the release cascade.`;
+const formatRootPeerDependencyChangeZh = (change) =>
+  change.from
+    ? `- 因本次联动发布，将 ${change.name} peer dependency 从 ${change.from} 更新到 ${change.to}。`
+    : `- 因本次联动发布，将 ${change.name} peer dependency 更新到 ${change.to}。`;
+const cascadeRootNotes = (pkg, locale) => {
+  const changes = Array.isArray(pkg.peerDependencyChanges) ? pkg.peerDependencyChanges : [];
+  const lines = changes.filter((change) => change?.name && change?.to);
+  if (lines.length > 0) {
+    return locale === 'zh'
+      ? `### 🔧 变更\n\n${lines.map(formatRootPeerDependencyChangeZh).join('\n')}`
+      : `### 🔧 Changed\n\n${lines.map(formatRootPeerDependencyChangeEn).join('\n')}`;
+  }
+  return locale === 'zh'
+    ? '### 🔧 变更\n\n- 因内部依赖联动纳入本次发布。'
+    : '### 🔧 Changed\n\n- Included in this release because internal dependencies changed.';
+};
+
+const hasRootPackageNotes = (pkg) =>
+  pkg.selectionReason !== 'cascade_dependency' || pkg.hasRealUnreleasedNotes !== false;
+
 for (const pkg of packages) {
   if (!pkg.unreleasedEn || !pkg.unreleasedZh) {
     console.error(`Package ${pkg.name} must provide both English and Chinese Unreleased content before finalize.`);
@@ -128,7 +152,7 @@ if (shouldFinalizeRoot) {
   for (const pkg of packages) {
     const targetVersion = publishedMap.get(pkg.name)?.version || pkg.version;
     rootLines.push(`### ${pkg.name}@${targetVersion}`);
-    rootLines.push(pkg.unreleasedEn);
+    rootLines.push(hasRootPackageNotes(pkg) ? pkg.unreleasedEn : cascadeRootNotes(pkg, 'en'));
     rootLines.push('');
   }
 
@@ -156,7 +180,7 @@ if (shouldFinalizeRoot) {
     for (const pkg of packages) {
       const targetVersion = publishedMap.get(pkg.name)?.version || pkg.version;
       zhLines.push(`### ${pkg.name}@${targetVersion}`);
-      zhLines.push(pkg.unreleasedZh);
+      zhLines.push(hasRootPackageNotes(pkg) ? pkg.unreleasedZh : cascadeRootNotes(pkg, 'zh'));
       zhLines.push('');
     }
 

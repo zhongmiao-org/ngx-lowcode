@@ -77,6 +77,20 @@ const appendBulletToUnreleased = (filePath, bullet) => {
   lines.splice(insertionIndex, 0, ...insertLines);
   fs.writeFileSync(filePath, `${lines.join('\n').replace(/\n+$/g, '\n')}\n`, 'utf8');
 };
+const formatPeerDependencyChangeEn = (change) =>
+  change.from
+    ? `- Aligned ${change.name} peer dependency from ${change.from} to ${change.to} for the release cascade.`
+    : `- Aligned ${change.name} peer dependency to ${change.to} for the release cascade.`;
+const formatPeerDependencyChangeZh = (change) =>
+  change.from
+    ? `- 在本次联动发布中将 ${change.name} peer dependency 从 ${change.from} 对齐到 ${change.to}。`
+    : `- 在本次联动发布中将 ${change.name} peer dependency 对齐到 ${change.to}。`;
+const cascadePackageNotesEn = (changes) => `### 🔧 Changed
+
+${changes.map(formatPeerDependencyChangeEn).join('\n')}`;
+const cascadePackageNotesZh = (changes) => `### 🔧 变更
+
+${changes.map(formatPeerDependencyChangeZh).join('\n')}`;
 const aggregatePackage = JSON.parse(fs.readFileSync(aggregatePackagePath, 'utf8'));
 aggregatePackage.version = aggregate.version;
 aggregatePackage.dependencies = aggregatePackage.dependencies || {};
@@ -96,6 +110,7 @@ for (const pkg of changedPackages) {
   }
 
   const packageJson = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
+  const sourcePeerDependencies = { ...(packageJson.peerDependencies || {}) };
   packageJson.version = packageVersion;
   packageJson.peerDependencies = packageJson.peerDependencies || {};
   for (const peerName of Object.keys(packageJson.peerDependencies)) {
@@ -107,16 +122,18 @@ for (const pkg of changedPackages) {
   fs.writeFileSync(pkgJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`, 'utf8');
 
   if (pkg.selectionReason === 'cascade_dependency') {
-    const triggerList =
-      Array.isArray(pkg.triggeredBy) && pkg.triggeredBy.length > 0 ? pkg.triggeredBy : ['direct package'];
     const changelogEnPath = pkg.changelogPathEn;
     const changelogZhPath = pkg.changelogPathZh;
-    const bulletEn =
-      pkg.unreleasedEn ||
-      `- chore(release): align peerDependencies for ${triggerList.join(', ')} to ${packageVersion} in release cascade.`;
-    const bulletZh =
-      pkg.unreleasedZh ||
-      `- chore(release): 在本次联动发布中将 ${triggerList.join('、')} 的 peerDependencies 对齐到 ${packageVersion}。`;
+    const peerDependencyChanges =
+      Array.isArray(pkg.peerDependencyChanges) && pkg.peerDependencyChanges.length > 0
+        ? pkg.peerDependencyChanges
+        : (Array.isArray(pkg.triggeredBy) ? pkg.triggeredBy : []).map((dependencyName) => ({
+            name: dependencyName,
+            from: sourcePeerDependencies[dependencyName] || '',
+            to: targetVersionByPackage.get(dependencyName) || aggregate.version
+          }));
+    const bulletEn = pkg.unreleasedEn || cascadePackageNotesEn(peerDependencyChanges);
+    const bulletZh = pkg.unreleasedZh || cascadePackageNotesZh(peerDependencyChanges);
 
     if (changelogEnPath) {
       ensureUnreleasedSection(changelogEnPath, '# Changelog');

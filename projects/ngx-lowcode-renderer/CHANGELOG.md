@@ -4,7 +4,9 @@
 
 ## 0.2.2 (2026-04-29)
 
-- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
+### 🔧 Changed
+
+- Aligned @zhongmiao/ngx-lowcode-core peer dependency from 0.2.1 to 0.2.2 for the release cascade.
 
 ## 0.2.1 (2026-04-29)
 
