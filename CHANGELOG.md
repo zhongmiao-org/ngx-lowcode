@@ -2,9 +2,39 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
+## 0.2.2 (2026-04-29)
+
 ### 🤖 CI
 
 - Include package release notes and release plan metadata in generated GitHub Release bodies.
+
+## Released Packages
+
+### @zhongmiao/ngx-lowcode-core@0.2.2
+
+### 🧪 Tests
+
+- Added Vitest unit tests for core package.
+
+### @zhongmiao/ngx-lowcode-designer@0.2.2
+
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
+
+### @zhongmiao/ngx-lowcode-materials@0.2.2
+
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
+
+### @zhongmiao/ngx-lowcode-puzzle-adapter@0.2.2
+
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
+
+### @zhongmiao/ngx-lowcode-renderer@0.2.2
+
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
+
+### @zhongmiao/ngx-lowcode-testing@0.2.2
+
+- chore(release): align peerDependencies for @zhongmiao/ngx-lowcode-core to 0.2.2 in release cascade.
 
 ## 0.2.1 (2026-04-29)
 

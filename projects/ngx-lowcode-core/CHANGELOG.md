@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.2.2 (2026-04-29)
+
 ### 🧪 Tests
 
 - Added Vitest unit tests for core package.
