@@ -4,7 +4,7 @@
 
 ### 🧪 Tests
 
-- Added Vitest unit tests for core package.
+- Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
 
 ## 0.2.1 (2026-04-29)
 

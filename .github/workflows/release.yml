@@ -88,17 +88,15 @@ jobs:
             .tmp/release-metadata.json \
             "${VERSION}" \
             "${DIST_TAG}" \
-            ".github/release-plans/v${VERSION}.json" \
+            .github/release-plan.json \
             .tmp/release-pr-body.md
 
       - name: Format release PR files
-        env:
-          VERSION: ${{ inputs.version }}
         run: |
           npx prettier --write \
             CHANGELOG.md \
             CHANGELOG.zh-CN.md \
-            ".github/release-plans/v${VERSION}.json" \
+            .github/release-plan.json \
             package-lock.json \
             projects/*/CHANGELOG.md \
             projects/*/CHANGELOG.zh-CN.md \
@@ -122,7 +120,7 @@ jobs:
             CHANGELOG.md \
             CHANGELOG.zh-CN.md \
             package-lock.json \
-            ".github/release-plans/v${VERSION}.json" \
+            .github/release-plan.json \
             projects/*/CHANGELOG.md \
             projects/*/CHANGELOG.zh-CN.md \
             projects/*/package.json
@@ -178,22 +176,19 @@ jobs:
         id: plan
         run: |
           git fetch --tags --force
-          PLAN_FILES="$(git diff-tree --no-commit-id --name-only -r -m HEAD | grep -E '^\.github/release-plans/v[^/]+\.json$' | sort -u || true)"
-          PLAN_COUNT="$(printf '%s\n' "${PLAN_FILES}" | sed '/^$/d' | wc -l | tr -d ' ')"
+          PLAN_FILE=".github/release-plan.json"
 
-          if [[ "${PLAN_COUNT}" -eq 0 ]]; then
+          if ! git diff-tree --no-commit-id --name-only -r -m HEAD | grep -Fxq "${PLAN_FILE}"; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "No merged release plan detected."
             exit 0
           fi
 
-          if [[ "${PLAN_COUNT}" -gt 1 ]]; then
-            echo "Multiple release plans were merged in one commit:"
-            printf '%s\n' "${PLAN_FILES}"
+          if [[ ! -f "${PLAN_FILE}" ]]; then
+            echo "Release plan ${PLAN_FILE} is missing."
             exit 1
           fi
 
-          PLAN_FILE="${PLAN_FILES}"
           VERSION="$(node -e "const fs=require('fs'); const plan=JSON.parse(fs.readFileSync(process.argv[1], 'utf8')); console.log(plan.version || '');" "${PLAN_FILE}")"
           DIST_TAG="$(node -e "const fs=require('fs'); const plan=JSON.parse(fs.readFileSync(process.argv[1], 'utf8')); console.log(plan.distTag || 'latest');" "${PLAN_FILE}")"
 
@@ -261,8 +256,7 @@ jobs:
         run: |
           npm run -s release:body -- \
             "${{ steps.plan.outputs.version }}" \
-            CHANGELOG.md \
-            "${{ steps.plan.outputs.plan_path }}" > .tmp/release-body.md
+            CHANGELOG.md > .tmp/release-body.md
 
       - name: Create release tag
         if: ${{ steps.plan.outputs.skip != 'true' }}

@@ -4,7 +4,7 @@
 
 ### 🤖 CI
 
-- 在生成的 GitHub Release body 中包含子包发布说明与 release plan 元数据。
+- 将发布元数据写入固定且精简的 release plan 文件，并从归档后的 changelog 生成 release notes。
 
 ## 0.2.1 (2026-04-29)
 
