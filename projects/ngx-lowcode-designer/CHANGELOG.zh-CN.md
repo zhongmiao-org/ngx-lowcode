@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+## 0.2.3 (2026-04-29)
+
+### 🔧 变更
+
+- 在本次联动发布中将 @zhongmiao/ngx-lowcode-core peer dependency 从 0.2.2 对齐到 0.2.3。
+
 ## 0.2.2 (2026-04-29)
 
 ### 🔧 变更

@@ -1,184 +1,254 @@
 {
-  "version": "0.2.2",
-  "tag": "v0.2.2",
+  "version": "0.2.3",
+  "tag": "v0.2.3",
   "distTag": "latest",
   "labels": ["auto-release", "release-pr"],
   "aggregate": {
     "name": "@zhongmiao/ngx-lowcode",
-    "version": "0.2.2"
+    "version": "0.2.3"
   },
   "directPackages": [
     {
       "name": "@zhongmiao/ngx-lowcode-core",
-      "version": "0.2.2",
-      "targetVersion": "0.2.2",
-      "sourceVersion": "0.2.1",
+      "version": "0.2.3",
+      "targetVersion": "0.2.3",
+      "sourceVersion": "0.2.2",
       "selectionReason": "direct_change",
       "triggeredBy": [],
       "projectDir": "projects/ngx-lowcode-core",
       "packageJsonPath": "projects/ngx-lowcode-core/package.json",
       "changelogPathEn": "projects/ngx-lowcode-core/CHANGELOG.md",
       "changelogPathZh": "projects/ngx-lowcode-core/CHANGELOG.zh-CN.md",
-      "latestReleaseTag": "v0.2.1",
+      "latestReleaseTag": "v0.2.2",
       "willRewriteInSandbox": true
     }
   ],
   "cascadePackages": [
     {
       "name": "@zhongmiao/ngx-lowcode-designer",
-      "version": "0.2.2",
-      "targetVersion": "0.2.2",
-      "sourceVersion": "0.2.1",
+      "version": "0.2.3",
+      "targetVersion": "0.2.3",
+      "sourceVersion": "0.2.2",
       "selectionReason": "cascade_dependency",
       "triggeredBy": ["@zhongmiao/ngx-lowcode-core"],
       "projectDir": "projects/ngx-lowcode-designer",
       "packageJsonPath": "projects/ngx-lowcode-designer/package.json",
       "changelogPathEn": "projects/ngx-lowcode-designer/CHANGELOG.md",
       "changelogPathZh": "projects/ngx-lowcode-designer/CHANGELOG.zh-CN.md",
-      "latestReleaseTag": "v0.2.1",
-      "willRewriteInSandbox": true
+      "latestReleaseTag": "v0.2.2",
+      "willRewriteInSandbox": true,
+      "peerDependencyChanges": [
+        {
+          "name": "@zhongmiao/ngx-lowcode-core",
+          "from": "0.2.2",
+          "to": "0.2.3"
+        }
+      ]
     },
     {
       "name": "@zhongmiao/ngx-lowcode-materials",
-      "version": "0.2.2",
-      "targetVersion": "0.2.2",
-      "sourceVersion": "0.2.1",
+      "version": "0.2.3",
+      "targetVersion": "0.2.3",
+      "sourceVersion": "0.2.2",
       "selectionReason": "cascade_dependency",
       "triggeredBy": ["@zhongmiao/ngx-lowcode-core"],
       "projectDir": "projects/ngx-lowcode-materials",
       "packageJsonPath": "projects/ngx-lowcode-materials/package.json",
       "changelogPathEn": "projects/ngx-lowcode-materials/CHANGELOG.md",
       "changelogPathZh": "projects/ngx-lowcode-materials/CHANGELOG.zh-CN.md",
-      "latestReleaseTag": "v0.2.1",
-      "willRewriteInSandbox": true
+      "latestReleaseTag": "v0.2.2",
+      "willRewriteInSandbox": true,
+      "peerDependencyChanges": [
+        {
+          "name": "@zhongmiao/ngx-lowcode-core",
+          "from": "0.2.2",
+          "to": "0.2.3"
+        }
+      ]
     },
     {
       "name": "@zhongmiao/ngx-lowcode-puzzle-adapter",
-      "version": "0.2.2",
-      "targetVersion": "0.2.2",
-      "sourceVersion": "0.2.1",
+      "version": "0.2.3",
+      "targetVersion": "0.2.3",
+      "sourceVersion": "0.2.2",
       "selectionReason": "cascade_dependency",
       "triggeredBy": ["@zhongmiao/ngx-lowcode-core"],
       "projectDir": "projects/ngx-lowcode-puzzle-adapter",
       "packageJsonPath": "projects/ngx-lowcode-puzzle-adapter/package.json",
       "changelogPathEn": "projects/ngx-lowcode-puzzle-adapter/CHANGELOG.md",
       "changelogPathZh": "projects/ngx-lowcode-puzzle-adapter/CHANGELOG.zh-CN.md",
-      "latestReleaseTag": "v0.2.1",
-      "willRewriteInSandbox": true
+      "latestReleaseTag": "v0.2.2",
+      "willRewriteInSandbox": true,
+      "peerDependencyChanges": [
+        {
+          "name": "@zhongmiao/ngx-lowcode-core",
+          "from": "0.2.2",
+          "to": "0.2.3"
+        }
+      ]
     },
     {
       "name": "@zhongmiao/ngx-lowcode-renderer",
-      "version": "0.2.2",
-      "targetVersion": "0.2.2",
-      "sourceVersion": "0.2.1",
+      "version": "0.2.3",
+      "targetVersion": "0.2.3",
+      "sourceVersion": "0.2.2",
       "selectionReason": "cascade_dependency",
       "triggeredBy": ["@zhongmiao/ngx-lowcode-core"],
       "projectDir": "projects/ngx-lowcode-renderer",
       "packageJsonPath": "projects/ngx-lowcode-renderer/package.json",
       "changelogPathEn": "projects/ngx-lowcode-renderer/CHANGELOG.md",
       "changelogPathZh": "projects/ngx-lowcode-renderer/CHANGELOG.zh-CN.md",
-      "latestReleaseTag": "v0.2.1",
-      "willRewriteInSandbox": true
+      "latestReleaseTag": "v0.2.2",
+      "willRewriteInSandbox": true,
+      "peerDependencyChanges": [
+        {
+          "name": "@zhongmiao/ngx-lowcode-core",
+          "from": "0.2.2",
+          "to": "0.2.3"
+        }
+      ]
     },
     {
       "name": "@zhongmiao/ngx-lowcode-testing",
-      "version": "0.2.2",
-      "targetVersion": "0.2.2",
-      "sourceVersion": "0.2.1",
+      "version": "0.2.3",
+      "targetVersion": "0.2.3",
+      "sourceVersion": "0.2.2",
       "selectionReason": "cascade_dependency",
       "triggeredBy": ["@zhongmiao/ngx-lowcode-core"],
       "projectDir": "projects/ngx-lowcode-testing",
       "packageJsonPath": "projects/ngx-lowcode-testing/package.json",
       "changelogPathEn": "projects/ngx-lowcode-testing/CHANGELOG.md",
       "changelogPathZh": "projects/ngx-lowcode-testing/CHANGELOG.zh-CN.md",
-      "latestReleaseTag": "v0.2.1",
-      "willRewriteInSandbox": true
+      "latestReleaseTag": "v0.2.2",
+      "willRewriteInSandbox": true,
+      "peerDependencyChanges": [
+        {
+          "name": "@zhongmiao/ngx-lowcode-core",
+          "from": "0.2.2",
+          "to": "0.2.3"
+        }
+      ]
     }
   ],
   "packages": [
     {
       "name": "@zhongmiao/ngx-lowcode-core",
-      "version": "0.2.2",
-      "targetVersion": "0.2.2",
-      "sourceVersion": "0.2.1",
+      "version": "0.2.3",
+      "targetVersion": "0.2.3",
+      "sourceVersion": "0.2.2",
       "selectionReason": "direct_change",
       "triggeredBy": [],
       "projectDir": "projects/ngx-lowcode-core",
       "packageJsonPath": "projects/ngx-lowcode-core/package.json",
       "changelogPathEn": "projects/ngx-lowcode-core/CHANGELOG.md",
       "changelogPathZh": "projects/ngx-lowcode-core/CHANGELOG.zh-CN.md",
-      "latestReleaseTag": "v0.2.1",
+      "latestReleaseTag": "v0.2.2",
       "willRewriteInSandbox": true
     },
     {
       "name": "@zhongmiao/ngx-lowcode-designer",
-      "version": "0.2.2",
-      "targetVersion": "0.2.2",
-      "sourceVersion": "0.2.1",
+      "version": "0.2.3",
+      "targetVersion": "0.2.3",
+      "sourceVersion": "0.2.2",
       "selectionReason": "cascade_dependency",
       "triggeredBy": ["@zhongmiao/ngx-lowcode-core"],
       "projectDir": "projects/ngx-lowcode-designer",
       "packageJsonPath": "projects/ngx-lowcode-designer/package.json",
       "changelogPathEn": "projects/ngx-lowcode-designer/CHANGELOG.md",
       "changelogPathZh": "projects/ngx-lowcode-designer/CHANGELOG.zh-CN.md",
-      "latestReleaseTag": "v0.2.1",
-      "willRewriteInSandbox": true
+      "latestReleaseTag": "v0.2.2",
+      "willRewriteInSandbox": true,
+      "peerDependencyChanges": [
+        {
+          "name": "@zhongmiao/ngx-lowcode-core",
+          "from": "0.2.2",
+          "to": "0.2.3"
+        }
+      ]
     },
     {
       "name": "@zhongmiao/ngx-lowcode-materials",
-      "version": "0.2.2",
-      "targetVersion": "0.2.2",
-      "sourceVersion": "0.2.1",
+      "version": "0.2.3",
+      "targetVersion": "0.2.3",
+      "sourceVersion": "0.2.2",
       "selectionReason": "cascade_dependency",
       "triggeredBy": ["@zhongmiao/ngx-lowcode-core"],
       "projectDir": "projects/ngx-lowcode-materials",
       "packageJsonPath": "projects/ngx-lowcode-materials/package.json",
       "changelogPathEn": "projects/ngx-lowcode-materials/CHANGELOG.md",
       "changelogPathZh": "projects/ngx-lowcode-materials/CHANGELOG.zh-CN.md",
-      "latestReleaseTag": "v0.2.1",
-      "willRewriteInSandbox": true
+      "latestReleaseTag": "v0.2.2",
+      "willRewriteInSandbox": true,
+      "peerDependencyChanges": [
+        {
+          "name": "@zhongmiao/ngx-lowcode-core",
+          "from": "0.2.2",
+          "to": "0.2.3"
+        }
+      ]
     },
     {
       "name": "@zhongmiao/ngx-lowcode-puzzle-adapter",
-      "version": "0.2.2",
-      "targetVersion": "0.2.2",
-      "sourceVersion": "0.2.1",
+      "version": "0.2.3",
+      "targetVersion": "0.2.3",
+      "sourceVersion": "0.2.2",
       "selectionReason": "cascade_dependency",
       "triggeredBy": ["@zhongmiao/ngx-lowcode-core"],
       "projectDir": "projects/ngx-lowcode-puzzle-adapter",
       "packageJsonPath": "projects/ngx-lowcode-puzzle-adapter/package.json",
       "changelogPathEn": "projects/ngx-lowcode-puzzle-adapter/CHANGELOG.md",
       "changelogPathZh": "projects/ngx-lowcode-puzzle-adapter/CHANGELOG.zh-CN.md",
-      "latestReleaseTag": "v0.2.1",
-      "willRewriteInSandbox": true
+      "latestReleaseTag": "v0.2.2",
+      "willRewriteInSandbox": true,
+      "peerDependencyChanges": [
+        {
+          "name": "@zhongmiao/ngx-lowcode-core",
+          "from": "0.2.2",
+          "to": "0.2.3"
+        }
+      ]
     },
     {
       "name": "@zhongmiao/ngx-lowcode-renderer",
-      "version": "0.2.2",
-      "targetVersion": "0.2.2",
-      "sourceVersion": "0.2.1",
+      "version": "0.2.3",
+      "targetVersion": "0.2.3",
+      "sourceVersion": "0.2.2",
       "selectionReason": "cascade_dependency",
       "triggeredBy": ["@zhongmiao/ngx-lowcode-core"],
       "projectDir": "projects/ngx-lowcode-renderer",
       "packageJsonPath": "projects/ngx-lowcode-renderer/package.json",
       "changelogPathEn": "projects/ngx-lowcode-renderer/CHANGELOG.md",
       "changelogPathZh": "projects/ngx-lowcode-renderer/CHANGELOG.zh-CN.md",
-      "latestReleaseTag": "v0.2.1",
-      "willRewriteInSandbox": true
+      "latestReleaseTag": "v0.2.2",
+      "willRewriteInSandbox": true,
+      "peerDependencyChanges": [
+        {
+          "name": "@zhongmiao/ngx-lowcode-core",
+          "from": "0.2.2",
+          "to": "0.2.3"
+        }
+      ]
     },
     {
       "name": "@zhongmiao/ngx-lowcode-testing",
-      "version": "0.2.2",
-      "targetVersion": "0.2.2",
-      "sourceVersion": "0.2.1",
+      "version": "0.2.3",
+      "targetVersion": "0.2.3",
+      "sourceVersion": "0.2.2",
       "selectionReason": "cascade_dependency",
       "triggeredBy": ["@zhongmiao/ngx-lowcode-core"],
       "projectDir": "projects/ngx-lowcode-testing",
       "packageJsonPath": "projects/ngx-lowcode-testing/package.json",
       "changelogPathEn": "projects/ngx-lowcode-testing/CHANGELOG.md",
       "changelogPathZh": "projects/ngx-lowcode-testing/CHANGELOG.zh-CN.md",
-      "latestReleaseTag": "v0.2.1",
-      "willRewriteInSandbox": true
+      "latestReleaseTag": "v0.2.2",
+      "willRewriteInSandbox": true,
+      "peerDependencyChanges": [
+        {
+          "name": "@zhongmiao/ngx-lowcode-core",
+          "from": "0.2.2",
+          "to": "0.2.3"
+        }
+      ]
     }
   ],
   "candidateCount": 1,
@@ -187,6 +257,6 @@
   "selectedCount": 6,
   "skippedAlreadyAtTargetCount": 0,
   "skippedUnchangedSinceBaseCount": 0,
-  "generatedAt": "2026-04-29T07:30:24.248Z",
-  "sourceSha": "091eaebaacc4ee614db7b8b9bc70875da4a77183"
+  "generatedAt": "2026-04-29T08:04:41.925Z",
+  "sourceSha": "e238376bd43a418eb7f26bfafca59bf507bd195a"
 }
