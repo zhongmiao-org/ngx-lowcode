@@ -100,10 +100,20 @@ while (queue.length > 0) {
   }
 }
 
-const releaseTemplateEn = (triggerPackages, version) =>
-  `- chore(release): align peerDependencies for ${triggerPackages.join(', ')} to ${version} in release cascade.`;
-const releaseTemplateZh = (triggerPackages, version) =>
-  `- chore(release): 在本次联动发布中将 ${triggerPackages.join('、')} 的 peerDependencies 对齐到 ${version}。`;
+const formatPeerDependencyChangeEn = (change) =>
+  change.from
+    ? `- Aligned ${change.name} peer dependency from ${change.from} to ${change.to} for the release cascade.`
+    : `- Aligned ${change.name} peer dependency to ${change.to} for the release cascade.`;
+const formatPeerDependencyChangeZh = (change) =>
+  change.from
+    ? `- 在本次联动发布中将 ${change.name} peer dependency 从 ${change.from} 对齐到 ${change.to}。`
+    : `- 在本次联动发布中将 ${change.name} peer dependency 对齐到 ${change.to}。`;
+const cascadePackageNotesEn = (changes) => `### 🔧 Changed
+
+${changes.map(formatPeerDependencyChangeEn).join('\n')}`;
+const cascadePackageNotesZh = (changes) => `### 🔧 变更
+
+${changes.map(formatPeerDependencyChangeZh).join('\n')}`;
 
 const cascadePackages = [];
 for (const [pkgName, roots] of cascadeRoots) {
@@ -113,8 +123,12 @@ for (const [pkgName, roots] of cascadeRoots) {
   const triggeredBy = [...roots].sort();
   const sourceVersion = pkg.version;
   const targetVersion = aggregate.version;
-  const syntheticEn = releaseTemplateEn(triggeredBy, targetVersion);
-  const syntheticZh = releaseTemplateZh(triggeredBy, targetVersion);
+  const hasRealUnreleasedNotes = Boolean(pkg.unreleasedEn);
+  const peerDependencyChanges = triggeredBy.map((dependencyName) => ({
+    name: dependencyName,
+    from: pkg.peerDependencies?.[dependencyName] || '',
+    to: targetVersion
+  }));
 
   cascadePackages.push({
     ...pkg,
@@ -124,8 +138,10 @@ for (const [pkgName, roots] of cascadeRoots) {
     selectionReason: 'cascade_dependency',
     willRewriteInSandbox: sourceVersion !== targetVersion,
     triggeredBy,
-    unreleasedEn: pkg.unreleasedEn || syntheticEn,
-    unreleasedZh: pkg.unreleasedZh || syntheticZh
+    peerDependencyChanges,
+    hasRealUnreleasedNotes,
+    unreleasedEn: pkg.unreleasedEn || cascadePackageNotesEn(peerDependencyChanges),
+    unreleasedZh: pkg.unreleasedZh || cascadePackageNotesZh(peerDependencyChanges)
   });
 }
 

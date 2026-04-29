@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### 🤖 CI
+
+- GitHub Release body 不再包含纯级联包的维护文案，并保留直接变更包的原始 changelog 文案。
+
 ## 0.2.2 (2026-04-29)
 
 ### 🤖 CI
@@ -18,23 +22,33 @@
 
 ### @zhongmiao/ngx-lowcode-designer@0.2.2
 
-- chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.2.2。
+### 🔧 变更
+
+- 因本次联动发布，将 @zhongmiao/ngx-lowcode-core peer dependency 从 0.2.1 更新到 0.2.2。
 
 ### @zhongmiao/ngx-lowcode-materials@0.2.2
 
-- chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.2.2。
+### 🔧 变更
+
+- 因本次联动发布，将 @zhongmiao/ngx-lowcode-core peer dependency 从 0.2.1 更新到 0.2.2。
 
 ### @zhongmiao/ngx-lowcode-puzzle-adapter@0.2.2
 
-- chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.2.2。
+### 🔧 变更
+
+- 因本次联动发布，将 @zhongmiao/ngx-lowcode-core peer dependency 从 0.2.1 更新到 0.2.2。
 
 ### @zhongmiao/ngx-lowcode-renderer@0.2.2
 
-- chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.2.2。
+### 🔧 变更
+
+- 因本次联动发布，将 @zhongmiao/ngx-lowcode-core peer dependency 从 0.2.1 更新到 0.2.2。
 
 ### @zhongmiao/ngx-lowcode-testing@0.2.2
 
-- chore(release): 在本次联动发布中将 @zhongmiao/ngx-lowcode-core 的 peerDependencies 对齐到 0.2.2。
+### 🔧 变更
+
+- 因本次联动发布，将 @zhongmiao/ngx-lowcode-core peer dependency 从 0.2.1 更新到 0.2.2。
 
 ## 0.2.1 (2026-04-29)
 

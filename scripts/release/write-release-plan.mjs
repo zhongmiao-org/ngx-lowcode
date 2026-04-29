@@ -55,7 +55,8 @@ const sanitizePackage = (pkg) => {
     'changelogPathEn',
     'changelogPathZh',
     'latestReleaseTag',
-    'willRewriteInSandbox'
+    'willRewriteInSandbox',
+    'peerDependencyChanges'
   ]) {
     if (pkg[key] !== undefined) {
       sanitized[key] = pkg[key];
