@@ -1,11 +1,9 @@
 # Changelog
 
-
 ## [Unreleased]
 
-## 0.2.1 (2026-04-29)
-
 ### 🧪 Tests
+
 - Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
 
 ## 0.1.0 (2026-04-16)
