@@ -1,9 +1,11 @@
 # Changelog
 
+
 ## [Unreleased]
 
-### 🧪 Tests
+## 0.2.1 (2026-04-29)
 
+### 🧪 Tests
 - Assert designer-to-renderer design mode handoff without exercising third-party tab internals.
 - Migrated package tests from Karma/Jasmine to Angular unit-test with Vitest.
 

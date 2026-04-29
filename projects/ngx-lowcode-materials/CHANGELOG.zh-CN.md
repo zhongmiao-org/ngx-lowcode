@@ -2,10 +2,12 @@
 
 [English](CHANGELOG.md) | 中文文档
 
+
 ## [Unreleased]
 
-### 🧪 测试
+## 0.2.1 (2026-04-29)
 
+### 🧪 测试
 - 通过 runtime context 直接覆盖 page 与 section 物料的模式切换。
 - 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
 
