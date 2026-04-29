@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## 0.2.1 (2026-04-29)
+
 ### 🧪 测试
 
 - 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。

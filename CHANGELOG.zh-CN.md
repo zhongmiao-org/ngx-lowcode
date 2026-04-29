@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.2.1 (2026-04-29)
+
 ### ✨ 新增
 
 - 恢复源码直连的本地 demo 应用，包含 renderer、designer、materials 模块以及 online/offline 运行模式。
@@ -15,6 +17,76 @@
 ### 🤖 CI
 
 - 发布前生成可 review 的 release PR，并在合并后通过 CI 发布 release plan。
+
+## 发布包清单
+
+### @zhongmiao/ngx-lowcode-core@0.2.1
+
+### 🧪 测试
+
+- 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
+### @zhongmiao/ngx-lowcode-core-types@0.2.1
+
+### 🧪 测试
+
+- 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
+### @zhongmiao/ngx-lowcode-core-utils@0.2.1
+
+### 🧪 测试
+
+- 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
+### @zhongmiao/ngx-lowcode-datasource@0.2.1
+
+### 🧪 测试
+
+- 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
+### @zhongmiao/ngx-lowcode-designer@0.2.1
+
+### 🧪 测试
+
+- 断言 designer 向 renderer 传递 design mode，不再测试第三方 tab 内部实现。
+- 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
+### @zhongmiao/ngx-lowcode-i18n@0.2.1
+
+### 🧪 测试
+
+- 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
+### @zhongmiao/ngx-lowcode-materials@0.2.1
+
+### 🧪 测试
+
+- 通过 runtime context 直接覆盖 page 与 section 物料的模式切换。
+- 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
+### @zhongmiao/ngx-lowcode-meta-model@0.2.1
+
+### 🧪 测试
+
+- 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
+### @zhongmiao/ngx-lowcode-puzzle-adapter@0.2.1
+
+### 🧪 测试
+
+- 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
+### @zhongmiao/ngx-lowcode-renderer@0.2.1
+
+### 🧪 测试
+
+- 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
+
+### @zhongmiao/ngx-lowcode-testing@0.2.1
+
+### 🧪 测试
+
+- 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
 
 ## 0.2.0 (2026-04-21)
 

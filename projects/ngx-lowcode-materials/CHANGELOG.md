@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.2.1 (2026-04-29)
+
 ### 🧪 Tests
 
 - Covered page and section material mode switching directly through runtime context.
