@@ -2,11 +2,19 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ## [Unreleased]
 
-- fix(demo): register Tethys SVG icons, keep material image previews offline-safe, and add a focused table demo.
-- test(runtime): align designer/material tests with runtime mode contracts instead of third-party tab internals.
-- test(vitest): migrate library test targets from Karma/Jasmine to Angular unit-test with Vitest.
-- feat(demo): restore a local source-linked demo app with renderer, designer, and materials modules plus online/offline runtime modes.
-- feat(local-dev): add watch commands for refreshing linked ngx-lowcode dist packages during host app development.
+### ✨ Added
+
+- Restored a local source-linked demo app with renderer, designer, and materials modules plus online/offline runtime modes.
+- Added watch commands for refreshing linked ngx-lowcode dist packages during host app development.
+
+### 🧪 Tests
+
+- Aligned designer/material tests with runtime mode contracts instead of third-party tab internals.
+- Migrated library test targets from Karma/Jasmine to Angular unit-test with Vitest.
+
+### 🤖 CI
+
+- Generate reviewable release PRs before publishing and publish merged plans after CI.
 
 ## 0.2.0 (2026-04-21)
 

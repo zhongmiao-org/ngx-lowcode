@@ -32,6 +32,8 @@
     "release:apply-batch-versions": "node scripts/release/apply-release-batch-versions.mjs",
     "release:publish-selected": "node scripts/release/publish-selected-packages.mjs",
     "release:finalize-unreleased": "node scripts/release/finalize-unreleased-changelogs.mjs",
+    "release:write-plan": "node scripts/release/write-release-plan.mjs",
+    "release:body": "node scripts/release/extract-release-body.mjs",
     "release:next-version": "node -p \"require('./projects/ngx-lowcode/package.json').version\""
   },
   "private": true,
