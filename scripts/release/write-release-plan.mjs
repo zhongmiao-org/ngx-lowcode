@@ -41,22 +41,44 @@ const packages = Array.isArray(metadata.packages) ? metadata.packages : [];
 const directPackages = Array.isArray(metadata.directPackages) ? metadata.directPackages : [];
 const cascadePackages = Array.isArray(metadata.cascadePackages) ? metadata.cascadePackages : [];
 
+const sanitizePackage = (pkg) => {
+  const sanitized = {};
+  for (const key of [
+    'name',
+    'version',
+    'targetVersion',
+    'sourceVersion',
+    'selectionReason',
+    'triggeredBy',
+    'projectDir',
+    'packageJsonPath',
+    'changelogPathEn',
+    'changelogPathZh',
+    'latestReleaseTag',
+    'willRewriteInSandbox'
+  ]) {
+    if (pkg[key] !== undefined) {
+      sanitized[key] = pkg[key];
+    }
+  }
+  return sanitized;
+};
+
 const plan = {
   version,
   tag: `v${version}`,
   distTag,
   labels: ['auto-release', 'release-pr'],
   aggregate: metadata.aggregate,
-  directPackages,
-  cascadePackages,
-  packages,
+  directPackages: directPackages.map(sanitizePackage),
+  cascadePackages: cascadePackages.map(sanitizePackage),
+  packages: packages.map(sanitizePackage),
   candidateCount: metadata.candidateCount || 0,
   directCount: metadata.directCount || directPackages.length,
   cascadeCount: metadata.cascadeCount || cascadePackages.length,
   selectedCount: metadata.selectedCount || packages.length,
   skippedAlreadyAtTargetCount: metadata.skippedAlreadyAtTargetCount || 0,
   skippedUnchangedSinceBaseCount: metadata.skippedUnchangedSinceBaseCount || 0,
-  rootNotes: metadata.rootNotes || { en: '', zh: '' },
   generatedAt: new Date().toISOString(),
   sourceSha: process.env.GITHUB_SHA || ''
 };

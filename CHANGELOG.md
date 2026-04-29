@@ -4,7 +4,7 @@ English | [中文文档](CHANGELOG.zh-CN.md)
 
 ### 🤖 CI
 
-- Include package release notes and release plan metadata in generated GitHub Release bodies.
+- Store sanitized release metadata in a fixed release plan file and generate release notes from archived changelog content.
 
 ## 0.2.1 (2026-04-29)
 
