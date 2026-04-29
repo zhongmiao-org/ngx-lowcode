@@ -2,12 +2,10 @@
 
 [English](CHANGELOG.md) | 中文文档
 
-
 ## [Unreleased]
 
-## 0.2.1 (2026-04-29)
-
 ### 🧪 测试
+
 - 断言 designer 向 renderer 传递 design mode，不再测试第三方 tab 内部实现。
 - 将包测试从 Karma/Jasmine 迁移到 Angular unit-test 与 Vitest。
 
